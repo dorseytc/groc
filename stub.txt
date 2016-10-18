@@ -1,0 +1,13 @@
+'stash of groc frags for main: 
+
+oc1 = Groc("George", "happy", "red")
+groc2 = Groc("Phillip", "sad", "orange")
+groc1.introduce()
+groc1.identify()
+groc2.introduce()
+groc2.identify()
+groc1.census()
+groc2.census()
+
+
+/usr/lib/python2.7/dist-packages/pygame/examples/

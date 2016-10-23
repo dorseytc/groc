@@ -14,14 +14,26 @@ from pygame.locals import *
 from pygame.compat import geterror
 
 
+K_NONE = 0 
+K_NORTH = 1
+K_EAST = 2
+K_SOUTH = 3
+K_WEST = 4
+K_MAXX = 1000
+K_MAXY = 600
+
 class Groc(pygame.sprite.Sprite):
     'Base class for the groc'
     grocCount = 0    
     datafile = "/home/ted/py/groc/grocfile.dat"
     fieldsep = '|'
     newline = "\n"
+    blank = pygame.Surface((4,4))
+    blank.fill((0,0,0))
+    blankrect = blank.get_rect()
+
     
-    def __init__(self, name, mood, color, x=None, y=None, id=None, birthdatetime=None):
+    def __init__(self, name, mood, color, x=None, y=None, id=None, birthdatetime=None, isMoving=False, direction=0):
         
         # i dont understand this
         super(Groc, self).__init__()
@@ -57,8 +69,45 @@ class Groc(pygame.sprite.Sprite):
             self.x = self.x + 500
         if self.y < 0: 
             self.y = self.y + 300
+        
         self.rect.move_ip(self.x, self.y)
         
+    def setMotion(self, isMoving):
+        self.isMoving = isMoving
+ 
+    def setDirection(self, direction=0):
+        self.direction = direction
+        
+    def moveit(self):
+        if self.isMoving:
+            if self.direction == K_NORTH:
+                self.y += 1
+            elif self.direction == K_SOUTH:
+                self.y -= 1
+            elif self.direction == K_EAST:
+                self.x += 1
+            elif self.direction == K_WEST:
+                self.x -= 1
+                
+                
+        if self.y < 0:
+            self.y = 0
+            self.direction = K_NORTH
+        elif self.y > K_MAXY:
+            self.y = K_MAXY
+            self.direction = K_SOUTH
+        
+        if self.x < 0:
+            self.x = 0 
+            self.direction = K_EAST
+        elif self.x > K_MAXX:
+            self.x = K_MAXX
+            self.direction = K_WEST
+        
+        
+        self.rect.move(self.x, self.y)
+        
+ 
     def introduce(self):
         print "My name is " + self.name + ".  I am " + self.color + " and I am feeling " + self.mood
         
@@ -95,6 +144,7 @@ def main():
         grocsRead += 1
         list = line.split(Groc.fieldsep)
         birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")
+        
         newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
         newGroc.identify()
         grocList.append(newGroc)
@@ -116,7 +166,9 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     running = True
+    counter = 0 
     while running:
+        counter += 1
         for event in pygame.event.get():
         #
         # Plotting the world
@@ -127,16 +179,43 @@ def main():
             elif event.type == QUIT:
                 running = False
         
-        for thisGroc in grocList:            
+        #screen.fill((0, 0, 0))
+        for thisGroc in grocList:     
+            
             screen.blit(thisGroc.surf, thisGroc.rect)
             pygame.display.flip()
         
-        density = 0
-        for anotherGroc in grocList:
-            if anotherGroc.x == thisGroc.x:
-                if anotherGroc.y == thisGroc.y:
-                    density += 1
+            print("This Groc: ", thisGroc.id, thisGroc.x, thisGroc.y)
+            density = 0
+            movingCount = 0
+            for anotherGroc in grocList:
+                print("Another Groc: ", anotherGroc.id, anotherGroc.x, anotherGroc.y)
+                if abs(anotherGroc.x - thisGroc.x) < 20:
+                    if abs(anotherGroc.y - thisGroc.y) < 20:
+                        density += 1
+                if density > 1:
+                    print("Density > 1")
+                    if thisGroc.isMoving:
+                        print('already moving', thisGroc.id)
+                    else:
+                        thisGroc.setMotion(True)
+                        thisGroc.setDirection(numpy.random.random_integers(1,4))
+                        print("Set in motion:  ", thisGroc.id)
                     
+
+                else:
+                    thisGroc.setMotion(False)
+                    
+            if thisGroc.isMoving:
+                movingCount += 1
+                
+            print "Moving Count: " + str(movingCount)
+            if movingCount == 0:           
+                if counter > 50:
+                    running = False
+                    
+            thisGroc.moveit()
+            pygame.display.update()
     
     #
     # Saving The World

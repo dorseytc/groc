@@ -70,43 +70,52 @@ class Groc(pygame.sprite.Sprite):
             self.x = self.x + 500
         if self.y < 0: 
             self.y = self.y + 300
-        
+        self.isMoving = isMoving
+        self.direction = direction
         self.rect.move_ip(self.x, self.y)
         
     def setMotion(self, isMoving):
+        print "SETMOTION", self.id, "isMoving", isMoving
+        
         self.isMoving = isMoving
  
     def setDirection(self, direction=0):
         self.direction = direction
         
-    def moveit(self):
-        if self.isMoving:
+    def update(self):
+        print "UPDATE", self.id, self.isMoving, self.direction, self.rect.top, self.rect.left
+        if self.isMoving == True:
             if self.direction == K_NORTH:
-                self.y += 1
+                self.rect.move_ip(0, -1)
             elif self.direction == K_SOUTH:
-                self.y -= 1
+                self.rect.move_ip(0, 1)
             elif self.direction == K_EAST:
-                self.x += 1
+                self.rect.move_ip(1, 0)
             elif self.direction == K_WEST:
-                self.x -= 1
+                self.rect.move_ip(-1,0)
                 
-                
-        if self.y < 0:
-            self.y = 0
-            self.direction = K_NORTH
-        elif self.y > K_MAXY:
-            self.y = K_MAXY
-            self.direction = K_SOUTH
+        if self.rect.left < 0:
+            self.rect.left = 0
+            if self.direction == K_WEST:
+                self.direction = K_NORTH
+        elif self.rect.right > K_MAXX:
+            self.rect.right = K_MAXX
+            if self.direction == K_EAST:
+                self.direction = K_SOUTH
+        if self.rect.top <= 0:
+            self.rect.top = 0
+            if self.direction == K_NORTH:
+                self.direction = K_EAST
+        elif self.rect.bottom >= K_MAXY:
+            self.rect.bottom = K_MAXY   
+            if self.direction == K_SOUTH:
+                self.direction = K_WEST
         
-        if self.x < 0:
-            self.x = 0 
-            self.direction = K_EAST
-        elif self.x > K_MAXX:
-            self.x = K_MAXX
-            self.direction = K_WEST
+        self.x = self.rect.left
+        self.y = self.rect.top
+        print "UPDATE", self.x, self.y
         
-        
-        self.rect.move(self.x, self.y)
+        #self.rect.move(self.x, self.y)
         
  
     def introduce(self):
@@ -180,43 +189,35 @@ def main():
             elif event.type == QUIT:
                 running = False
         
-        #screen.fill((0, 0, 0))
+        screen.fill((0, 0, 0))
         for thisGroc in grocList:     
             
             screen.blit(thisGroc.surf, thisGroc.rect)
             pygame.display.flip()
         
-            print("This Groc: ", thisGroc.id, thisGroc.x, thisGroc.y)
             density = 0
             movingCount = 0
             for anotherGroc in grocList:
-                print("Another Groc: ", anotherGroc.id, anotherGroc.x, anotherGroc.y)
                 if abs(anotherGroc.x - thisGroc.x) < 20:
                     if abs(anotherGroc.y - thisGroc.y) < 20:
-                        density += 1
+                        density += 1                        
                 if density > 1:
-                    print("Density > 1")
-                    if thisGroc.isMoving:
-                        print('already moving', thisGroc.id)
+                    if thisGroc.isMoving == True:
+                        print "Density>1 isMoving", thisGroc.id, thisGroc.isMoving
                     else:
                         thisGroc.setMotion(True)
                         thisGroc.setDirection(numpy.random.random_integers(1,4))
-                        print("Set in motion:  ", thisGroc.id)
-                    
-
                 else:
                     thisGroc.setMotion(False)
                     
             if thisGroc.isMoving:
                 movingCount += 1
-                
-            print "Moving Count: " + str(movingCount)
             if movingCount == 0:           
-                if counter > 50:
+                if counter > 500:
                     running = False
                     
-            thisGroc.moveit()
-            pygame.display.update()
+            thisGroc.update()
+            screen.blit(thisGroc.surf, thisGroc.rect)
     
     #
     # Saving The World

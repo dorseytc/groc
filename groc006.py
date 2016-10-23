@@ -6,6 +6,7 @@
 #   003     tcd     10/16/16    Retrieving saved world
 #   004     tcd     10/16/16    Improved class and function structure
 #   005     tcd     10/17/16    Rendering via pygame
+#   006     tcd     10/22/16    Some form of pygame hell
 
 import datetime, numpy
 import matplotlib.pyplot as plt

@@ -5,13 +5,16 @@
 #   002     tcd     10/16/16    Saving the world
 #   003     tcd     10/16/16    Retrieving saved world
 #   004     tcd     10/16/16    Improved class and function structure
+#   005     tcd     10/17/16    Rendering via pygame
 
 import datetime, numpy
 import matplotlib.pyplot as plt
+import os, pygame
+from pygame.locals import *
+from pygame.compat import geterror
 
 
-
-class Groc:
+class Groc(pygame.sprite.Sprite):
     'Base class for the groc'
     grocCount = 0    
     datafile = "/home/ted/py/groc/grocfile.dat"
@@ -19,6 +22,15 @@ class Groc:
     newline = "\n"
     
     def __init__(self, name, mood, color, x=None, y=None, id=None, birthdatetime=None):
+        
+        # i dont understand this
+        super(Groc, self).__init__()
+        self.surf = pygame.Surface((4,4))
+        self.surf.fill((255,255,255))
+        self.rect = self.surf.get_rect()
+        
+        
+        
         Groc.grocCount += 1
         self.name = name
         self.mood = mood
@@ -26,11 +38,11 @@ class Groc:
         if x == None:
             self.x = numpy.random.random_integers((-1*(1+Groc.grocCount)), (1+Groc.grocCount))
         else:
-            self.x = x
+            self.x = int(x)
         if y == None:
             self.y = numpy.random.random_integers((-1*(1+Groc.grocCount)), (1+Groc.grocCount))
         else:
-            self.y = y
+            self.y = int(y)
         if id == None:
             self.id = Groc.grocCount
         else:
@@ -41,7 +53,11 @@ class Groc:
             self.birthdatetime = datetime.datetime.now()
         else:
             self.birthdatetime = birthdatetime
-        
+        if self.x < 0: 
+            self.x = self.x + 500
+        if self.y < 0: 
+            self.y = self.y + 300
+        self.rect.move_ip(self.x, self.y)
         
     def introduce(self):
         print "My name is " + self.name + ".  I am " + self.color + " and I am feeling " + self.mood
@@ -97,37 +113,30 @@ def main():
         print 'Retrieved saved grocs'
     grocList[1].census()
     
-    
-    for i in range(1, 3):
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    running = True
+    while running:
+        for event in pygame.event.get():
         #
         # Plotting the world
         #
-        worldsize = 1+ grocList[1].getCount()
-        mapMark = 'g^'
-        world = plt.figure()
-        ax = world.add_subplot(111)
-        p = ax.plot((-1*worldsize), (-1*worldsize), mapMark, (-1*worldsize), worldsize, mapMark, worldsize, worldsize, mapMark, worldsize, (-1*worldsize), mapMark)
-        ax.set_xlabel('X Longitude')
-        ax.set_ylabel('Y Latitude')
-        ax.set_title('Groc World Map')
-        for thisGroc in grocList:
-            thisGroc.introduce()
-            thisGroc.identify()
-            thisGroc.locate()
-            p = ax.plot(thisGroc.x, thisGroc.y, 'bo')       
-        plt.show()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+            elif event.type == QUIT:
+                running = False
         
+        for thisGroc in grocList:            
+            screen.blit(thisGroc.surf, thisGroc.rect)
+            pygame.display.flip()
         
-        for thisGroc in grocList:
-            density = 0
-            for anotherGroc in grocList:
-                if thisGroc.x == anotherGroc.x and thisGroc.y == anotherGroc.y:
+        density = 0
+        for anotherGroc in grocList:
+            if anotherGroc.x == thisGroc.x:
+                if anotherGroc.y == thisGroc.y:
                     density += 1
-            if density > 1:
-                thisGroc.density = density
-                print thisGroc.id, density
-        
-        
+                    
     
     #
     # Saving The World

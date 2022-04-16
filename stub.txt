@@ -10,4 +10,4 @@ groc1.census()
 groc2.census()
 
 
-/usr/lib/python2.7/dist-packages/pygame/examples/
+/usr/lib/python2.7/dist-packages/pygame/examples/stub.txt

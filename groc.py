@@ -27,15 +27,14 @@ class Groc:
         print self.name + " is at " + str(self.latitude) + ", " + str(self.longitude)
         
     def census(self):
-        print "Total Groc Population is ", Groc.grocCount
-        
+        print "Total Groc Population is ", Groc.grocCount        
 
-        
+    def getCount(self):
+        return self.grocCount
 
 grocList = []
 for count in range(0, 10):
     name = 'G'+str(count)
-    print name
     newGroc = Groc(name, 'happy', 'green')
     newGroc.identify()
     newGroc.introduce()
@@ -43,10 +42,20 @@ for count in range(0, 10):
     grocList.append(newGroc)
     
 grocList[count].census()
+worldsize = 1+ grocList[count].getCount()
+mapMark = 'g^'
 
+world = plt.figure()
+ax = world.add_subplot(111)
+p = ax.plot((-1*worldsize), (-1*worldsize), mapMark, (-1*worldsize), worldsize, mapMark, worldsize, worldsize, mapMark, worldsize, (-1*worldsize), mapMark)
+ax.set_xlabel('X Longitude')
+ax.set_ylabel('Y Latitude')
+ax.set_title('Groc World Map')
 for thisGroc in grocList:
     thisGroc.introduce()
     thisGroc.identify()
     thisGroc.locate()
+    p = ax.plot(thisGroc.longitude, thisGroc.latitude, 'bo')
     
-continent = plt.figure()
+
+plt.show()

@@ -4,15 +4,19 @@
 #   001     tcd     10/16/16    Created
 #   002     tcd     10/16/16    Saving the world
 #   003     tcd     10/16/16    Retrieving saved world
+#   004     tcd     10/16/16    Improved class and function structure
 
 import datetime, numpy
 import matplotlib.pyplot as plt
+
+
 
 class Groc:
     'Base class for the groc'
     grocCount = 0    
     datafile = "/home/ted/py/groc/grocfile.dat"
     fieldsep = '|'
+    newline = "\n"
     
     def __init__(self, name, mood, color, x=None, y=None, id=None, birthdatetime=None):
         Groc.grocCount += 1
@@ -60,49 +64,83 @@ class Groc:
 
 
 
+def main():   
+    grocList = [] 
     
-grocList = []
-
-
-savedFile = open(Groc.datafile, "r")
-line = savedFile.readline()
-while line: 
-    list = line.split(Groc.fieldsep)
-    birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")
-    newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
-    newGroc.identify()
-    grocList.append(newGroc)
+    
+    #
+    #Reading the world
+    #
+    
+    savedFile = open(Groc.datafile, "r")
+    grocsRead = 0 
     line = savedFile.readline()
-savedFile.close()
+    while line: 
+        grocsRead += 1
+        list = line.split(Groc.fieldsep)
+        birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")
+        newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
+        newGroc.identify()
+        grocList.append(newGroc)
+        line = savedFile.readline()
+    savedFile.close()      
+    if grocsRead == 0: 
+        for count in range(0, 10):
+            name = 'G'+str(count)
+            newGroc = Groc(name, 'happy', 'green')
+            newGroc.identify()
+            newGroc.introduce()
+            newGroc.locate()
+            grocList.append(newGroc)
+        print 'Spawned grocs'
+    else:
+        print 'Retrieved saved grocs'
+    grocList[1].census()
     
-
     
-grocList[1].census()
-worldsize = 1+ grocList[1].getCount()
-mapMark = 'g^'
-
-world = plt.figure()
-ax = world.add_subplot(111)
-p = ax.plot((-1*worldsize), (-1*worldsize), mapMark, (-1*worldsize), worldsize, mapMark, worldsize, worldsize, mapMark, worldsize, (-1*worldsize), mapMark)
-ax.set_xlabel('X Longitude')
-ax.set_ylabel('Y Latitude')
-ax.set_title('Groc World Map')
-for thisGroc in grocList:
-    thisGroc.introduce()
-    thisGroc.identify()
-    thisGroc.locate()
-    p = ax.plot(thisGroc.x, thisGroc.y, 'bo')
+    for i in range(1, 3):
+        #
+        # Plotting the world
+        #
+        worldsize = 1+ grocList[1].getCount()
+        mapMark = 'g^'
+        world = plt.figure()
+        ax = world.add_subplot(111)
+        p = ax.plot((-1*worldsize), (-1*worldsize), mapMark, (-1*worldsize), worldsize, mapMark, worldsize, worldsize, mapMark, worldsize, (-1*worldsize), mapMark)
+        ax.set_xlabel('X Longitude')
+        ax.set_ylabel('Y Latitude')
+        ax.set_title('Groc World Map')
+        for thisGroc in grocList:
+            thisGroc.introduce()
+            thisGroc.identify()
+            thisGroc.locate()
+            p = ax.plot(thisGroc.x, thisGroc.y, 'bo')       
+        plt.show()
+        
+        
+        for thisGroc in grocList:
+            density = 0
+            for anotherGroc in grocList:
+                if thisGroc.x == anotherGroc.x and thisGroc.y == anotherGroc.y:
+                    density += 1
+            if density > 1:
+                thisGroc.density = density
+                print thisGroc.id, density
+        
+        
     
-
-plt.show()
-
-grocFile = open(Groc.datafile, "w")
-nl = "\n"
-for thisGroc in grocList:
-    grocText = thisGroc.dump()
-    print grocText
-    grocFile.write(grocText+nl)
-
-grocFile.close()
+    #
+    # Saving The World
+    #
+    
+    grocFile = open(Groc.datafile, "w")
+    nl = Groc.newline
+    for thisGroc in grocList:
+        grocText = thisGroc.dump()
+        grocFile.write(grocText+nl)
+        print thisGroc.id, 'saved'
+    grocFile.close()
 
             
+if __name__ == '__main__':
+    main()

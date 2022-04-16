@@ -3,6 +3,7 @@
 #   Version Author  Date        Comment
 #   001     tcd     10/16/16    Created
 #   002     tcd     10/16/16    Saving the world
+#   003     tcd     10/16/16    Retrieving saved world
 
 import datetime, numpy
 import matplotlib.pyplot as plt
@@ -11,6 +12,7 @@ class Groc:
     'Base class for the groc'
     grocCount = 0    
     datafile = "/home/ted/py/groc/grocfile.dat"
+    fieldsep = '|'
     
     def __init__(self, name, mood, color, x=None, y=None, id=None, birthdatetime=None):
         Groc.grocCount += 1
@@ -28,7 +30,9 @@ class Groc:
         if id == None:
             self.id = Groc.grocCount
         else:
-            self.id = id
+            #i think i want these to be uniquely assigned upon creation of the Groc
+            self.id = Groc.grocCount
+            #self.id = id
         if birthdatetime == None:
             self.birthdatetime = datetime.datetime.now()
         else:
@@ -51,27 +55,30 @@ class Groc:
         return self.grocCount
     
     def dump(self):
-        dumpstring = '"' + self.name + '","' + self.mood + '","' + self.color + '",'
-        dumpstring = dumpstring + str(self.x) + ',' + str(self.y) + ',' + str(self.id) + ',"' 
-        dumpstring = dumpstring + self.birthdatetime.strftime("%Y-%m-%d %H:%M") + '"'
-        return dumpstring
-    
+        fs = Groc.fieldsep
+        return self.name + fs + self.mood + fs + self.color + fs + str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + self.birthdatetime.strftime("%Y-%m-%d %H:%M")
+
+
+
     
 grocList = []
 
 
-
-
-for count in range(0, 10):
-    name = 'G'+str(count)
-    newGroc = Groc(name, 'happy', 'green')
+savedFile = open(Groc.datafile, "r")
+line = savedFile.readline()
+while line: 
+    list = line.split(Groc.fieldsep)
+    birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")
+    newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
     newGroc.identify()
-    newGroc.introduce()
-    newGroc.locate()
     grocList.append(newGroc)
+    line = savedFile.readline()
+savedFile.close()
     
-grocList[count].census()
-worldsize = 1+ grocList[count].getCount()
+
+    
+grocList[1].census()
+worldsize = 1+ grocList[1].getCount()
 mapMark = 'g^'
 
 world = plt.figure()
@@ -89,7 +96,7 @@ for thisGroc in grocList:
 
 plt.show()
 
-grocFile = open(datafile, "w")
+grocFile = open(Groc.datafile, "w")
 nl = "\n"
 for thisGroc in grocList:
     grocText = thisGroc.dump()

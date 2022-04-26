@@ -56,7 +56,7 @@ class Groc(pygame.sprite.Sprite):
             self.y = numpy.random.random_integers(0,K_MAXY)
         else:
             self.y = int(y)
-        print "X,Y:", self.x, self.y
+        print ("X,Y:", self.x, self.y)
         if id == None:
             self.id = Groc.grocCount
         else:
@@ -67,13 +67,13 @@ class Groc(pygame.sprite.Sprite):
             self.birthdatetime = datetime.datetime.now()
         else:
             self.birthdatetime = birthdatetime
-        print "X,Y:", self.x, self.y
+        print ("X,Y:", self.x, self.y)
         self.isMoving = isMoving
         self.direction = direction
         self.rect.move_ip(self.x, self.y)
         
     def setMotion(self, isMoving):
-        print "SETMOTION", self.id, "isMoving", isMoving
+        print ("SETMOTION", self.id, "isMoving", isMoving)
         
         self.isMoving = isMoving
  
@@ -81,7 +81,7 @@ class Groc(pygame.sprite.Sprite):
         self.direction = direction
         
     def update(self):
-        print "UPDATE", self.id, self.isMoving, self.direction, self.x, self.y, self.rect.left, self.rect.top
+        print ("UPDATE", self.id, self.isMoving, self.direction, self.x, self.y, self.rect.left, self.rect.top)
         if self.isMoving == True:
             if self.direction == K_NORTH:
                 self.rect.move_ip(0, -1)
@@ -114,20 +114,20 @@ class Groc(pygame.sprite.Sprite):
             self.rect.move(self.x, self.y)
             
         else:
-            print "UPDATE", self.id, "nothing to do"
+            print ("UPDATE", self.id, "nothing to do")
  
     def introduce(self):
-        print "My name is " + self.name + ".  I am " + self.color + " and I am feeling " + self.mood
+        print ("My name is " + self.name + ".  I am " + self.color + " and I am feeling " + self.mood)
         
     def identify(self):
-        print "My ID is " + str(self.id) + " and I was born " + self.birthdatetime.strftime("%Y-%m-%d %H:%M")
+        print ("My ID is " + str(self.id) + " and I was born " + self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
         
     def locate(self):
-        print self.name + " is at " + str(self.y) + ", " + str(self.x)
-        print self.name, "isMoving: ", self.isMoving, "Direction: ", self.direction
+        print (self.name + " is at " + str(self.y) + ", " + str(self.x))
+        print (self.name, "isMoving: ", self.isMoving, "Direction: ", self.direction)
         
     def census(self):
-        print "Total Groc Population is ", Groc.grocCount        
+        print ("Total Groc Population is ", Groc.grocCount        )
 
     def getCount(self):
         return self.grocCount
@@ -152,7 +152,7 @@ def main():
     while line: 
         grocsRead += 1
         list = line.split(Groc.fieldsep)
-        print list
+        print (list)
         birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")        
         newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
         newGroc.identify()
@@ -168,9 +168,9 @@ def main():
             newGroc.introduce()
             newGroc.locate()
             grocList.append(newGroc)
-        print 'Spawned grocs'
+        print ('Spawned grocs')
     else:
-        print 'Retrieved saved grocs'
+        print ('Retrieved saved grocs')
     grocList[1].census()
     
     pygame.init()
@@ -193,39 +193,39 @@ def main():
         
         movingCount = 0
         for thisGroc in grocList:   
-            print "***"
-            print "***"
-            print "*** GROC:", thisGroc.id, thisGroc.isMoving, thisGroc.direction, thisGroc.x, thisGroc.y
-            print "***"
-            print "***"
+            print ("***")
+            print ("***")
+            print ("*** GROC:", thisGroc.id, thisGroc.isMoving, thisGroc.direction, thisGroc.x, thisGroc.y)
+            print ("***")
+            print ("***")
             screen.blit(thisGroc.surf, thisGroc.rect)
             pygame.display.flip()
         
             density = 0
             for anotherGroc in grocList:
                 if anotherGroc.id == thisGroc.id:
-                    print thisGroc.id, "skip myself when evaluating density"
+                    print (thisGroc.id, "skip myself when evaluating density")
                 elif abs(anotherGroc.x - thisGroc.x) < 20:
                     if abs(anotherGroc.y - thisGroc.y) < 20:                        
                         if anotherGroc.isMoving == True: 
-                            print thisGroc.id, "ignoring passers by"
+                            print (thisGroc.id, "ignoring passers by")
                         else:
-                            print thisGroc.id, "somebody already here = density"
+                            print (thisGroc.id, "somebody already here = density")
                             density += 1
                         
             if thisGroc.isMoving == True:
                 if density > 0: 
-                    print thisGroc.id, "already moving", density
+                    print (thisGroc.id, "already moving", density)
                 else:
-                    print thisGroc.id, "stop moving", density
+                    print (thisGroc.id, "stop moving", density)
                     thisGroc.setMotion(False)
             else:
                 if density > 0:
-                    print thisGroc.id, "start moving", density
+                    print (thisGroc.id, "start moving", density)
                     thisGroc.setMotion(True)
                     thisGroc.setDirection(numpy.random.random_integers(1,4))
                 else:
-                    print thisGroc.id, "already stopped", density
+                    print (thisGroc.id, "already stopped", density)
                     
             if thisGroc.isMoving == "True":
                 movingCount += 1
@@ -235,13 +235,12 @@ def main():
             thisGroc.update()            
             screen.blit(thisGroc.surf, thisGroc.rect)
               
-            print "***"
-            print "***"
-            print "*** GROC:", thisGroc.id, thisGroc.isMoving, thisGroc.direction, thisGroc.x, thisGroc.y
-            print "***"
-            print "***"
-            print "****************************************************************************"
-            print "****************************************************************************"
+            print ("***")
+            print ("***")
+            print ("*** GROC:", thisGroc.id, thisGroc.isMoving, thisGroc.direction, thisGroc.x, thisGroc.y)
+            print ("***")
+            print ("***")
+            print ("****************************************************************************")
             
         if movingCount == 0:
             if counter > 30:
@@ -256,7 +255,7 @@ def main():
     for thisGroc in grocList:
         grocText = thisGroc.dump()
         grocFile.write(grocText+nl)
-        print thisGroc.id, 'saved'
+        print (thisGroc.id, 'saved')
     grocFile.close()
 
             

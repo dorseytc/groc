@@ -6,9 +6,9 @@
 #   TDORSEY     10/17/16    Rendering via pygame
 #   TDORSEY     10/22/16    Some form of pygame hell
 #   TDORSEY     04/26/22    Reducing to text based for now
-#   
+#   TDORSEY     04/27/22    Adding logging
 
-import datetime, numpy
+import datetime, numpy, logging
 
 
 K_NONE = 0 
@@ -16,34 +16,43 @@ K_NORTH = 1
 K_EAST = 2
 K_SOUTH = 3
 K_WEST = 4
-K_MAXX = 1000
-K_MAXY = 600
+K_MAXX = 80
+K_MAXY = 24
+K_LIMIT = 2
+K_CYCLE = 1
+Log_Format = "%(levelname)s %(asctime)s - %(message)s"
+logging.basicConfig(filename = "groclog.log", 
+                    filemode = "w", 
+                    format = Log_Format, 
+                    level = logging.DEBUG)
+logger = logging.getLogger()
 
 class Groc():
     'Base class for the groc'
     grocCount = 0    
-    datafile = "/home/ted/git/groc/grocfile.dat"
+    fromfile = "/home/ted/git/groc/grocfile.dat"
+    destfile = "/home/ted/git/groc/grocfile.new"
     fieldsep = '|'
     newline = "\n"
-
     
     def __init__(self, name, mood, color, x=None, y=None, id=None, birthdatetime=None, isMoving=False, direction=0):
         
         super(Groc, self).__init__()
-        
+
         Groc.grocCount += 1
         self.name = name
         self.mood = mood
         self.color = color
         if x == None:
-            self.x = numpy.random.random_integers(0,K_MAXX)            
+            #self.x = numpy.random.random_integers(0,K_MAXX)            
+            self.x = numpy.random.randint(1, K_MAXX)
         else:
             self.x = int(x)
         if y == None:
-            self.y = numpy.random.random_integers(0,K_MAXY)
+            #self.y = numpy.random.random_integers(0,K_MAXY)
+            self.y = numpy.random.randint(0,K_MAXY)
         else:
             self.y = int(y)
-        print ("X,Y:", self.x, self.y)
         if id == None:
             self.id = Groc.grocCount
         else:
@@ -54,20 +63,24 @@ class Groc():
             self.birthdatetime = datetime.datetime.now()
         else:
             self.birthdatetime = birthdatetime
-        print ("X,Y:", self.x, self.y)
         self.isMoving = isMoving
+        logger.debug ("Groc " + str(self.id) + " X,Y:" + str(self.x) + "," + str(self.y))
         self.direction = direction
         
-    def setMotion(self, isMoving):
-        print ("SETMOTION", self.id, "isMoving", isMoving)
         
+        
+# setMotion
+    def setMotion(self, isMoving):
+        logger.debug ("SETMOTION Groc:" + str(self.id) + " isMoving: " + str(isMoving))
         self.isMoving = isMoving
- 
+
+# setDirection
     def setDirection(self, direction=0):
         self.direction = direction
-        
+
+# update        
     def update(self):
-        print ("UPDATE", self.id, self.isMoving, self.direction, self.x, self.y)
+        logger.debug ("UPDATE Groc " + str(self.id) + " isMoving? " + str(self.isMoving) + " Direction? " + str(self.direction) + " " + str(self.x) + "," + str( self.y))
         if self.isMoving == True:
             if self.direction == K_NORTH:
                 self.y += 1
@@ -97,29 +110,43 @@ class Groc():
                 if self.direction == K_SOUTH:
                     self.direction = K_WEST
         else:
-            print ("UPDATE", self.id, "nothing to do")
+            logger.debug ("UPDATE Groc " + str(self.id) + " has nothing to do")
  
+ 
+ 
+ 
+# introduce 
     def introduce(self):
-        print ("My name is " + self.name + ".  I am " + self.color + " and I am feeling " + self.mood)
+        logger.debug ("My name is " + self.name + ".  I am " + self.color + " and I am feeling " + self.mood)
         
+# identify
     def identify(self):
-        print ("My ID is " + str(self.id) + " and I was born " + self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
+        logger.debug ("My ID is " + str(self.id) + " and I was born " + self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
         
+# locate
     def locate(self):
-        print (self.name + " is at " + str(self.y) + ", " + str(self.x))
-        print (self.name, "isMoving: ", self.isMoving, "Direction: ", self.direction)
+        logger.debug ("Groc " + self.name + " is at " + str(self.y) + ", " + str(self.x))
+        logger.debug ("Groc " + self.name + " isMoving: " +str(self.isMoving) +  " Direction: " + str(self.direction))
         
+# census
     def census(self):
-        print ("Total Groc Population is ", Groc.grocCount        )
+        logger.debug ("Total Groc Population is " + str(Groc.grocCount))
 
+# getCount
     def getCount(self):
         return self.grocCount
     
+# dump
     def dump(self):
         fs = Groc.fieldsep
         return self.name + fs + self.mood + fs + self.color + fs + str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + self.birthdatetime.strftime("%Y-%m-%d %H:%M")
 
 
+
+
+
+
+# main
 
 def main():   
     grocList = [] 
@@ -129,13 +156,13 @@ def main():
     #Reading the world
     #
     
-    savedFile = open(Groc.datafile, "r")
+    savedFile = open(Groc.fromfile, "r")
     grocsRead = 0 
     line = savedFile.readline()
     while line: 
         grocsRead += 1
         list = line.split(Groc.fieldsep)
-        print (list)
+        #logger.debug (list)
         birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")        
         newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
         newGroc.identify()
@@ -143,18 +170,18 @@ def main():
         grocList.append(newGroc)
         line = savedFile.readline()
     savedFile.close()      
-    print ("Done reading saved grocs")
+    logger.debug ("Done reading saved grocs")
     if grocsRead == 0: 
-        for count in range(0, 10):
+        for count in range(0, K_LIMIT):
             name = 'G'+str(count)
             newGroc = Groc(name, 'happy', 'green')
             newGroc.identify()
             newGroc.introduce()
             newGroc.locate()
             grocList.append(newGroc)
-        print ('Spawned grocs')
+        logger.debug ('Spawned grocs')
     else:
-        print ('Retrieved saved grocs')
+        logger.debug ('Retrieved saved grocs')
     grocList[1].census()
     
     running = True
@@ -166,45 +193,47 @@ def main():
         # Plotting the world
         #
         for thisGroc in grocList:   
-            print ("***")
-            print ("***")
-            print ("*** GROC:", thisGroc.id, thisGroc.isMoving, thisGroc.direction, thisGroc.x, thisGroc.y)
-            print ("***")
-            print ("***")
+            logger.debug ("***")
+            logger.debug ("***")
+            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
+            logger.debug ("***")
+            logger.debug ("***")
         
             density = 0
             for anotherGroc in grocList:
                 if anotherGroc.id == thisGroc.id:
-                    print (thisGroc.id, "skip myself when evaluating density")
+                    logger.debug ("Groc " + str(thisGroc.id) + " skip myself when evaluating density")
                 elif abs(anotherGroc.x - thisGroc.x) < 20:
                     if abs(anotherGroc.y - thisGroc.y) < 20:                        
                         if anotherGroc.isMoving == True: 
-                            print (thisGroc.id, "ignoring passers by")
+                            logger.debug ("Groc " + str(thisGroc.id) +  "ignoring passers by")
                         else:
-                            print (thisGroc.id, "somebody already here = density")
+                            logger.debug ("Groc " + str(thisGroc.id) +  "somebody already here = density")
                             density += 1
                     else:
-                            print (anotherGroc.id, "Groc is more than 20y away ", anotherGroc.x, anotherGroc.y, ", whereas I am at ", thisGroc.x, thisGroc.y)
+                            logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20y away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
                 else:
-                     print (anotherGroc.id, "groc is more than 20x away ", anotherGroc.x, anotherGroc.y, ", whereas I am at ", thisGroc.x, thisGroc.y)
+                     logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20x away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
                         
             if thisGroc.isMoving == True:
                 if density > 0: 
-                    print (thisGroc.id, "already moving", density)
+                    logger.debug ("Groc " + str(thisGroc.id) +  " already moving. Density "  + str(density))
                 else:
-                    print (thisGroc.id, "stop moving", density)
+                    logger.debug ("Groc " + str(thisGroc.id) +  "stop moving.  Density " + str(density))
                     thisGroc.setMotion(False)
             else:
                 if density > 20:
-                    print (thisGroc.id, "Crowded start moving", density)
+                    logger.debug ("Groc " + str(thisGroc.id) +  " Crowded.  Start moving. Density "  + str(density))
                     thisGroc.setMotion(True)
-                    thisGroc.setDirection(numpy.random.random_integers(1,4))
+                    #thisGroc.setDirection(numpy.random.random_integers(1,4))
+                    thisGroc.setDirection(numpy.random.randint(1,4+1))
                 elif density > 10:
-                    print (thisGroc.id, "already stopped", density)
+                    logger.debug ("Groc " + str(thisGroc.id) +  " Comfortable.  Density "  + str(density))
                 else:
                     thisGroc.setMotion(True)
-                    thisGroc.setDirection(numpy.random.random_integers(1,4))
-                    print (thisGroc.id, "Lonely start moving", density)
+                    #thisGroc.setDirection(numpy.random.random_integers(1,4))
+                    thisGroc.setDirection(numpy.random.randint(1,4+1))
+                    logger.debug ("Groc " + str(thisGroc.id) +  " Lonely, start moving.  Density "  + str(density))
                     
             if thisGroc.isMoving == "True":
                 movingCount += 1
@@ -213,28 +242,27 @@ def main():
                     
             thisGroc.update()            
               
-            print ("***")
-            print ("***")
-            print ("*** GROC: id, isMoving, direction, x, y ***")
-            print ("*** GROC:", thisGroc.id, thisGroc.isMoving, thisGroc.direction, thisGroc.x, thisGroc.y)
-            print ("***")
-            print ("***")
-            print ("****************************************************************************")
+            logger.debug ("***")
+            logger.debug ("***")
+            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
+            logger.debug ("***")
+            logger.debug ("***")
+            logger.debug ("****************************************************************************")
             
         if movingCount == 0:
-            if counter > 30:
+            if counter > K_CYCLE:
                 running = False
     
     #
     # Saving The World
     #
     
-    grocFile = open(Groc.datafile, "w")
+    grocFile = open(Groc.destfile, "w")
     nl = Groc.newline
     for thisGroc in grocList:
         grocText = thisGroc.dump()
         grocFile.write(grocText+nl)
-        print (thisGroc.id, 'saved')
+        logger.debug ("Groc " + str(thisGroc.id) + " saved")
     grocFile.close()
 
             

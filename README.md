@@ -1,2 +1,5 @@
 # groc
-An exploration of object oriented ai
+
+## to run, try something like 
+
+python3 groc.py

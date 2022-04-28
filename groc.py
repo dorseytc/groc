@@ -1,25 +1,35 @@
+#!/usr/bin/python
 #
-#   TDORSEY     10/16/16    Created
-#   TDORSEY     10/16/16    Saving the world
-#   TDORSEY     10/16/16    Retrieving saved world
-#   TDORSEY     10/16/16    Improved class and function structure
-#   TDORSEY     10/17/16    Rendering via pygame
-#   TDORSEY     10/22/16    Some form of pygame hell
-#   TDORSEY     04/26/22    Reducing to text based for now
-#   TDORSEY     04/27/22    Adding logging
+#   TDORSEY     2016-10-16  Created
+#   TDORSEY     2016-10-16  Saving the world
+#   TDORSEY     2016-10-16  Retrieving saved world
+#   TDORSEY     2016-10-16  Improved class and function structure
+#   TDORSEY     2016-10-17  Rendering via pygame
+#   TDORSEY     2016-10-22  Some form of pygame hell
+#   TDORSEY     2022-04-26  Removing pygame in favor of text based 
+#   TDORSEY     2022-04-27  Adding logging
+#                           Configurable loop lengths 
+#   TDORSEY     2022-04-27  Log groc moves separately 
+
 
 import datetime, numpy, logging
 
+# limiters
 
+K_GROC_LIMIT = 2
+K_ITER_LIMIT = 1
+
+# world dimensions
+K_MAXX = 80
+K_MAXY = 24
+
+# cardinal directions
 K_NONE = 0 
 K_NORTH = 1
 K_EAST = 2
 K_SOUTH = 3
 K_WEST = 4
-K_MAXX = 80
-K_MAXY = 24
-K_LIMIT = 2
-K_CYCLE = 1
+
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "groclog.log", 
                     filemode = "w", 
@@ -30,8 +40,8 @@ logger = logging.getLogger()
 class Groc():
     'Base class for the groc'
     grocCount = 0    
-    fromfile = "/home/ted/git/groc/grocfile.dat"
-    destfile = "/home/ted/git/groc/grocfile.new"
+    grocfile = "/home/ted/git/groc/grocfile.dat"
+    worldfile = "/home/ted/git/groc/world.log"
     fieldsep = '|'
     newline = "\n"
     
@@ -150,19 +160,24 @@ class Groc():
 
 def main():   
     grocList = [] 
-    
+    world = []
+    worldline = " " * K_MAXX 
+
+    for i in range(K_MAXY):
+      world.append(str(i).zfill(3) + ":" + worldline) 
+   
+    print (world)
     
     #
     #Reading the world
     #
     
-    savedFile = open(Groc.fromfile, "r")
+    savedFile = open(Groc.grocfile, "r")
     grocsRead = 0 
     line = savedFile.readline()
     while line: 
         grocsRead += 1
         list = line.split(Groc.fieldsep)
-        #logger.debug (list)
         birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")        
         newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
         newGroc.identify()
@@ -172,7 +187,7 @@ def main():
     savedFile.close()      
     logger.debug ("Done reading saved grocs")
     if grocsRead == 0: 
-        for count in range(0, K_LIMIT):
+        for count in range(0, K_GROC_LIMIT):
             name = 'G'+str(count)
             newGroc = Groc(name, 'happy', 'green')
             newGroc.identify()
@@ -182,16 +197,15 @@ def main():
         logger.debug ('Spawned grocs')
     else:
         logger.debug ('Retrieved saved grocs')
-    grocList[1].census()
     
     running = True
     counter = 0 
-    movingCount = 0 
     while running:
         counter += 1
         #
         # Plotting the world
         #
+        movingCount = 0 
         for thisGroc in grocList:   
             logger.debug ("***")
             logger.debug ("***")
@@ -206,10 +220,10 @@ def main():
                 elif abs(anotherGroc.x - thisGroc.x) < 20:
                     if abs(anotherGroc.y - thisGroc.y) < 20:                        
                         if anotherGroc.isMoving == True: 
-                            logger.debug ("Groc " + str(thisGroc.id) +  "ignoring passers by")
+                            logger.debug ("Groc " + str(thisGroc.id) +  " ignoring passers by")
                         else:
-                            logger.debug ("Groc " + str(thisGroc.id) +  "somebody already here = density")
                             density += 1
+                            logger.debug ("Groc " + str(thisGroc.id) +  " somebody already here, density " + str(density ))
                     else:
                             logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20y away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
                 else:
@@ -235,7 +249,8 @@ def main():
                     thisGroc.setDirection(numpy.random.randint(1,4+1))
                     logger.debug ("Groc " + str(thisGroc.id) +  " Lonely, start moving.  Density "  + str(density))
                     
-            if thisGroc.isMoving == "True":
+            logger.debug("Groc " + str(thisGroc.id) + " isMoving:" + str(thisGroc.isMoving))
+            if thisGroc.isMoving == True:
                 movingCount += 1
                 
                 
@@ -249,21 +264,28 @@ def main():
             logger.debug ("***")
             logger.debug ("****************************************************************************")
             
-        if movingCount == 0:
-            if counter > K_CYCLE:
-                running = False
+        logger.debug("Counter: " + str(counter) + " Moving count: " + str(movingCount))
+        #if movingCount == 0:
+        if counter > K_ITER_LIMIT:
+            running = False
     
     #
     # Saving The World
     #
     
-    grocFile = open(Groc.destfile, "w")
+    grocFile = open(Groc.grocfile, "w")
     nl = Groc.newline
     for thisGroc in grocList:
+        worldline = world[thisGroc.y]
+        world[thisGroc.y] = worldline[0:thisGroc.x-1] + "X" + worldline[thisGroc.x:K_MAXX]
         grocText = thisGroc.dump()
         grocFile.write(grocText+nl)
         logger.debug ("Groc " + str(thisGroc.id) + " saved")
     grocFile.close()
+    for i in range(K_MAXY):
+       print(world[i])
+
+    print (world)
 
             
 if __name__ == '__main__':

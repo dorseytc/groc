@@ -2,7 +2,9 @@
 #
 # putpipe.py
 #
-import os, sys
+# TDORSEY 2022-04-28  Created
+#
+import os, sys, time
 
 FIFO_PATH = '/tmp/pipe'
 
@@ -10,14 +12,19 @@ try:
   print("about to try")
   rpipe = open(FIFO_PATH, "r")
 except Exception as e:
-  print (e)
-  sys.exit()
+  print(e)
+  exit()
+
+line = ""
+print ("Opened pipe")
 while True:
   msg = rpipe.read(1)
   if msg == '\n':
     print("newline")
+    print(line)
+    line = ""
   else:
-    print(msg) 
+    line = line + msg
   if len(msg) != 1:
     print("Sender Terminated")
     break

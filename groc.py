@@ -18,7 +18,7 @@ import datetime, numpy, logging
 # limiters
 
 K_GROC_LIMIT = 2
-K_ITER_LIMIT = 30
+K_ITER_LIMIT = 300
 
 # world dimensions
 K_MAXX = 80
@@ -42,7 +42,6 @@ class Groc():
     'Base class for the groc'
     grocCount = 0    
     grocfile = "/home/ted/git/groc/grocfile.dat"
-    worldfile = "/home/ted/git/groc/world.log"
     fieldsep = '|'
     newline = "\n"
     
@@ -161,11 +160,14 @@ class Groc():
 
 def main():   
     grocList = [] 
-    world = []
-    worldline = " " * K_MAXX 
+    grid = [[0 for y in range(K_MAXY+1)] for x in range(K_MAXX+1)]
 
-    for i in range(K_MAXY):
-      world.append(str(i).zfill(3) + ":" + worldline) 
+    for y in range(K_MAXY+1):
+      for x in range(K_MAXX+1):  
+        grid[x][y] = "."
+        print (grid[x][y], end='')
+      print (":")
+    print("") 
     
     #
     #Reading the world
@@ -204,6 +206,9 @@ def main():
         #
         # Plotting the world
         #
+        for y in range(K_MAXY):
+          for x in range(K_MAXX):  
+            grid[x][y] = "."
         movingCount = 0 
         for thisGroc in grocList:   
             logger.debug ("***")
@@ -252,10 +257,10 @@ def main():
             if thisGroc.isMoving == True:
                 movingCount += 1
                 
-                
-                    
             thisGroc.update()            
-              
+            logger.debug ("*** GROC: "  + str(thisGroc.x) + "," + str( thisGroc.y))
+            grid[thisGroc.x][thisGroc.y] = "X"
+
             logger.debug ("***")
             logger.debug ("***")
             logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
@@ -264,7 +269,13 @@ def main():
             logger.debug ("****************************************************************************")
             
         logger.debug("Counter: " + str(counter) + " Moving count: " + str(movingCount))
+
         #if movingCount == 0:
+        for y in range(K_MAXY):
+          for x in range(K_MAXX):  
+            print (grid[x][y], end='')
+          print (":")
+        print("") 
         if counter > K_ITER_LIMIT:
             running = False
     
@@ -275,15 +286,11 @@ def main():
     grocFile = open(Groc.grocfile, "w")
     nl = Groc.newline
     for thisGroc in grocList:
-        worldline = world[thisGroc.y]
-        world[thisGroc.y] = worldline[0:thisGroc.x-1] + "X" + worldline[thisGroc.x:K_MAXX]
         grocText = thisGroc.dump()
         grocFile.write(grocText+nl)
         logger.debug ("Groc " + str(thisGroc.id) + " saved")
     grocFile.close()
 
-    for i in range(K_MAXY):
-       print(world[i])
 
 
             

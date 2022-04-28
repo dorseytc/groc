@@ -10,6 +10,7 @@
 #   TDORSEY     2022-04-27  Adding logging
 #                           Configurable loop lengths 
 #   TDORSEY     2022-04-27  Log groc moves separately 
+#   TDORSEY     2022-04-28  Groc position to stdout for now
 
 
 import datetime, numpy, logging
@@ -17,7 +18,7 @@ import datetime, numpy, logging
 # limiters
 
 K_GROC_LIMIT = 2
-K_ITER_LIMIT = 1
+K_ITER_LIMIT = 30
 
 # world dimensions
 K_MAXX = 80
@@ -165,8 +166,6 @@ def main():
 
     for i in range(K_MAXY):
       world.append(str(i).zfill(3) + ":" + worldline) 
-   
-    print (world)
     
     #
     #Reading the world
@@ -282,10 +281,10 @@ def main():
         grocFile.write(grocText+nl)
         logger.debug ("Groc " + str(thisGroc.id) + " saved")
     grocFile.close()
+
     for i in range(K_MAXY):
        print(world[i])
 
-    print (world)
 
             
 if __name__ == '__main__':

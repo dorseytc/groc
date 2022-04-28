@@ -1,79 +1,1127 @@
-DEBUG 2022-04-27 17:09:56,299 - Groc 1 X,Y:52,5
-DEBUG 2022-04-27 17:09:56,299 - My ID is 1 and I was born 2022-04-27 17:02
-DEBUG 2022-04-27 17:09:56,299 - Groc G0 is at 5, 52
-DEBUG 2022-04-27 17:09:56,299 - Groc G0 isMoving: False Direction: 0
-DEBUG 2022-04-27 17:09:56,299 - Groc 2 X,Y:22,20
-DEBUG 2022-04-27 17:09:56,299 - My ID is 2 and I was born 2022-04-27 17:02
-DEBUG 2022-04-27 17:09:56,299 - Groc G1 is at 20, 22
-DEBUG 2022-04-27 17:09:56,299 - Groc G1 isMoving: False Direction: 0
-DEBUG 2022-04-27 17:09:56,299 - Done reading saved grocs
-DEBUG 2022-04-27 17:09:56,299 - Retrieved saved grocs
-DEBUG 2022-04-27 17:09:56,299 - Total Groc Population is 2
-DEBUG 2022-04-27 17:09:56,299 - ***
-DEBUG 2022-04-27 17:09:56,299 - ***
-DEBUG 2022-04-27 17:09:56,299 - *** GROC: 1 IsMoving? False Direction? 0 52,5
-DEBUG 2022-04-27 17:09:56,299 - ***
-DEBUG 2022-04-27 17:09:56,299 - ***
-DEBUG 2022-04-27 17:09:56,299 - Groc 1 skip myself when evaluating density
-DEBUG 2022-04-27 17:09:56,299 - Groc 2 is more than 20x away 22,20 whereas I am at 52,5
-DEBUG 2022-04-27 17:09:56,299 - SETMOTION Groc:1 isMoving: True
-DEBUG 2022-04-27 17:09:56,300 - Groc 1 Lonely, start moving.  Density 0
-DEBUG 2022-04-27 17:09:56,300 - UPDATE Groc 1 isMoving? True Direction? 3 52,5
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - *** GROC: 1 IsMoving? True Direction? 3 52,4
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ****************************************************************************
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - *** GROC: 2 IsMoving? False Direction? 0 22,20
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - Groc 1 is more than 20x away 52,4 whereas I am at 22,20
-DEBUG 2022-04-27 17:09:56,300 - Groc 2 skip myself when evaluating density
-DEBUG 2022-04-27 17:09:56,300 - SETMOTION Groc:2 isMoving: True
-DEBUG 2022-04-27 17:09:56,300 - Groc 2 Lonely, start moving.  Density 0
-DEBUG 2022-04-27 17:09:56,300 - UPDATE Groc 2 isMoving? True Direction? 4 22,20
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - *** GROC: 2 IsMoving? True Direction? 4 21,20
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ****************************************************************************
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - *** GROC: 1 IsMoving? True Direction? 3 52,4
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - Groc 1 skip myself when evaluating density
-DEBUG 2022-04-27 17:09:56,300 - Groc 2 is more than 20x away 21,20 whereas I am at 52,4
-DEBUG 2022-04-27 17:09:56,300 - Groc 1stop moving.  Density 0
-DEBUG 2022-04-27 17:09:56,300 - SETMOTION Groc:1 isMoving: False
-DEBUG 2022-04-27 17:09:56,300 - UPDATE Groc 1 isMoving? False Direction? 3 52,4
-DEBUG 2022-04-27 17:09:56,300 - UPDATE Groc 1 has nothing to do
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - *** GROC: 1 IsMoving? False Direction? 3 52,4
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,300 - ****************************************************************************
-DEBUG 2022-04-27 17:09:56,300 - ***
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - *** GROC: 2 IsMoving? True Direction? 4 21,20
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - Groc 1 is more than 20x away 52,4 whereas I am at 21,20
-DEBUG 2022-04-27 17:09:56,301 - Groc 2 skip myself when evaluating density
-DEBUG 2022-04-27 17:09:56,301 - Groc 2stop moving.  Density 0
-DEBUG 2022-04-27 17:09:56,301 - SETMOTION Groc:2 isMoving: False
-DEBUG 2022-04-27 17:09:56,301 - UPDATE Groc 2 isMoving? False Direction? 4 21,20
-DEBUG 2022-04-27 17:09:56,301 - UPDATE Groc 2 has nothing to do
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - *** GROC: 2 IsMoving? False Direction? 4 21,20
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - ***
-DEBUG 2022-04-27 17:09:56,301 - ****************************************************************************
-DEBUG 2022-04-27 17:09:56,301 - Groc 1 saved
-DEBUG 2022-04-27 17:09:56,301 - Groc 2 saved
+DEBUG 2022-04-28 16:38:26,815 - Groc 1 X,Y:79,6
+DEBUG 2022-04-28 16:38:26,815 - My ID is 1 and I was born 2022-04-27 17:02
+DEBUG 2022-04-28 16:38:26,815 - Groc G0 is at 6, 79
+DEBUG 2022-04-28 16:38:26,815 - Groc G0 isMoving: False Direction: 0
+DEBUG 2022-04-28 16:38:26,815 - Groc 2 X,Y:15,13
+DEBUG 2022-04-28 16:38:26,815 - My ID is 2 and I was born 2022-04-27 17:02
+DEBUG 2022-04-28 16:38:26,815 - Groc G1 is at 13, 15
+DEBUG 2022-04-28 16:38:26,815 - Groc G1 isMoving: False Direction: 0
+DEBUG 2022-04-28 16:38:26,815 - Done reading saved grocs
+DEBUG 2022-04-28 16:38:26,815 - Retrieved saved grocs
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - *** GROC: 1 IsMoving? False Direction? 0 79,6
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,815 - Groc 2 is more than 20x away 15,13 whereas I am at 79,6
+DEBUG 2022-04-28 16:38:26,815 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,815 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,815 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,815 - UPDATE Groc 1 isMoving? True Direction? 2 79,6
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - *** GROC: 1 IsMoving? True Direction? 2 80,6
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - *** GROC: 2 IsMoving? False Direction? 0 15,13
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - ***
+DEBUG 2022-04-28 16:38:26,815 - Groc 1 is more than 20x away 80,6 whereas I am at 15,13
+DEBUG 2022-04-28 16:38:26,815 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,815 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,816 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,816 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,816 - UPDATE Groc 2 isMoving? True Direction? 3 15,13
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - *** GROC: 2 IsMoving? True Direction? 3 15,12
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,816 - Counter: 1 Moving count: 2
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - *** GROC: 1 IsMoving? True Direction? 2 80,6
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,816 - Groc 2 is more than 20x away 15,12 whereas I am at 80,6
+DEBUG 2022-04-28 16:38:26,816 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,816 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,816 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,816 - UPDATE Groc 1 isMoving? False Direction? 2 80,6
+DEBUG 2022-04-28 16:38:26,816 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - *** GROC: 1 IsMoving? False Direction? 2 80,6
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - *** GROC: 2 IsMoving? True Direction? 3 15,12
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - Groc 1 is more than 20x away 80,6 whereas I am at 15,12
+DEBUG 2022-04-28 16:38:26,816 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,816 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,816 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,816 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,816 - UPDATE Groc 2 isMoving? False Direction? 3 15,12
+DEBUG 2022-04-28 16:38:26,816 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - *** GROC: 2 IsMoving? False Direction? 3 15,12
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,816 - Counter: 2 Moving count: 0
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - *** GROC: 1 IsMoving? False Direction? 2 80,6
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - ***
+DEBUG 2022-04-28 16:38:26,816 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,816 - Groc 2 is more than 20x away 15,12 whereas I am at 80,6
+DEBUG 2022-04-28 16:38:26,817 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,817 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,817 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,817 - UPDATE Groc 1 isMoving? True Direction? 3 80,6
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - *** GROC: 1 IsMoving? True Direction? 3 80,5
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - *** GROC: 2 IsMoving? False Direction? 3 15,12
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - Groc 1 is more than 20x away 80,5 whereas I am at 15,12
+DEBUG 2022-04-28 16:38:26,817 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,817 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,817 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,817 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,817 - UPDATE Groc 2 isMoving? True Direction? 3 15,12
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - *** GROC: 2 IsMoving? True Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,817 - Counter: 3 Moving count: 2
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - *** GROC: 1 IsMoving? True Direction? 3 80,5
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,817 - Groc 2 is more than 20x away 15,11 whereas I am at 80,5
+DEBUG 2022-04-28 16:38:26,817 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,817 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,817 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,817 - UPDATE Groc 1 isMoving? False Direction? 3 80,5
+DEBUG 2022-04-28 16:38:26,817 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - *** GROC: 1 IsMoving? False Direction? 3 80,5
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,817 - *** GROC: 2 IsMoving? True Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,817 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - Groc 1 is more than 20x away 80,5 whereas I am at 15,11
+DEBUG 2022-04-28 16:38:26,818 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,818 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,818 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,818 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,818 - UPDATE Groc 2 isMoving? False Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,818 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - *** GROC: 2 IsMoving? False Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,818 - Counter: 4 Moving count: 0
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - *** GROC: 1 IsMoving? False Direction? 3 80,5
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,818 - Groc 2 is more than 20x away 15,11 whereas I am at 80,5
+DEBUG 2022-04-28 16:38:26,818 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,818 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,818 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,818 - UPDATE Groc 1 isMoving? True Direction? 4 80,5
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - *** GROC: 1 IsMoving? True Direction? 4 79,5
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - *** GROC: 2 IsMoving? False Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - Groc 1 is more than 20x away 79,5 whereas I am at 15,11
+DEBUG 2022-04-28 16:38:26,818 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,818 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,818 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,818 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,818 - UPDATE Groc 2 isMoving? True Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,818 - *** GROC: 2 IsMoving? True Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,818 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,819 - Counter: 5 Moving count: 2
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - *** GROC: 1 IsMoving? True Direction? 4 79,5
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,819 - Groc 2 is more than 20x away 15,10 whereas I am at 79,5
+DEBUG 2022-04-28 16:38:26,819 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,819 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,819 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,819 - UPDATE Groc 1 isMoving? False Direction? 4 79,5
+DEBUG 2022-04-28 16:38:26,819 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - *** GROC: 1 IsMoving? False Direction? 4 79,5
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - *** GROC: 2 IsMoving? True Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - Groc 1 is more than 20x away 79,5 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,819 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,819 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,819 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,819 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,819 - UPDATE Groc 2 isMoving? False Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,819 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - *** GROC: 2 IsMoving? False Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,819 - Counter: 6 Moving count: 0
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - *** GROC: 1 IsMoving? False Direction? 4 79,5
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,819 - Groc 2 is more than 20x away 15,10 whereas I am at 79,5
+DEBUG 2022-04-28 16:38:26,819 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,819 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,819 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,819 - UPDATE Groc 1 isMoving? True Direction? 4 79,5
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,819 - ***
+DEBUG 2022-04-28 16:38:26,820 - *** GROC: 1 IsMoving? True Direction? 4 78,5
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - *** GROC: 2 IsMoving? False Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - Groc 1 is more than 20x away 78,5 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,820 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,820 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,820 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,820 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,820 - UPDATE Groc 2 isMoving? True Direction? 4 15,10
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - *** GROC: 2 IsMoving? True Direction? 4 14,10
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,820 - Counter: 7 Moving count: 2
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - *** GROC: 1 IsMoving? True Direction? 4 78,5
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,820 - Groc 2 is more than 20x away 14,10 whereas I am at 78,5
+DEBUG 2022-04-28 16:38:26,820 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,820 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,820 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,820 - UPDATE Groc 1 isMoving? False Direction? 4 78,5
+DEBUG 2022-04-28 16:38:26,820 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - *** GROC: 1 IsMoving? False Direction? 4 78,5
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - *** GROC: 2 IsMoving? True Direction? 4 14,10
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - Groc 1 is more than 20x away 78,5 whereas I am at 14,10
+DEBUG 2022-04-28 16:38:26,820 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,820 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,820 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,820 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,820 - UPDATE Groc 2 isMoving? False Direction? 4 14,10
+DEBUG 2022-04-28 16:38:26,820 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,820 - ***
+DEBUG 2022-04-28 16:38:26,821 - *** GROC: 2 IsMoving? False Direction? 4 14,10
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,821 - Counter: 8 Moving count: 0
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - *** GROC: 1 IsMoving? False Direction? 4 78,5
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,821 - Groc 2 is more than 20x away 14,10 whereas I am at 78,5
+DEBUG 2022-04-28 16:38:26,821 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,821 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,821 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,821 - UPDATE Groc 1 isMoving? True Direction? 3 78,5
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - *** GROC: 1 IsMoving? True Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - *** GROC: 2 IsMoving? False Direction? 4 14,10
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - Groc 1 is more than 20x away 78,4 whereas I am at 14,10
+DEBUG 2022-04-28 16:38:26,821 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,821 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,821 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,821 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,821 - UPDATE Groc 2 isMoving? True Direction? 2 14,10
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - *** GROC: 2 IsMoving? True Direction? 2 15,10
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,821 - Counter: 9 Moving count: 2
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - *** GROC: 1 IsMoving? True Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,821 - Groc 2 is more than 20x away 15,10 whereas I am at 78,4
+DEBUG 2022-04-28 16:38:26,821 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,821 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,821 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,821 - UPDATE Groc 1 isMoving? False Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,821 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,821 - ***
+DEBUG 2022-04-28 16:38:26,822 - *** GROC: 1 IsMoving? False Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - *** GROC: 2 IsMoving? True Direction? 2 15,10
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - Groc 1 is more than 20x away 78,4 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,822 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,822 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,822 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,822 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,822 - UPDATE Groc 2 isMoving? False Direction? 2 15,10
+DEBUG 2022-04-28 16:38:26,822 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - *** GROC: 2 IsMoving? False Direction? 2 15,10
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,822 - Counter: 10 Moving count: 0
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - *** GROC: 1 IsMoving? False Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,822 - Groc 2 is more than 20x away 15,10 whereas I am at 78,4
+DEBUG 2022-04-28 16:38:26,822 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,822 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,822 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,822 - UPDATE Groc 1 isMoving? True Direction? 4 78,4
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - *** GROC: 1 IsMoving? True Direction? 4 77,4
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - *** GROC: 2 IsMoving? False Direction? 2 15,10
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - ***
+DEBUG 2022-04-28 16:38:26,822 - Groc 1 is more than 20x away 77,4 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,822 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,823 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,823 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,823 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,823 - UPDATE Groc 2 isMoving? True Direction? 2 15,10
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - *** GROC: 2 IsMoving? True Direction? 2 16,10
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,823 - Counter: 11 Moving count: 2
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - *** GROC: 1 IsMoving? True Direction? 4 77,4
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,823 - Groc 2 is more than 20x away 16,10 whereas I am at 77,4
+DEBUG 2022-04-28 16:38:26,823 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,823 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,823 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,823 - UPDATE Groc 1 isMoving? False Direction? 4 77,4
+DEBUG 2022-04-28 16:38:26,823 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - *** GROC: 1 IsMoving? False Direction? 4 77,4
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - *** GROC: 2 IsMoving? True Direction? 2 16,10
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - Groc 1 is more than 20x away 77,4 whereas I am at 16,10
+DEBUG 2022-04-28 16:38:26,823 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,823 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,823 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,823 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,823 - UPDATE Groc 2 isMoving? False Direction? 2 16,10
+DEBUG 2022-04-28 16:38:26,823 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - *** GROC: 2 IsMoving? False Direction? 2 16,10
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,823 - Counter: 12 Moving count: 0
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - *** GROC: 1 IsMoving? False Direction? 4 77,4
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,823 - ***
+DEBUG 2022-04-28 16:38:26,824 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,824 - Groc 2 is more than 20x away 16,10 whereas I am at 77,4
+DEBUG 2022-04-28 16:38:26,824 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,824 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,824 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,824 - UPDATE Groc 1 isMoving? True Direction? 4 77,4
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - *** GROC: 1 IsMoving? True Direction? 4 76,4
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - *** GROC: 2 IsMoving? False Direction? 2 16,10
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - Groc 1 is more than 20x away 76,4 whereas I am at 16,10
+DEBUG 2022-04-28 16:38:26,824 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,824 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,824 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,824 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,824 - UPDATE Groc 2 isMoving? True Direction? 2 16,10
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - *** GROC: 2 IsMoving? True Direction? 2 17,10
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,824 - Counter: 13 Moving count: 2
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - *** GROC: 1 IsMoving? True Direction? 4 76,4
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,824 - Groc 2 is more than 20x away 17,10 whereas I am at 76,4
+DEBUG 2022-04-28 16:38:26,824 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,824 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,824 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,824 - UPDATE Groc 1 isMoving? False Direction? 4 76,4
+DEBUG 2022-04-28 16:38:26,824 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - *** GROC: 1 IsMoving? False Direction? 4 76,4
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - *** GROC: 2 IsMoving? True Direction? 2 17,10
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,824 - ***
+DEBUG 2022-04-28 16:38:26,825 - Groc 1 is more than 20x away 76,4 whereas I am at 17,10
+DEBUG 2022-04-28 16:38:26,825 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,825 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,825 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,825 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,825 - UPDATE Groc 2 isMoving? False Direction? 2 17,10
+DEBUG 2022-04-28 16:38:26,825 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - *** GROC: 2 IsMoving? False Direction? 2 17,10
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,825 - Counter: 14 Moving count: 0
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - *** GROC: 1 IsMoving? False Direction? 4 76,4
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,825 - Groc 2 is more than 20x away 17,10 whereas I am at 76,4
+DEBUG 2022-04-28 16:38:26,825 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,825 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,825 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,825 - UPDATE Groc 1 isMoving? True Direction? 1 76,4
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - *** GROC: 1 IsMoving? True Direction? 1 76,5
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - *** GROC: 2 IsMoving? False Direction? 2 17,10
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - Groc 1 is more than 20x away 76,5 whereas I am at 17,10
+DEBUG 2022-04-28 16:38:26,825 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,825 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,825 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,825 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,825 - UPDATE Groc 2 isMoving? True Direction? 4 17,10
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - *** GROC: 2 IsMoving? True Direction? 4 16,10
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,825 - Counter: 15 Moving count: 2
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - ***
+DEBUG 2022-04-28 16:38:26,825 - *** GROC: 1 IsMoving? True Direction? 1 76,5
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,826 - Groc 2 is more than 20x away 16,10 whereas I am at 76,5
+DEBUG 2022-04-28 16:38:26,826 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,826 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,826 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,826 - UPDATE Groc 1 isMoving? False Direction? 1 76,5
+DEBUG 2022-04-28 16:38:26,826 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - *** GROC: 1 IsMoving? False Direction? 1 76,5
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - *** GROC: 2 IsMoving? True Direction? 4 16,10
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - Groc 1 is more than 20x away 76,5 whereas I am at 16,10
+DEBUG 2022-04-28 16:38:26,826 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,826 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,826 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,826 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,826 - UPDATE Groc 2 isMoving? False Direction? 4 16,10
+DEBUG 2022-04-28 16:38:26,826 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - *** GROC: 2 IsMoving? False Direction? 4 16,10
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,826 - Counter: 16 Moving count: 0
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - *** GROC: 1 IsMoving? False Direction? 1 76,5
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,826 - Groc 2 is more than 20x away 16,10 whereas I am at 76,5
+DEBUG 2022-04-28 16:38:26,826 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,826 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,826 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,826 - UPDATE Groc 1 isMoving? True Direction? 2 76,5
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - *** GROC: 1 IsMoving? True Direction? 2 77,5
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,826 - ***
+DEBUG 2022-04-28 16:38:26,827 - *** GROC: 2 IsMoving? False Direction? 4 16,10
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - Groc 1 is more than 20x away 77,5 whereas I am at 16,10
+DEBUG 2022-04-28 16:38:26,827 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,827 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,827 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,827 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,827 - UPDATE Groc 2 isMoving? True Direction? 4 16,10
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - *** GROC: 2 IsMoving? True Direction? 4 15,10
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,827 - Counter: 17 Moving count: 2
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - *** GROC: 1 IsMoving? True Direction? 2 77,5
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,827 - Groc 2 is more than 20x away 15,10 whereas I am at 77,5
+DEBUG 2022-04-28 16:38:26,827 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,827 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,827 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,827 - UPDATE Groc 1 isMoving? False Direction? 2 77,5
+DEBUG 2022-04-28 16:38:26,827 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - *** GROC: 1 IsMoving? False Direction? 2 77,5
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - *** GROC: 2 IsMoving? True Direction? 4 15,10
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - Groc 1 is more than 20x away 77,5 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,827 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,827 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,827 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,827 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,827 - UPDATE Groc 2 isMoving? False Direction? 4 15,10
+DEBUG 2022-04-28 16:38:26,827 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - *** GROC: 2 IsMoving? False Direction? 4 15,10
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,827 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,827 - Counter: 18 Moving count: 0
+DEBUG 2022-04-28 16:38:26,827 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - *** GROC: 1 IsMoving? False Direction? 2 77,5
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,828 - Groc 2 is more than 20x away 15,10 whereas I am at 77,5
+DEBUG 2022-04-28 16:38:26,828 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,828 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,828 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,828 - UPDATE Groc 1 isMoving? True Direction? 3 77,5
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - *** GROC: 1 IsMoving? True Direction? 3 77,4
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - *** GROC: 2 IsMoving? False Direction? 4 15,10
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - Groc 1 is more than 20x away 77,4 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,828 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,828 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,828 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,828 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,828 - UPDATE Groc 2 isMoving? True Direction? 1 15,10
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - *** GROC: 2 IsMoving? True Direction? 1 15,11
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,828 - Counter: 19 Moving count: 2
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - *** GROC: 1 IsMoving? True Direction? 3 77,4
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,828 - Groc 2 is more than 20x away 15,11 whereas I am at 77,4
+DEBUG 2022-04-28 16:38:26,828 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,828 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,828 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,828 - UPDATE Groc 1 isMoving? False Direction? 3 77,4
+DEBUG 2022-04-28 16:38:26,828 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - *** GROC: 1 IsMoving? False Direction? 3 77,4
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,828 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,828 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - *** GROC: 2 IsMoving? True Direction? 1 15,11
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - Groc 1 is more than 20x away 77,4 whereas I am at 15,11
+DEBUG 2022-04-28 16:38:26,829 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,829 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,829 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,829 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,829 - UPDATE Groc 2 isMoving? False Direction? 1 15,11
+DEBUG 2022-04-28 16:38:26,829 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - *** GROC: 2 IsMoving? False Direction? 1 15,11
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,829 - Counter: 20 Moving count: 0
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - *** GROC: 1 IsMoving? False Direction? 3 77,4
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,829 - Groc 2 is more than 20x away 15,11 whereas I am at 77,4
+DEBUG 2022-04-28 16:38:26,829 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,829 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,829 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,829 - UPDATE Groc 1 isMoving? True Direction? 2 77,4
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - *** GROC: 1 IsMoving? True Direction? 2 78,4
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - *** GROC: 2 IsMoving? False Direction? 1 15,11
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - Groc 1 is more than 20x away 78,4 whereas I am at 15,11
+DEBUG 2022-04-28 16:38:26,829 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,829 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,829 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,829 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,829 - UPDATE Groc 2 isMoving? True Direction? 3 15,11
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - *** GROC: 2 IsMoving? True Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,829 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,829 - Counter: 21 Moving count: 2
+DEBUG 2022-04-28 16:38:26,829 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - *** GROC: 1 IsMoving? True Direction? 2 78,4
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,830 - Groc 2 is more than 20x away 15,10 whereas I am at 78,4
+DEBUG 2022-04-28 16:38:26,830 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,830 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,830 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,830 - UPDATE Groc 1 isMoving? False Direction? 2 78,4
+DEBUG 2022-04-28 16:38:26,830 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - *** GROC: 1 IsMoving? False Direction? 2 78,4
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - *** GROC: 2 IsMoving? True Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - Groc 1 is more than 20x away 78,4 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,830 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,830 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,830 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,830 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,830 - UPDATE Groc 2 isMoving? False Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,830 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - *** GROC: 2 IsMoving? False Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,830 - Counter: 22 Moving count: 0
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - *** GROC: 1 IsMoving? False Direction? 2 78,4
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,830 - Groc 2 is more than 20x away 15,10 whereas I am at 78,4
+DEBUG 2022-04-28 16:38:26,830 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,830 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,830 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,830 - UPDATE Groc 1 isMoving? True Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - *** GROC: 1 IsMoving? True Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,830 - ***
+DEBUG 2022-04-28 16:38:26,831 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - *** GROC: 2 IsMoving? False Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - Groc 1 is more than 20x away 78,3 whereas I am at 15,10
+DEBUG 2022-04-28 16:38:26,831 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,831 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,831 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,831 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,831 - UPDATE Groc 2 isMoving? True Direction? 3 15,10
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - *** GROC: 2 IsMoving? True Direction? 3 15,9
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,831 - Counter: 23 Moving count: 2
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - *** GROC: 1 IsMoving? True Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,831 - Groc 2 is more than 20x away 15,9 whereas I am at 78,3
+DEBUG 2022-04-28 16:38:26,831 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,831 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,831 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,831 - UPDATE Groc 1 isMoving? False Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,831 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - *** GROC: 1 IsMoving? False Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - *** GROC: 2 IsMoving? True Direction? 3 15,9
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - Groc 1 is more than 20x away 78,3 whereas I am at 15,9
+DEBUG 2022-04-28 16:38:26,831 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,831 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,831 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,831 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,831 - UPDATE Groc 2 isMoving? False Direction? 3 15,9
+DEBUG 2022-04-28 16:38:26,831 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - *** GROC: 2 IsMoving? False Direction? 3 15,9
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ***
+DEBUG 2022-04-28 16:38:26,831 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,832 - Counter: 24 Moving count: 0
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - *** GROC: 1 IsMoving? False Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,832 - Groc 2 is more than 20x away 15,9 whereas I am at 78,3
+DEBUG 2022-04-28 16:38:26,832 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,832 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,832 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,832 - UPDATE Groc 1 isMoving? True Direction? 1 78,3
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - *** GROC: 1 IsMoving? True Direction? 1 78,4
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - *** GROC: 2 IsMoving? False Direction? 3 15,9
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - Groc 1 is more than 20x away 78,4 whereas I am at 15,9
+DEBUG 2022-04-28 16:38:26,832 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,832 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,832 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,832 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,832 - UPDATE Groc 2 isMoving? True Direction? 2 15,9
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - *** GROC: 2 IsMoving? True Direction? 2 16,9
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,832 - Counter: 25 Moving count: 2
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - *** GROC: 1 IsMoving? True Direction? 1 78,4
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,832 - Groc 2 is more than 20x away 16,9 whereas I am at 78,4
+DEBUG 2022-04-28 16:38:26,832 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,832 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,832 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,832 - UPDATE Groc 1 isMoving? False Direction? 1 78,4
+DEBUG 2022-04-28 16:38:26,832 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - *** GROC: 1 IsMoving? False Direction? 1 78,4
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,832 - ***
+DEBUG 2022-04-28 16:38:26,833 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - *** GROC: 2 IsMoving? True Direction? 2 16,9
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - Groc 1 is more than 20x away 78,4 whereas I am at 16,9
+DEBUG 2022-04-28 16:38:26,833 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,833 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,833 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,833 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,833 - UPDATE Groc 2 isMoving? False Direction? 2 16,9
+DEBUG 2022-04-28 16:38:26,833 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - *** GROC: 2 IsMoving? False Direction? 2 16,9
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,833 - Counter: 26 Moving count: 0
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - *** GROC: 1 IsMoving? False Direction? 1 78,4
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,833 - Groc 2 is more than 20x away 16,9 whereas I am at 78,4
+DEBUG 2022-04-28 16:38:26,833 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,833 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,833 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,833 - UPDATE Groc 1 isMoving? True Direction? 3 78,4
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - *** GROC: 1 IsMoving? True Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - *** GROC: 2 IsMoving? False Direction? 2 16,9
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - Groc 1 is more than 20x away 78,3 whereas I am at 16,9
+DEBUG 2022-04-28 16:38:26,833 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,833 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,833 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,833 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,833 - UPDATE Groc 2 isMoving? True Direction? 1 16,9
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - *** GROC: 2 IsMoving? True Direction? 1 16,10
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ***
+DEBUG 2022-04-28 16:38:26,833 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,834 - Counter: 27 Moving count: 2
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - *** GROC: 1 IsMoving? True Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,834 - Groc 2 is more than 20x away 16,10 whereas I am at 78,3
+DEBUG 2022-04-28 16:38:26,834 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,834 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,834 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,834 - UPDATE Groc 1 isMoving? False Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,834 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - *** GROC: 1 IsMoving? False Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - *** GROC: 2 IsMoving? True Direction? 1 16,10
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - Groc 1 is more than 20x away 78,3 whereas I am at 16,10
+DEBUG 2022-04-28 16:38:26,834 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,834 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,834 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,834 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,834 - UPDATE Groc 2 isMoving? False Direction? 1 16,10
+DEBUG 2022-04-28 16:38:26,834 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - *** GROC: 2 IsMoving? False Direction? 1 16,10
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,834 - Counter: 28 Moving count: 0
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - *** GROC: 1 IsMoving? False Direction? 3 78,3
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,834 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,834 - Groc 2 is more than 20x away 16,10 whereas I am at 78,3
+DEBUG 2022-04-28 16:38:26,834 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,834 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,834 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,834 - UPDATE Groc 1 isMoving? True Direction? 4 78,3
+DEBUG 2022-04-28 16:38:26,834 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - *** GROC: 1 IsMoving? True Direction? 4 77,3
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - *** GROC: 2 IsMoving? False Direction? 1 16,10
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - Groc 1 is more than 20x away 77,3 whereas I am at 16,10
+DEBUG 2022-04-28 16:38:26,835 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,835 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,835 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,835 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,835 - UPDATE Groc 2 isMoving? True Direction? 1 16,10
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - *** GROC: 2 IsMoving? True Direction? 1 16,11
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,835 - Counter: 29 Moving count: 2
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - *** GROC: 1 IsMoving? True Direction? 4 77,3
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,835 - Groc 2 is more than 20x away 16,11 whereas I am at 77,3
+DEBUG 2022-04-28 16:38:26,835 - Groc 1stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,835 - SETMOTION Groc:1 isMoving: False
+DEBUG 2022-04-28 16:38:26,835 - Groc 1 isMoving:False
+DEBUG 2022-04-28 16:38:26,835 - UPDATE Groc 1 isMoving? False Direction? 4 77,3
+DEBUG 2022-04-28 16:38:26,835 - UPDATE Groc 1 has nothing to do
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - *** GROC: 1 IsMoving? False Direction? 4 77,3
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - *** GROC: 2 IsMoving? True Direction? 1 16,11
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,835 - Groc 1 is more than 20x away 77,3 whereas I am at 16,11
+DEBUG 2022-04-28 16:38:26,835 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,835 - Groc 2stop moving.  Density 0
+DEBUG 2022-04-28 16:38:26,835 - SETMOTION Groc:2 isMoving: False
+DEBUG 2022-04-28 16:38:26,835 - Groc 2 isMoving:False
+DEBUG 2022-04-28 16:38:26,835 - UPDATE Groc 2 isMoving? False Direction? 1 16,11
+DEBUG 2022-04-28 16:38:26,835 - UPDATE Groc 2 has nothing to do
+DEBUG 2022-04-28 16:38:26,835 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - *** GROC: 2 IsMoving? False Direction? 1 16,11
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,836 - Counter: 30 Moving count: 0
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - *** GROC: 1 IsMoving? False Direction? 4 77,3
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - Groc 1 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,836 - Groc 2 is more than 20x away 16,11 whereas I am at 77,3
+DEBUG 2022-04-28 16:38:26,836 - SETMOTION Groc:1 isMoving: True
+DEBUG 2022-04-28 16:38:26,836 - Groc 1 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,836 - Groc 1 isMoving:True
+DEBUG 2022-04-28 16:38:26,836 - UPDATE Groc 1 isMoving? True Direction? 4 77,3
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - *** GROC: 1 IsMoving? True Direction? 4 76,3
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - *** GROC: 2 IsMoving? False Direction? 1 16,11
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - Groc 1 is more than 20x away 76,3 whereas I am at 16,11
+DEBUG 2022-04-28 16:38:26,836 - Groc 2 skip myself when evaluating density
+DEBUG 2022-04-28 16:38:26,836 - SETMOTION Groc:2 isMoving: True
+DEBUG 2022-04-28 16:38:26,836 - Groc 2 Lonely, start moving.  Density 0
+DEBUG 2022-04-28 16:38:26,836 - Groc 2 isMoving:True
+DEBUG 2022-04-28 16:38:26,836 - UPDATE Groc 2 isMoving? True Direction? 1 16,11
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - *** GROC: 2 IsMoving? True Direction? 1 16,12
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ***
+DEBUG 2022-04-28 16:38:26,836 - ****************************************************************************
+DEBUG 2022-04-28 16:38:26,836 - Counter: 31 Moving count: 2
+DEBUG 2022-04-28 16:38:26,836 - Groc 1 saved
+DEBUG 2022-04-28 16:38:26,836 - Groc 2 saved

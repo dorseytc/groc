@@ -11,6 +11,7 @@
 #                           Configurable loop lengths 
 #   TDORSEY     2022-04-27  Log groc moves separately 
 #   TDORSEY     2022-04-28  Groc position to stdout for now
+#   TDORSEY     2022-04-28  Pipe location to renderer
 
 
 import datetime, numpy, logging
@@ -159,137 +160,138 @@ class Groc():
 # main
 
 def main():   
-    grocList = [] 
-    grid = [[0 for y in range(K_MAXY+1)] for x in range(K_MAXX+1)]
+  grocList = [] 
+  grid = [[0 for y in range(K_MAXY+1)] for x in range(K_MAXX+1)]
 
-    for y in range(K_MAXY+1):
-      for x in range(K_MAXX+1):  
-        grid[x][y] = "."
-        print (grid[x][y], end='')
-      print (":")
-    print("") 
+  for y in range(K_MAXY+1):
+    for x in range(K_MAXX+1):  
+      grid[x][y] = "."
+      print (grid[x][y], end='')
+    print (":")
+  print("") 
     
-    #
-    #Reading the world
-    #
-    
-    savedFile = open(Groc.grocfile, "r")
-    grocsRead = 0 
+  #
+  #Reading the world
+  #
+   
+  savedFile = open(Groc.grocfile, "r")
+  grocsRead = 0 
+  line = savedFile.readline()
+  while line: 
+    grocsRead += 1
+    list = line.split(Groc.fieldsep)
+    birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")        
+    newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
+    newGroc.identify()
+    newGroc.locate()
+    grocList.append(newGroc)
     line = savedFile.readline()
-    while line: 
-        grocsRead += 1
-        list = line.split(Groc.fieldsep)
-        birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), "%Y-%m-%d %H:%M")        
-        newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], birthdatetime)
-        newGroc.identify()
-        newGroc.locate()
-        grocList.append(newGroc)
-        line = savedFile.readline()
-    savedFile.close()      
-    logger.debug ("Done reading saved grocs")
-    if grocsRead == 0: 
-        for count in range(0, K_GROC_LIMIT):
-            name = 'G'+str(count)
-            newGroc = Groc(name, 'happy', 'green')
-            newGroc.identify()
-            newGroc.introduce()
-            newGroc.locate()
-            grocList.append(newGroc)
-        logger.debug ('Spawned grocs')
-    else:
-        logger.debug ('Retrieved saved grocs')
+  savedFile.close()      
+  logger.debug ("Done reading saved grocs")
+  if grocsRead == 0: 
+    for count in range(0, K_GROC_LIMIT):
+      name = 'G'+str(count)
+      newGroc = Groc(name, 'happy', 'green')
+      newGroc.identify()
+      newGroc.introduce()
+      newGroc.locate()
+      grocList.append(newGroc)
+    logger.debug ('Spawned grocs')
+  else:
+    logger.debug ('Retrieved saved grocs')
     
-    running = True
-    counter = 0 
-    while running:
-        counter += 1
-        #
-        # Plotting the world
-        #
-        for y in range(K_MAXY):
-          for x in range(K_MAXX):  
-            grid[x][y] = "."
-        movingCount = 0 
-        for thisGroc in grocList:   
-            logger.debug ("***")
-            logger.debug ("***")
-            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
-            logger.debug ("***")
-            logger.debug ("***")
-        
-            density = 0
-            for anotherGroc in grocList:
-                if anotherGroc.id == thisGroc.id:
-                    logger.debug ("Groc " + str(thisGroc.id) + " skip myself when evaluating density")
-                elif abs(anotherGroc.x - thisGroc.x) < 20:
-                    if abs(anotherGroc.y - thisGroc.y) < 20:                        
-                        if anotherGroc.isMoving == True: 
-                            logger.debug ("Groc " + str(thisGroc.id) +  " ignoring passers by")
-                        else:
-                            density += 1
-                            logger.debug ("Groc " + str(thisGroc.id) +  " somebody already here, density " + str(density ))
-                    else:
-                            logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20y away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
-                else:
-                     logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20x away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
-                        
-            if thisGroc.isMoving == True:
-                if density > 0: 
-                    logger.debug ("Groc " + str(thisGroc.id) +  " already moving. Density "  + str(density))
-                else:
-                    logger.debug ("Groc " + str(thisGroc.id) +  "stop moving.  Density " + str(density))
-                    thisGroc.setMotion(False)
-            else:
-                if density > 20:
-                    logger.debug ("Groc " + str(thisGroc.id) +  " Crowded.  Start moving. Density "  + str(density))
-                    thisGroc.setMotion(True)
-                    #thisGroc.setDirection(numpy.random.random_integers(1,4))
-                    thisGroc.setDirection(numpy.random.randint(1,4+1))
-                elif density > 10:
-                    logger.debug ("Groc " + str(thisGroc.id) +  " Comfortable.  Density "  + str(density))
-                else:
-                    thisGroc.setMotion(True)
-                    #thisGroc.setDirection(numpy.random.random_integers(1,4))
-                    thisGroc.setDirection(numpy.random.randint(1,4+1))
-                    logger.debug ("Groc " + str(thisGroc.id) +  " Lonely, start moving.  Density "  + str(density))
-                    
-            logger.debug("Groc " + str(thisGroc.id) + " isMoving:" + str(thisGroc.isMoving))
-            if thisGroc.isMoving == True:
-                movingCount += 1
-                
-            thisGroc.update()            
-            logger.debug ("*** GROC: "  + str(thisGroc.x) + "," + str( thisGroc.y))
-            grid[thisGroc.x][thisGroc.y] = "X"
+  running = True
+  counter = 0 
+  while running:
+    counter += 1
+    #
+    # Plotting the world
+    #
+    for y in range(K_MAXY):
+      for x in range(K_MAXX):  
+        grid[x][y] = "."
 
-            logger.debug ("***")
-            logger.debug ("***")
-            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
-            logger.debug ("***")
-            logger.debug ("***")
-            logger.debug ("****************************************************************************")
+    movingCount = 0 
+    for thisGroc in grocList:   
+      logger.debug ("***")
+      logger.debug ("***")
+      logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
+      logger.debug ("***")
+      logger.debug ("***")
+        
+      density = 0
+      for anotherGroc in grocList:
+        if anotherGroc.id == thisGroc.id:
+          logger.debug ("Groc " + str(thisGroc.id) + " skip myself when evaluating density")
+        elif abs(anotherGroc.x - thisGroc.x) < 20:
+          if abs(anotherGroc.y - thisGroc.y) < 20:                        
+            if anotherGroc.isMoving == True: 
+              logger.debug ("Groc " + str(thisGroc.id) +  " ignoring passers by")
+            else:
+              density += 1
+              logger.debug ("Groc " + str(thisGroc.id) +  " somebody already here, density " + str(density ))
+          else:
+            logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20y away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
+        else:
+          logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20x away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
+                        
+        if thisGroc.isMoving == True:
+          if density > 0: 
+            logger.debug ("Groc " + str(thisGroc.id) +  " already moving. Density "  + str(density))
+          else:
+            logger.debug ("Groc " + str(thisGroc.id) +  "stop moving.  Density " + str(density))
+            thisGroc.setMotion(False)
+        else:
+          if density > 20:
+            logger.debug ("Groc " + str(thisGroc.id) +  " Crowded.  Start moving. Density "  + str(density))
+            thisGroc.setMotion(True)
+            #thisGroc.setDirection(numpy.random.random_integers(1,4))
+            thisGroc.setDirection(numpy.random.randint(1,4+1))
+          elif density > 10:
+            logger.debug ("Groc " + str(thisGroc.id) +  " Comfortable.  Density "  + str(density))
+          else:
+            thisGroc.setMotion(True)
+            #thisGroc.setDirection(numpy.random.random_integers(1,4))
+            thisGroc.setDirection(numpy.random.randint(1,4+1))
+            logger.debug ("Groc " + str(thisGroc.id) +  " Lonely, start moving.  Density "  + str(density))
+                    
+        if thisGroc.isMoving == True:
+          movingCount += 1
+                
+        thisGroc.update()            
+        logger.debug ("*** GROC: "  + str(thisGroc.x) + "," + str( thisGroc.y))
+        grid[thisGroc.x][thisGroc.y] = "X"
+
+        logger.debug ("***")
+        logger.debug ("***")
+        logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
+        logger.debug ("***")
+        logger.debug ("***")
+        logger.debug ("****************************************************************************")
             
         logger.debug("Counter: " + str(counter) + " Moving count: " + str(movingCount))
 
-        #if movingCount == 0:
-        for y in range(K_MAXY):
-          for x in range(K_MAXX):  
-            print (grid[x][y], end='')
-          print (":")
-        print("") 
-        if counter > K_ITER_LIMIT:
-            running = False
+    #if movingCount == 0:
+    for y in range(K_MAXY):
+      for x in range(K_MAXX):  
+        print (grid[x][y], end='')
+      print (":")
+    print("") 
+
+    if counter > K_ITER_LIMIT:
+      running = False
     
     #
     # Saving The World
     #
     
-    grocFile = open(Groc.grocfile, "w")
-    nl = Groc.newline
-    for thisGroc in grocList:
-        grocText = thisGroc.dump()
-        grocFile.write(grocText+nl)
-        logger.debug ("Groc " + str(thisGroc.id) + " saved")
-    grocFile.close()
+  grocFile = open(Groc.grocfile, "w")
+  nl = Groc.newline
+  for thisGroc in grocList:
+    grocText = thisGroc.dump()
+    grocFile.write(grocText+nl)
+    logger.debug ("Groc " + str(thisGroc.id) + " saved")
+  grocFile.close()
 
 
 

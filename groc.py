@@ -19,7 +19,7 @@ import datetime, numpy, logging, os
 # limiters
 
 K_GROC_LIMIT = 2
-K_ITER_LIMIT = 3000
+K_ITER_LIMIT = 0
 
 # world dimensions
 K_MAXX = 800
@@ -49,7 +49,7 @@ Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = K_GROCLOG, 
                     filemode = "w", 
                     format = Log_Format, 
-                    level = logging.DEBUG)
+                    level = logging.ERROR)
 logger = logging.getLogger()
 
 class Groc():
@@ -288,6 +288,14 @@ def main():
       running = True
     elif counter > K_ITER_LIMIT:
       running = False
+    if counter % 100 == 0:
+      grocFile = open(K_GROCFILE, "w")
+      for thisGroc in grocList:
+        grocText = thisGroc.dump()
+        grocFile.write(grocText+K_NEWLINE)
+        logger.debug ("Groc " + str(thisGroc.id) + " saved")
+      grocFile.close()
+
     #
     # Saving The World
     #

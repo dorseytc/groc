@@ -25,9 +25,7 @@ screen.fill(worldcolor)
 while True:
   msg = rpipe.read(1)
   if msg == '\n':
-    print(line)
     movemsg = line.split(",")
-    print(movemsg)
     grocId = movemsg[0]
     oldX = int(movemsg[1]) 
     oldY = int(movemsg[2])

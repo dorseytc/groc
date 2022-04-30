@@ -18,7 +18,7 @@ import datetime, numpy, logging, os
 
 # limiters
 
-K_GROC_LIMIT = 2
+K_GROC_LIMIT = 10
 K_ITER_LIMIT = 0
 
 # world dimensions

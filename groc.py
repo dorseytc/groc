@@ -19,11 +19,11 @@ import datetime, numpy, logging, os
 # limiters
 
 K_GROC_LIMIT = 2
-K_ITER_LIMIT = 300
+K_ITER_LIMIT = 0
 
 # world dimensions
-K_MAXX = 80
-K_MAXY = 24
+K_MAXX = 800
+K_MAXY = 240
 
 # cardinal directions
 K_NONE = 0 
@@ -33,16 +33,20 @@ K_SOUTH = 3
 K_WEST = 4
 
 # Init Code
-pipe = "/tmp/grocpipe"
+K_PIPE_NAME = "/tmp/grocpipe"
+K_GROCFILE = "grocfile.dat"
+K_GROCLOG = "groclog.log"
+K_FIELDSEP = '|'
+K_NEWLINE = "\n"
 print ("start world.py to continue")
-if os.path.exists(pipe):
-  os.unlink(pipe)
-if not os.path.exists(pipe):
-  os.mkfifo(pipe, 0o600)
-  wpipe = open(pipe, 'w', newline='\n')
+if os.path.exists(K_PIPE_NAME):
+  os.unlink(K_PIPE_NAME)
+if not os.path.exists(K_PIPE_NAME):
+  os.mkfifo(K_PIPE_NAME, 0o600)
+  wpipe = open(K_PIPE_NAME, 'w', newline=K_NEWLINE)
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
-logging.basicConfig(filename = "groclog.log", 
+logging.basicConfig(filename = K_GROCLOG, 
                     filemode = "w", 
                     format = Log_Format, 
                     level = logging.DEBUG)
@@ -51,9 +55,6 @@ logger = logging.getLogger()
 class Groc():
     'Base class for the groc'
     grocCount = 0    
-    grocfile = "/home/ted/git/groc/grocfile.dat"
-    fieldsep = '|'
-    newline = "\n"
     
     def __init__(self, name, mood, color, x=None, y=None, id=None, 
                  birthdatetime=None, isMoving=False, direction=0):
@@ -69,14 +70,13 @@ class Groc():
         else:
             self.x = int(x)
         if y == None:
-            self.y = numpy.random.randint(0,K_MAXY)
+            self.y = numpy.random.randint(1,K_MAXY)
         else:
             self.y = int(y)
         if id == None:
             self.id = Groc.grocCount
         else:
             self.id = Groc.grocCount
-            #self.id = id
         if birthdatetime == None:
             self.birthdatetime = datetime.datetime.now()
         else:
@@ -89,7 +89,7 @@ class Groc():
 # move 
     def move(self, oldX, oldY, newX, newY):
         wpipe.write(str(self.id) + "," + str(oldX) + "," + str(oldY) + "," +
-                    str(newX) + "," + str(newY) + "\n")
+                    str(newX) + "," + str(newY) + K_NEWLINE)
         
 # setMotion
     def setMotion(self, isMoving):
@@ -116,19 +116,20 @@ class Groc():
                 self.y += -1
             elif self.direction == K_EAST:
                 self.x += 1
-            elif self.direction == K_WEST:
+            else:  
+                #elif self.direction == K_WEST:
                 self.x += -1
                 
-            if self.x < 0:
-                self.x = 0
+            if self.x <= 0:
+                self.x = 1
                 if self.direction == K_WEST:
                     self.direction = K_NORTH
-            elif self.y > K_MAXX:
-                self.y = K_MAXX
+            elif self.x > K_MAXX:
+                self.x = K_MAXX
                 if self.direction == K_EAST:
                     self.direction = K_SOUTH
             elif self.y <= 0:
-                self.y = 0
+                self.y = 1
                 if self.direction == K_NORTH:
                     self.direction = K_EAST
             elif self.y >= K_MAXY:
@@ -168,7 +169,7 @@ class Groc():
     
 # dump
     def dump(self):
-        fs = Groc.fieldsep
+        fs = K_FIELDSEP
         return ( self.name + fs + self.mood + fs + self.color + fs + 
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
                self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
@@ -185,13 +186,13 @@ def main():
   #
   #Reading the world
   #
-  savedFile = open(Groc.grocfile, "r")
+  savedFile = open(K_GROCFILE, "r")
   grocsRead = 0 
   line = savedFile.readline()
   while line: 
     grocsRead += 1
-    list = line.split(Groc.fieldsep)
-    birthdatetime = datetime.datetime.strptime(list[6].rstrip('\n'), 
+    list = line.split(K_FIELDSEP)
+    birthdatetime = datetime.datetime.strptime(list[6].rstrip(K_NEWLINE), 
                                                "%Y-%m-%d %H:%M")        
     newGroc = Groc(list[0],list[1], list[2], list[3], list[4], list[5], 
                    birthdatetime)
@@ -217,80 +218,73 @@ def main():
     # Plotting the world
     #
     movingCount = 0 
+#####
     for thisGroc in grocList:   
-      thisGroc.locate()
-      density = 0
-      oldX = thisGroc.x
-      oldY = thisGroc.y
-      for anotherGroc in grocList:
-        if anotherGroc.id == thisGroc.id:
-          logger.debug ("Groc " + str(thisGroc.id) + 
-                        " skip myself when evaluating density")
-        elif abs(anotherGroc.x - thisGroc.x) < 20:
-          if abs(anotherGroc.y - thisGroc.y) < 20:                        
-            if anotherGroc.isMoving == True: 
-              logger.debug ("Groc " + str(thisGroc.id) +  
-                            " ignoring passers by")
-            else:
-              density += 1
-              logger.debug ("Groc " + str(thisGroc.id) +  
-                            " somebody already here, density " + str(density ))
-          else:
-            logger.debug ("Groc " + str(anotherGroc.id) +  " >20y away " + 
-                          str(anotherGroc.x) + "," + str(anotherGroc.y) + 
-                          " and I am at "  + str(thisGroc.x) + "," + 
-                          str(thisGroc.y))
-        else:
-          logger.debug ("Groc " + str(anotherGroc.id) + " >20x away " + 
-                        str(anotherGroc.x) + "," + str( anotherGroc.y) + 
-                        " and I am at " + str(thisGroc.x) + "," + 
-                        str(thisGroc.y))
+            logger.debug ("***")
+            logger.debug ("***")
+            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
+            logger.debug ("***")
+            logger.debug ("***")
+        
+            density = 0
+            for anotherGroc in grocList:
+                if anotherGroc.id == thisGroc.id:
+                    logger.debug ("Groc " + str(thisGroc.id) + " skip myself when evaluating density")
+                elif abs(anotherGroc.x - thisGroc.x) < 20:
+                    if abs(anotherGroc.y - thisGroc.y) < 20:                        
+                        if anotherGroc.isMoving == True: 
+                            logger.debug ("Groc " + str(thisGroc.id) +  "ignoring passers by")
+                        else:
+                            logger.debug ("Groc " + str(thisGroc.id) +  "somebody already here = density")
+                            density += 1
+                    else:
+                            logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20y away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
+                else:
+                     logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20x away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
                         
-        if thisGroc.isMoving == True:
-          if density > 0: 
-            logger.debug ("Groc " + str(thisGroc.id) + 
-                          " already moving. Density "  + str(density))
-          else:
-            logger.debug ("Groc " + str(thisGroc.id) +  
-                          "stop moving.  Density " + str(density))
-            thisGroc.setMotion(False)
-        else:
-          if density > 20:
-            logger.debug ("Groc " + str(thisGroc.id) + 
-                          " Crowded.  Start moving. Density "  + str(density))
-            thisGroc.setMotion(True)
-            thisGroc.setDirection(numpy.random.randint(1,4+1))
-          elif density > 10:
-            logger.debug ("Groc " + str(thisGroc.id) + 
-                          " Comfortable.  Density "  + str(density))
-          else:
-            thisGroc.setMotion(True)
-            thisGroc.setDirection(numpy.random.randint(1,4+1))
-            logger.debug ("Groc " + str(thisGroc.id) + 
-                          " Lonely, start moving.  Density "  + str(density))
+            if thisGroc.isMoving == True:
+                if density > 0: 
+                    logger.debug ("Groc " + str(thisGroc.id) +  " already moving. Density "  + str(density))
+                else:
+                    logger.debug ("Groc " + str(thisGroc.id) +  "stop moving.  Density " + str(density))
+                    thisGroc.setMotion(False)
+            else:
+                if density > 20:
+                    logger.debug ("Groc " + str(thisGroc.id) +  " Crowded.  Start moving. Density "  + str(density))
+                    thisGroc.setMotion(True)
+                    #thisGroc.setDirection(numpy.random.random_integers(1,4))
+                    thisGroc.setDirection(numpy.random.randint(1,4+1))
+                elif density > 10:
+                    logger.debug ("Groc " + str(thisGroc.id) +  " Comfortable.  Density "  + str(density))
+                else:
+                    thisGroc.setMotion(True)
+                    #thisGroc.setDirection(numpy.random.random_integers(1,4))
+                    thisGroc.setDirection(numpy.random.randint(1,4+1))
+                    logger.debug ("Groc " + str(thisGroc.id) +  " Lonely, start moving.  Density "  + str(density))
                     
-        if thisGroc.isMoving == True:
-          movingCount += 1
+            if thisGroc.isMoving == "True":
+                movingCount += 1
                 
-        thisGroc.update()
-
-    if counter > K_ITER_LIMIT:
+            thisGroc.update()            
+              
+    if K_ITER_LIMIT == 0:
+      running = True
+    elif counter > K_ITER_LIMIT:
       running = False
     #
     # Saving The World
     #
     
-  grocFile = open(Groc.grocfile, "w")
-  nl = Groc.newline
+  grocFile = open(K_GROCFILE, "w")
   for thisGroc in grocList:
     grocText = thisGroc.dump()
-    grocFile.write(grocText+nl)
+    grocFile.write(grocText+K_NEWLINE)
     logger.debug ("Groc " + str(thisGroc.id) + " saved")
   grocFile.close()
   
   wpipe.close()
-  if os.path.exists(pipe):
-    os.unlink(pipe)
+  if os.path.exists(K_PIPE_NAME):
+    os.unlink(K_PIPE_NAME)
 
 
 

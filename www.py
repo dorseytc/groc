@@ -4,6 +4,7 @@
 #
 # TDORSEY 2022-04-28  Created
 #
+
 import pygame, os
 pipe = "/tmp/grocpipe"
 try:
@@ -18,7 +19,7 @@ line = ""
 msgcount = 0
 print ("Opened pipe")
 pygame.init
-screen = pygame.display.set_mode([800, 250])
+screen = pygame.display.set_mode([1800, 800])
 worldcolor = (255, 255, 255)
 groccolor = (0, 0, 255)
 screen.fill(worldcolor)

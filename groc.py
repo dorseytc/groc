@@ -19,7 +19,7 @@ import datetime, numpy, logging, os
 # limiters
 
 K_GROC_LIMIT = 2
-K_ITER_LIMIT = 0
+K_ITER_LIMIT = 3000
 
 # world dimensions
 K_MAXX = 800
@@ -220,47 +220,64 @@ def main():
     movingCount = 0 
 #####
     for thisGroc in grocList:   
-            logger.debug ("***")
-            logger.debug ("***")
-            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + str(thisGroc.isMoving) + " Direction? " + str(thisGroc.direction) + " " + str(thisGroc.x) + "," + str( thisGroc.y))
-            logger.debug ("***")
-            logger.debug ("***")
+            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + 
+                          str(thisGroc.isMoving) + " Direction? " + 
+                          str(thisGroc.direction) + " " + str(thisGroc.x) + 
+                          "," + str( thisGroc.y))
         
             density = 0
             for anotherGroc in grocList:
                 if anotherGroc.id == thisGroc.id:
-                    logger.debug ("Groc " + str(thisGroc.id) + " skip myself when evaluating density")
+                    logger.debug ("Groc " + str(thisGroc.id) + 
+                                  " skip myself when evaluating density")
                 elif abs(anotherGroc.x - thisGroc.x) < 20:
                     if abs(anotherGroc.y - thisGroc.y) < 20:                        
                         if anotherGroc.isMoving == True: 
-                            logger.debug ("Groc " + str(thisGroc.id) +  "ignoring passers by")
+                            logger.debug ("Groc " + str(thisGroc.id) + 
+                                          " ignoring passers by")
                         else:
-                            logger.debug ("Groc " + str(thisGroc.id) +  "somebody already here = density")
+                            logger.debug ("Groc " + str(thisGroc.id) + 
+                                          "somebody already here = density")
                             density += 1
                     else:
-                            logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20y away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
+                            logger.debug ("Groc " + str(anotherGroc.id) + 
+                                          " >20y away " + str(anotherGroc.x) + 
+                                          "," + str( anotherGroc.y) + 
+                                          " whereas I am at " + 
+                                          str(thisGroc.x) + "," + 
+                                          str(thisGroc.y))
                 else:
-                     logger.debug ("Groc " + str(anotherGroc.id) +  " is more than 20x away " + str(anotherGroc.x) + "," + str( anotherGroc.y) + " whereas I am at "  + str(thisGroc.x) + "," + str(thisGroc.y))
+                     logger.debug ("Groc " + str(anotherGroc.id) + 
+                                   " >20x away " + str(anotherGroc.x) + "," + 
+                                   str( anotherGroc.y) + " whereas I am at "  + 
+                                   str(thisGroc.x) + "," + str(thisGroc.y))
                         
             if thisGroc.isMoving == True:
                 if density > 0: 
-                    logger.debug ("Groc " + str(thisGroc.id) +  " already moving. Density "  + str(density))
+                    logger.debug ("Groc " + str(thisGroc.id) + 
+                                  " already moving. Density "  + str(density))
                 else:
-                    logger.debug ("Groc " + str(thisGroc.id) +  "stop moving.  Density " + str(density))
+                    logger.debug ("Groc " + str(thisGroc.id) +  
+                                  " stop moving.  Density " + str(density))
                     thisGroc.setMotion(False)
             else:
                 if density > 20:
-                    logger.debug ("Groc " + str(thisGroc.id) +  " Crowded.  Start moving. Density "  + str(density))
+                    logger.debug ("Groc " + str(thisGroc.id) +  
+                                  " Crowded.  Start moving. Density " + 
+                                  str(density))
                     thisGroc.setMotion(True)
                     #thisGroc.setDirection(numpy.random.random_integers(1,4))
                     thisGroc.setDirection(numpy.random.randint(1,4+1))
                 elif density > 10:
-                    logger.debug ("Groc " + str(thisGroc.id) +  " Comfortable.  Density "  + str(density))
+                    logger.debug ("Groc " + str(thisGroc.id) + 
+                                  " Comfortable.  Density "  + str(density))
                 else:
                     thisGroc.setMotion(True)
                     #thisGroc.setDirection(numpy.random.random_integers(1,4))
                     thisGroc.setDirection(numpy.random.randint(1,4+1))
-                    logger.debug ("Groc " + str(thisGroc.id) +  " Lonely, start moving.  Density "  + str(density))
+                    logger.debug ("Groc " + str(thisGroc.id) + 
+                                  " Lonely, start moving.  Density " + 
+                                  str(density))
                     
             if thisGroc.isMoving == "True":
                 movingCount += 1

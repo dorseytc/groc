@@ -3,7 +3,10 @@
 ## to run, try something like 
 
 python3 groc.py
+python3 www.py
 
+- start the grocs first with groc.py
+- run one of the world generators next, world.py or www.py
 
 ## wish list
 

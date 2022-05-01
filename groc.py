@@ -96,11 +96,6 @@ class Groc():
                       " X,Y:" + str(self.x) + "," + str(self.y))
         self.direction = direction
        
-# move 
-#    def move(self, oldX, oldY, newX, newY):
-#        wpipe.write(str(self.id) + "," + str(oldX) + "," + str(oldY) + "," +
-#                    str(newX) + "," + str(newY) + K_NEWLINE)
-        
 # setMotion
     def setMotion(self, pisMoving):
         self.isMoving = pisMoving
@@ -119,14 +114,12 @@ class Groc():
         newY = self.y
         if self.isMoving == True:
             if self.direction == K_NORTH:
-                #self.y += 1
                 newY = self.y + 1
             elif self.direction == K_SOUTH:
                 newY = self.y - 1
             elif self.direction == K_EAST:
                 newX = self.x + 1
             else:  
-                #elif self.direction == K_WEST:
                 newX = self.x - 1
                 
             if newX <= 0:
@@ -146,7 +139,8 @@ class Groc():
                 if self.direction == K_SOUTH:
                     self.direction = K_WEST
         else:
-            logger.debug ("UPDATE Groc " + str(self.id) + " has nothing to do")
+            logger.debug ("UPDATE Groc " + str(self.id) + 
+                          " has nothing to do")
         return (newX, newY) 
  
  
@@ -163,7 +157,6 @@ class Groc():
         
 # locate
     def locate(self):
-        self.move(0,0,self.x,self.y)
         logger.debug ("locate Groc " + self.name + " at " + str(self.x) + 
                       ", " + str(self.y) + " Moving: " + 
                       str(self.isMoving) +  " Direction: " + 

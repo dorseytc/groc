@@ -4,24 +4,8 @@
 #
 #      world class for groc, an object-oriented experiment in ai
 #
-#   TDORSEY     2016-10-16  Created
-#   TDORSEY     2016-10-16  Saving the world
-#   TDORSEY     2016-10-16  Retrieving saved world
-#   TDORSEY     2016-10-16  Improved class and function structure
-#   TDORSEY     2016-10-17  Rendering via pygame
-#   TDORSEY     2016-10-22  Some form of pygame hell
-#   TDORSEY     2022-04-26  Removing pygame in favor of text based 
-#   TDORSEY     2022-04-27  Adding logging
-#                           Configurable loop lengths 
-#   TDORSEY     2022-04-27  Log groc moves separately 
-#   TDORSEY     2022-04-28  Groc position to stdout for now
-#   TDORSEY     2022-04-29  Pipe location to world.py
-#                           Brownian motion
-#                           Ability to iterate forever
-#   TDORSEY     2022-04-30  Grocs seek nearest groc
-#                           Generate grocs up to limit when reading a file
-#                           Exit when nobody is moving 
-#   TDORSEY     2022-05-01  Refactor groc into groc.py class file
+#   TDORSEY     2022-05-01  Created world.py by refactoring
+#                           groc.py into "class-specific" Refactor groc into groc.py class file
 #                           Remainder becomes world.py
 
 import datetime 
@@ -111,6 +95,9 @@ def main():
                           birthdatetime)
       newGroc.identify()
       newGroc.locate()
+      wpipe.write(str(newGroc.id) + "," + 
+                          str(0) + "," + str(0) + "," + 
+                          str(newGroc.x) + "," + str(newGroc.y) + K_NEWLINE)
       grocList.append(newGroc)
       line = savedFile.readline()
     savedFile.close()      
@@ -118,11 +105,14 @@ def main():
     grocsRead = 0
   if grocsRead < p_numGrocs:
     for count in range(0, (p_numGrocs - grocsRead)):
-      name = 'G'+str(count)
+      name = 'G' + str(count)
       newGroc = groc.Groc(name, 'happy', 'green')
       newGroc.identify()
       newGroc.introduce()
       newGroc.locate()
+      wpipe.write(str(newGroc.id) + "," + 
+                  str(0) + "," + str(0) + "," + 
+                  str(newGroc.x) + "," + str(newGroc.y) + K_NEWLINE)
       grocList.append(newGroc)
     
   running = True
@@ -181,15 +171,17 @@ def main():
                 else: 
                   thisGroc.setDirection(K_SOUTH)
 
-            newX, newY = thisGroc.update()            
+            newX, newY = thisGroc.move()            
             if newX == thisGroc.x and newY == thisGroc.y:
               logger.debug("Groc " + str(thisGroc.id) + 
                            " was unable to move") 
             else:
               #world.move
-              wpipe.write(str(self.id) + "," + 
-                          str(oldX) + "," + str(oldY) + "," + 
+              wpipe.write(str(thisGroc.id) + "," + 
+                          str(thisGroc.x) + "," + str(thisGroc.y) + "," + 
                           str(newX) + "," + str(newY) + K_NEWLINE)
+              thisGroc.x = newX
+              thisGroc.y = newY
 
               
               

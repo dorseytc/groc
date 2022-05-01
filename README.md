@@ -3,10 +3,15 @@
 ## to run, try something like 
 
 python3 groc.py \
-python3 www.py
+python3 w-flat.py
+
+### FYI
 
 - start the grocs first with groc.py
-- run one of the world generators next, world.py or www.py
+- run one of the world generators next:
+-- w-debug.py 
+-- w-flat.py
+  
 
 ## wish list
 

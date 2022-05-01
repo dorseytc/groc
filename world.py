@@ -5,7 +5,7 @@
 #      world class for groc, an object-oriented experiment in ai
 #
 #   TDORSEY     2022-05-01  Created world.py by refactoring
-#                           groc.py into "class-specific" Refactor groc into groc.py class file
+#                           groc.py into "class-specific" groc.py
 #                           Remainder becomes world.py
 
 import datetime 

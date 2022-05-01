@@ -1,8 +1,13 @@
 #!/usr/bin/python
 #
-# www.py
+# render.py
+#
+#   receive messages from world.py containing instructions
+#   on groc movement.  Uses pygame. (Other versions may use other
+#   rendering mechanisms) 
 #
 # TDORSEY 2022-04-28  Created
+# TDORSEY 2022-05-01  Renamed to render.py
 #
 
 import pygame, os

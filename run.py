@@ -75,7 +75,6 @@ def main():
                           list[3], list[4], list[5], 
                           birthdatetime)
       newGroc.identify()
-      newGroc.locate()
       wpipe.write(str(newGroc.id) + "," + 
                           str(0) + "," + str(0) + "," + 
                           str(newGroc.x) + "," + str(newGroc.y) + 
@@ -91,8 +90,6 @@ def main():
       newX, newY = thisWorld.randomLocation()
       newGroc = groc.Groc(thisWorld, name, 'happy', 'green', newX, newY)
       newGroc.identify()
-      newGroc.introduce()
-      newGroc.locate()
       wpipe.write(str(newGroc.id) + "," + 
                   str(0) + "," + str(0) + "," + 
                   str(newGroc.x) + "," + str(newGroc.y) + thisWorld.NEWLINE)
@@ -104,68 +101,29 @@ def main():
     counter += 1
     movingCount = 0 
     for thisGroc in grocList:   
-            logger.debug ("*** GROC: " + str(thisGroc.id) + " IsMoving? " + 
-                          str(thisGroc.isMoving) + " Direction? " + 
-                          str(thisGroc.direction) + " " + str(thisGroc.x) + 
-                          "," + str( thisGroc.y))
-        
-            least_zdist = thisWorld.MAXX + thisWorld.MAXY
-            nearestx = thisWorld.MAXX
-            nearesty = thisWorld.MAXY 
-            for anotherGroc in grocList:
-                if anotherGroc.id == thisGroc.id:
-                    logger.debug ("Groc " + str(thisGroc.id) + 
-                                  " skip myself when evaluating density")
-                else: 
-                    xdiff = abs(thisGroc.x - anotherGroc.x) 
-                    ydiff = abs(thisGroc.y - anotherGroc.y)
-                    zdist = math.sqrt((xdiff ** 2) + (ydiff ** 2))
-                    logger.debug("Groc " + str(anotherGroc.id) + 
-                       " is " + str(zdist) + " away")
-                    if zdist < least_zdist:
-                      least_zdist = zdist
-                      nearestx = anotherGroc.x
-                      nearesty = anotherGroc.y
-            if least_zdist < 20:  
-              logger.debug("Groc " + str(thisGroc.id) + 
-                           " is happy to have friends")
-              thisGroc.isMoving = False
-            else:
-              thisGroc.isMoving = True
-              movingCount += 1
-              if nearestx == thisGroc.x:
-                if nearesty > thisGroc.y:
-                  thisGroc.setDirection(thisWorld.NORTH)
-                else:
-                  thisGroc.setDirection(thisWorld.SOUTH)
-              elif nearesty == thisGroc.y:
-                if nearestx > thisGroc.x:
-                  thisGroc.setDirection(thisWorld.EAST)
-                else:
-                  thisGroc.setDirection(thisWorld.WEST)
-              elif abs(nearestx) > abs(nearesty):
-                if nearestx > thisGroc.x:
-                  thisGroc.setDirection(thisWorld.EAST)
-                else:
-                  thisGroc.setDirection(thisWorld.WEST)
-              else:
-                if nearesty > thisGroc.y:
-                  thisGroc.setDirection(thisWorld.NORTH) 
-                else: 
-                  thisGroc.setDirection(thisWorld.SOUTH)
 
-            newX, newY = thisGroc.move()            
-            if newX == thisGroc.x and newY == thisGroc.y:
-              logger.debug("Groc " + str(thisGroc.id) + 
-                           " was unable to move") 
-            else:
-              #world.move
-              wpipe.write(str(thisGroc.id) + "," + 
-                          str(thisGroc.x) + "," + str(thisGroc.y) + "," + 
-                          str(newX) + "," + str(newY) + 
+       nearestX, nearestY = thisGroc.findNearestGroc(grocList)
+       zdist = thisWorld.findDistance(thisGroc.x, thisGroc.y, 
+                                      nearestX, nearestY)
+       if zdist < 20: 
+         thisGroc.setMood('Happy')
+         newX, newY = (thisGroc.x, thisGroc.y)
+       else:
+         thisGroc.setMood('Lonely')
+         newX, newY = thisGroc.moveToward(nearestX, nearestY)
+
+       if thisGroc.didMove(newX, newY): 
+         movingCount += 1
+         #world.move
+         wpipe.write(str(thisGroc.id) + "," + 
+                     str(thisGroc.x) + "," + str(thisGroc.y) + "," + 
+                     str(newX) + "," + str(newY) + 
                           thisWorld.NEWLINE)
-              thisGroc.x = newX
-              thisGroc.y = newY
+         thisGroc.x = newX
+         thisGroc.y = newY
+       else: 
+         logger.debug("Groc " + str(thisGroc.id) + 
+                      " did not move")
 
               
               

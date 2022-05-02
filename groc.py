@@ -24,6 +24,7 @@
 #                           Exit when nobody is moving 
 #   TDORSEY     2022-05-01  Refactor groc into groc.py class file
 #   TDORSEY     2022-05-02  World owns constants now
+#                           Add movement methods to Groc
 
 import datetime 
 import logging
@@ -46,7 +47,7 @@ class World():
     PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
     LOGFILE = "groc.log"
-    LOGLEVEL = logging.DEBUG
+    LOGLEVEL = logging.ERROR
     
     def __init__(self, x, y):
         
@@ -61,6 +62,10 @@ class World():
                             level = self.LOGLEVEL)
         self.logger = logging.getLogger()
 
+    def findDistance(self, firstx, firsty, secondx, secondy):
+        xDiff = abs(firstx - secondx) 
+        yDiff = abs(firsty - secondy)
+        return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
 
      
     def randomLocation(self):
@@ -74,7 +79,7 @@ class Groc():
     grocCount = 0    
     
     def __init__(self, world, name, mood, color, x, y, id=None, 
-                 birthdatetime=None, isMoving=False, direction=0):
+                 birthdatetime=None):
         
         super(Groc, self).__init__()
 
@@ -93,85 +98,60 @@ class Groc():
             self.birthdatetime = datetime.datetime.now()
         else:
             self.birthdatetime = birthdatetime
-        self.isMoving = isMoving
         self.world.logger.debug ("Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
-        self.direction = direction
        
-# setMotion
-    def setMotion(self, pisMoving):
-        self.isMoving = pisMoving
+    def findNearestGroc(self, listOfGrocs):
+        nearestx = self.world.MAXX
+        nearesty = self.world.MAXY 
+        leastDist = nearestx + nearesty
+        for anotherGroc in listOfGrocs:
+          if anotherGroc.id == self.id:
+            self.world.logger.debug("Groc " + str(self.id) + 
+                          " skip myself")
+          else: 
+            zDist = self.world.findDistance(self.x, self.y, 
+                               anotherGroc.x, anotherGroc.y)
+            self.world.logger.debug("Groc " + str(anotherGroc.id) + 
+                       " is " + str(zDist) + " away")
+            if zDist < leastDist:
+              leastDist = zDist
+              nearestx = anotherGroc.x
+              nearesty = anotherGroc.y
+        return (nearestx, nearesty)
 
-# setDirection
-    def setDirection(self, pdirection=0):
-        self.direction = pdirection
 
-# update        
-    def move(self):
-        self.world.logger.debug ("update Groc " + str(self.id) + " isMoving? " + 
-                      str(self.isMoving) + " Direction? " + 
-                      str(self.direction) + " " + str(self.x) + "," + 
-                      str( self.y))
+    def setMood(self, newMood):
+        self.mood = newMood
+  
+    def didMove(self, x, y):
+        if self.x == x and self.y == y:
+          result = False
+        else:
+          result = True
+        return (result)
+
+    def moveToward(self, x, y, speed=1):
         newX = self.x
         newY = self.y
-        if self.isMoving == True:
-            if self.direction == self.world.NORTH:
-                newY = self.y + 1
-            elif self.direction == self.world.SOUTH:
-                newY = self.y - 1
-            elif self.direction == self.world.EAST:
-                newX = self.x + 1
-            else:  
-                newX = self.x - 1
-                
-            if newX <= 0:
-                newX = 0;
-                if self.direction == self.world.WEST:
-                    self.direction = self.world.NORTH
-            elif newX > self.world.MAXX:
-                newX = self.world.MAXX
-                if self.direction == self.world.EAST:
-                    self.direction = self.world.SOUTH
-            elif newY <= 0:
-                newY = 1
-                if self.direction == self.world.NORTH:
-                    self.direction = self.world.EAST
-            elif newY >= self.world.MAXY:
-                newY = self.world.MAXY   
-                if self.direction == self.world.SOUTH:
-                    self.direction = self.world.WEST
-        else:
-            self.world.logger.debug ("UPDATE Groc " + str(self.id) + 
-                          " has nothing to do")
-        return (newX, newY) 
+        for step in range(speed):
+          self.world.logger.debug("Step " + str(step))
+          if newX < x:
+            newX = newX + 1
+          elif newX > x:
+            newX = newX - 1
+          elif newY < y:
+            newY = newY + 1
+          elif newY > y:
+            newY = newY - 1
+        return (newX, newY)
  
- 
- 
-# introduce 
-    def introduce(self):
-        self.world.logger.debug ("My name is " + self.name + ".  I am " + self.color + 
-                      " and I am feeling " + self.mood)
-        
 # identify
     def identify(self):
-        self.world.logger.debug ("My ID is " + str(self.id) + " and I was born " + 
+        self.world.logger.debug ("My ID is " + str(self.id) + 
+                      " and I was born " + 
                       self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
         
-# locate
-    def locate(self):
-        self.world.logger.debug ("locate Groc " + self.name + " at " + str(self.x) + 
-                      ", " + str(self.y) + " Moving: " + 
-                      str(self.isMoving) +  " Direction: " + 
-                      str(self.direction))
-        
-# census
-    def census(self):
-        self.world.logger.debug ("Total Groc Population is " + str(Groc.grocCount))
-
-# getCount
-    def getCount(self):
-        return self.grocCount
-    
 # dump
     def dump(self):
         fs = self.world.FIELDSEP

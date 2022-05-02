@@ -25,6 +25,7 @@
 #   TDORSEY     2022-05-01  Refactor groc into groc.py class file
 #   TDORSEY     2022-05-02  World owns constants now
 #                           Add movement methods to Groc
+#                           Add elapsedTicks and tick() to World
 
 import datetime 
 import logging
@@ -34,7 +35,6 @@ import os
 import sys
 
 print("Loading groc")
-
 
 class World():
     'Base class for the world'
@@ -46,8 +46,10 @@ class World():
     NEWLINE = '\n'
     PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
+    WORLDFILE = "world.dat"
     LOGFILE = "groc.log"
     LOGLEVEL = logging.ERROR
+    elapsedTicks = 0
     
     def __init__(self, x, y):
         
@@ -61,11 +63,18 @@ class World():
                             format = Log_Format, 
                             level = self.LOGLEVEL)
         self.logger = logging.getLogger()
+        if os.path.exists(self.WORLDFILE):
+          worldFile = open(self.WORLDFILE, "r")
+          line = worldFile.readline()
+          World.elapsedTicks = int(line)
+        else:
+          World.elapsedTicks = 0
 
     def findDistance(self, firstx, firsty, secondx, secondy):
         xDiff = abs(firstx - secondx) 
         yDiff = abs(firsty - secondy)
-        return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
+        #return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
+        return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
 
      
     def randomLocation(self):
@@ -73,6 +82,13 @@ class World():
         newY = numpy.random.randint(1, self.MAXY)
         return (newX, newY)
 
+    def saveWorld(self):
+        worldFile = open(World.WORLDFILE, "w")
+        worldFile.write(str(self.elapsedTicks) + self.NEWLINE)
+        worldFile.close()
+
+    def tick(self):
+        self.elapsedTicks += 1
 
 class Groc():
     'Base class for the groc'

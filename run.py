@@ -132,7 +132,7 @@ def main():
       logger.debug("Nobody is moving")
     elif p_iterations == 0:
       running = True
-    elif counter > p_iterations:
+    elif counter >= p_iterations:
       running = False
       logger.debug("Iteration count exceeded")
     if counter % 100 == 0 or running == False:
@@ -143,12 +143,13 @@ def main():
         grocFile.write(grocText+thisWorld.NEWLINE)
         logger.debug ("Groc " + str(thisGroc.id) + " saved")
       grocFile.close()
+      thisWorld.saveWorld()
 
-    #
-    # Saving The World
-    #
-    
-  
+    thisWorld.tick()
+
+  #
+  # Saving The World
+  #
   wpipe.close()
   if os.path.exists(thisWorld.PIPENAME):
     os.unlink(thisWorld.PIPENAME)

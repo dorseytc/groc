@@ -8,6 +8,9 @@
 #                           groc.py into "class-specific" files 
 #                           for world.py and groc.py
 #                           Remainder becomes run.py
+#   TDORSEY     2022-05-02  Move constants to World class
+#                           Move initial code into main
+#   
 
 import datetime 
 import logging
@@ -15,62 +18,50 @@ import math
 import os
 import sys
 import groc
-import world
 
-# limiters
+# default limits
 
 K_GROC_LIMIT = 2
 K_ITER_LIMIT = 1000
 
-# Init Code
-K_PIPE_NAME = "/tmp/grocpipe"
-K_GROCFILE = "grocfile.dat"
-K_WORLDLOG = "world.log"
-K_NEWLINE = "\n"
-print ("start render to continue")
-if os.path.exists(K_PIPE_NAME):
-  os.unlink(K_PIPE_NAME)
-if not os.path.exists(K_PIPE_NAME):
-  os.mkfifo(K_PIPE_NAME, 0o600)
-  wpipe = open(K_PIPE_NAME, 'w', newline=K_NEWLINE)
-#Command Line Arguments
-numArgs = len(sys.argv)
-print(sys.argv)
-if numArgs > 3:
-  p_grocFile = sys.argv[3] 
-else:
-  p_grocFile = K_GROCFILE
-  
-if numArgs > 2:
-  p_iterations = int(sys.argv[2])
-else:
-  p_iterations = K_ITER_LIMIT
-
-if numArgs > 1:
-  p_numGrocs = int(sys.argv[1])
-else:
-  p_numGrocs = K_GROC_LIMIT
-  
-print("p_numGrocs: ", p_numGrocs) 
-print("p_iterations: ", p_iterations)
-print("p_grocFile: ", p_grocFile)
-
-Log_Format = "%(levelname)s %(asctime)s - %(message)s"
-logging.basicConfig(filename = K_WORLDLOG, 
-                    filemode = "w", 
-                    format = Log_Format, 
-                    level = logging.ERROR)
-logger = logging.getLogger()
 
 # main
 
 def main():   
-  grocList = [] 
-  thisWorld = world.World(1800,800)
+  thisWorld = groc.World(1800,800)
+  print ("start render to continue")
+  if os.path.exists(thisWorld.PIPENAME):
+    os.unlink(thisWorld.PIPENAME)
+  if not os.path.exists(thisWorld.PIPENAME):
+    os.mkfifo(thisWorld.PIPENAME, 0o600)
+    wpipe = open(thisWorld.PIPENAME, 'w', newline=thisWorld.NEWLINE)
+  #Command Line Arguments
+  numArgs = len(sys.argv)
+  print(sys.argv)
+  if numArgs > 3:
+    p_grocFile = sys.argv[3] 
+  else:
+    p_grocFile = thisWorld.GROCFILE
+  
+  if numArgs > 2:
+    p_iterations = int(sys.argv[2])
+  else:
+    p_iterations = K_ITER_LIMIT
+
+  if numArgs > 1:
+    p_numGrocs = int(sys.argv[1])
+  else:
+    p_numGrocs = K_GROC_LIMIT
+  
+  print("p_numGrocs: ", p_numGrocs) 
+  print("p_iterations: ", p_iterations)
+  print("p_grocFile: ", p_grocFile)
+
+  logger = thisWorld.logger
   # 
- 
   #Reading the world
   #
+  grocList = [] 
   if os.path.exists(p_grocFile):
     savedFile = open(p_grocFile, "r")
     grocsRead = 0 
@@ -79,7 +70,7 @@ def main():
       grocsRead += 1
       list = line.split(thisWorld.FIELDSEP)
       birthdatetime = datetime.datetime.strptime(
-                      list[6].rstrip(K_NEWLINE), "%Y-%m-%d %H:%M")        
+                      list[6].rstrip(thisWorld.NEWLINE), "%Y-%m-%d %H:%M")        
       newGroc = groc.Groc(thisWorld, list[0],list[1], list[2], 
                           list[3], list[4], list[5], 
                           birthdatetime)
@@ -88,7 +79,7 @@ def main():
       wpipe.write(str(newGroc.id) + "," + 
                           str(0) + "," + str(0) + "," + 
                           str(newGroc.x) + "," + str(newGroc.y) + 
-                          K_NEWLINE)
+                          thisWorld.NEWLINE)
       grocList.append(newGroc)
       line = savedFile.readline()
     savedFile.close()      
@@ -104,7 +95,7 @@ def main():
       newGroc.locate()
       wpipe.write(str(newGroc.id) + "," + 
                   str(0) + "," + str(0) + "," + 
-                  str(newGroc.x) + "," + str(newGroc.y) + K_NEWLINE)
+                  str(newGroc.x) + "," + str(newGroc.y) + thisWorld.NEWLINE)
       grocList.append(newGroc)
     
   running = True
@@ -172,7 +163,7 @@ def main():
               wpipe.write(str(thisGroc.id) + "," + 
                           str(thisGroc.x) + "," + str(thisGroc.y) + "," + 
                           str(newX) + "," + str(newY) + 
-                          K_NEWLINE)
+                          thisWorld.NEWLINE)
               thisGroc.x = newX
               thisGroc.y = newY
 
@@ -191,7 +182,7 @@ def main():
       grocFile = open(p_grocFile, "w")
       for thisGroc in grocList:
         grocText = thisGroc.dump()
-        grocFile.write(grocText+K_NEWLINE)
+        grocFile.write(grocText+thisWorld.NEWLINE)
         logger.debug ("Groc " + str(thisGroc.id) + " saved")
       grocFile.close()
 
@@ -201,8 +192,8 @@ def main():
     
   
   wpipe.close()
-  if os.path.exists(K_PIPE_NAME):
-    os.unlink(K_PIPE_NAME)
+  if os.path.exists(thisWorld.PIPENAME):
+    os.unlink(thisWorld.PIPENAME)
 
 
 

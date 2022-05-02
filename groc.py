@@ -23,24 +23,51 @@
 #                           Generate grocs up to limit when reading a file
 #                           Exit when nobody is moving 
 #   TDORSEY     2022-05-01  Refactor groc into groc.py class file
-#                           Remainder becomes world.py
+#   TDORSEY     2022-05-02  World owns constants now
 
 import datetime 
 import logging
 import math
+import numpy
 import os
 import sys
-import world
 
 print("Loading groc")
-K_GROCLOG = "groc.log"
 
-Log_Format = "%(levelname)s %(asctime)s - %(message)s"
-logging.basicConfig(filename = K_GROCLOG, 
-                    filemode = "w", 
-                    format = Log_Format, 
-                    level = logging.ERROR)
-logger = logging.getLogger()
+
+class World():
+    'Base class for the world'
+    NORTH = 1
+    EAST = 2
+    SOUTH = 3
+    WEST = 4
+    FIELDSEP = '|'
+    NEWLINE = '\n'
+    PIPENAME = "/tmp/grocpipe"
+    GROCFILE = "grocfile.dat"
+    LOGFILE = "groc.log"
+    LOGLEVEL = logging.DEBUG
+    
+    def __init__(self, x, y):
+        
+        super(World, self).__init__()
+         
+        self.MAXX = x
+        self.MAXY = y
+        Log_Format = "%(levelname)s %(asctime)s - %(message)s"
+        logging.basicConfig(filename = self.LOGFILE,
+                            filemode = "w", 
+                            format = Log_Format, 
+                            level = self.LOGLEVEL)
+        self.logger = logging.getLogger()
+
+
+     
+    def randomLocation(self):
+        newX = numpy.random.randint(1, self.MAXX)  
+        newY = numpy.random.randint(1, self.MAXY)
+        return (newX, newY)
+
 
 class Groc():
     'Base class for the groc'
@@ -67,7 +94,7 @@ class Groc():
         else:
             self.birthdatetime = birthdatetime
         self.isMoving = isMoving
-        logger.debug ("Groc " + str(self.id) + 
+        self.world.logger.debug ("Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
         self.direction = direction
        
@@ -81,7 +108,7 @@ class Groc():
 
 # update        
     def move(self):
-        logger.debug ("update Groc " + str(self.id) + " isMoving? " + 
+        self.world.logger.debug ("update Groc " + str(self.id) + " isMoving? " + 
                       str(self.isMoving) + " Direction? " + 
                       str(self.direction) + " " + str(self.x) + "," + 
                       str( self.y))
@@ -114,7 +141,7 @@ class Groc():
                 if self.direction == self.world.SOUTH:
                     self.direction = self.world.WEST
         else:
-            logger.debug ("UPDATE Groc " + str(self.id) + 
+            self.world.logger.debug ("UPDATE Groc " + str(self.id) + 
                           " has nothing to do")
         return (newX, newY) 
  
@@ -122,24 +149,24 @@ class Groc():
  
 # introduce 
     def introduce(self):
-        logger.debug ("My name is " + self.name + ".  I am " + self.color + 
+        self.world.logger.debug ("My name is " + self.name + ".  I am " + self.color + 
                       " and I am feeling " + self.mood)
         
 # identify
     def identify(self):
-        logger.debug ("My ID is " + str(self.id) + " and I was born " + 
+        self.world.logger.debug ("My ID is " + str(self.id) + " and I was born " + 
                       self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
         
 # locate
     def locate(self):
-        logger.debug ("locate Groc " + self.name + " at " + str(self.x) + 
+        self.world.logger.debug ("locate Groc " + self.name + " at " + str(self.x) + 
                       ", " + str(self.y) + " Moving: " + 
                       str(self.isMoving) +  " Direction: " + 
                       str(self.direction))
         
 # census
     def census(self):
-        logger.debug ("Total Groc Population is " + str(Groc.grocCount))
+        self.world.logger.debug ("Total Groc Population is " + str(Groc.grocCount))
 
 # getCount
     def getCount(self):

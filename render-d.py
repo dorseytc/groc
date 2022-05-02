@@ -1,8 +1,16 @@
 #!/usr/bin/python
 #
-# world.py
+# render-d.py
+#
+# text based "render" of a groc world. 
+# receives messages from world.py containing instructions on
+# groc movement.  Other versions might render graphically, 
+# this one, for debugging purposes, reveals the contents of the 
+# messages piped between "world" and the renderer
 #
 # TDORSEY 2022-04-28  Created
+# TDORSEY 2022-05-01  Renamed render-d to denote its roles as a
+#                     debugging tool
 #
 import os, sys, time
 

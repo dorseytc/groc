@@ -2,42 +2,22 @@
 
 ## to run, try something like 
 
-python3 groc.py \
-python3 w-flat.py
+python3 run.py \ 
+python3 render.py
 
 ### FYI
 
-- start the grocs first with groc.py
-- run one of the world generators next:
--- w-debug.py 
--- w-flat.py
+- start the world first with world.py
+- run one of the world renderers next:
+   - w-debug.py 
+   - w-flat.py
+
+### Supporting Files
+
+groc.py - the Groc class \ 
+world.py - the World class
   
+### See Also
 
-## wish list
-
-### movement
-
-- "movement" should be part of the Groc class
-- "movement" should be based on motivation
-- "nearest Groc" should be told to the Groc by the World
-- variable speed could be introduced
-- approach direction could be randomized
-
-### motivation
-- "motivation" should include companionship, food, space (overcrowding)
-- age should be determined by ticks
-- hunger should be based on ticks since food
-- need for companionship vs need for space should be randomized
-
-### predators
-- could be expressed as "species"
-- predators might eat prey
-- prey might band together to fight predators
-
-### mood
-- color might indicate mood or health
-- color might indicate age
-- health might be affected by food, companionship, mating
-
-### death
-- death might occur of old age, starvation, predation
+- TODO.md - a list of planned enhancements
+- RELEASES.md - a compilation of features in each release

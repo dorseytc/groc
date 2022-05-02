@@ -28,61 +28,36 @@
 import datetime 
 import logging
 import math
-import numpy 
 import os
 import sys
+import world
 
-# limiters
-
-K_GROC_LIMIT = 2
-K_ITER_LIMIT = 1000
-
-# world dimensions
-K_MAXX = 1800
-K_MAXY = 800
-
-# cardinal directions
-K_NONE = 0 
-K_NORTH = 1
-K_EAST = 2
-K_SOUTH = 3
-K_WEST = 4
-
-# Init Code
-K_PIPE_NAME = "/tmp/grocpipe"
-K_GROCFILE = "grocfile.dat"
-K_GROCLOG = "groclog.log"
-K_FIELDSEP = '|'
-K_NEWLINE = "\n"
+print("Loading groc")
+K_GROCLOG = "groc.log"
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = K_GROCLOG, 
                     filemode = "w", 
                     format = Log_Format, 
-                    level = logging.DEBUG)
+                    level = logging.ERROR)
 logger = logging.getLogger()
 
 class Groc():
     'Base class for the groc'
     grocCount = 0    
     
-    def __init__(self, name, mood, color, x=None, y=None, id=None, 
+    def __init__(self, world, name, mood, color, x, y, id=None, 
                  birthdatetime=None, isMoving=False, direction=0):
         
         super(Groc, self).__init__()
 
         Groc.grocCount += 1
+        self.world = world
         self.name = name
         self.mood = mood
         self.color = color
-        if x == None:
-            self.x = numpy.random.randint(1, K_MAXX)
-        else:
-            self.x = int(x)
-        if y == None:
-            self.y = numpy.random.randint(1,K_MAXY)
-        else:
-            self.y = int(y)
+        self.x = int(x)
+        self.y = int(y)
         if id == None:
             self.id = Groc.grocCount
         else:
@@ -113,31 +88,31 @@ class Groc():
         newX = self.x
         newY = self.y
         if self.isMoving == True:
-            if self.direction == K_NORTH:
+            if self.direction == self.world.NORTH:
                 newY = self.y + 1
-            elif self.direction == K_SOUTH:
+            elif self.direction == self.world.SOUTH:
                 newY = self.y - 1
-            elif self.direction == K_EAST:
+            elif self.direction == self.world.EAST:
                 newX = self.x + 1
             else:  
                 newX = self.x - 1
                 
             if newX <= 0:
                 newX = 0;
-                if self.direction == K_WEST:
-                    self.direction = K_NORTH
-            elif newX > K_MAXX:
-                newX = K_MAXX
-                if self.direction == K_EAST:
-                    self.direction = K_SOUTH
+                if self.direction == self.world.WEST:
+                    self.direction = self.world.NORTH
+            elif newX > self.world.MAXX:
+                newX = self.world.MAXX
+                if self.direction == self.world.EAST:
+                    self.direction = self.world.SOUTH
             elif newY <= 0:
                 newY = 1
-                if self.direction == K_NORTH:
-                    self.direction = K_EAST
-            elif newY >= K_MAXY:
-                newY = K_MAXY   
-                if self.direction == K_SOUTH:
-                    self.direction = K_WEST
+                if self.direction == self.world.NORTH:
+                    self.direction = self.world.EAST
+            elif newY >= self.world.MAXY:
+                newY = self.world.MAXY   
+                if self.direction == self.world.SOUTH:
+                    self.direction = self.world.WEST
         else:
             logger.debug ("UPDATE Groc " + str(self.id) + 
                           " has nothing to do")
@@ -172,7 +147,7 @@ class Groc():
     
 # dump
     def dump(self):
-        fs = K_FIELDSEP
+        fs = self.world.FIELDSEP
         return ( self.name + fs + self.mood + fs + self.color + fs + 
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
                self.birthdatetime.strftime("%Y-%m-%d %H:%M"))

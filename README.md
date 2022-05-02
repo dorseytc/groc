@@ -2,7 +2,7 @@
 
 ## to run, try something like 
 
-python3 world.py \
+python3 run.py \ 
 python3 render.py
 
 ### FYI
@@ -11,6 +11,11 @@ python3 render.py
 - run one of the world renderers next:
    - w-debug.py 
    - w-flat.py
+
+### Supporting Files
+
+groc.py - the Groc class \ 
+world.py - the World class
   
 ### See Also
 

@@ -10,7 +10,10 @@
 # TDORSEY 2022-05-01  Renamed to render.py
 #
 
-import pygame, os
+import pygame 
+import os
+import groc
+
 pipe = "/tmp/grocpipe"
 try:
   print("Looking for the pipe")
@@ -25,13 +28,13 @@ msgcount = 0
 print ("Opened pipe")
 pygame.init
 screen = pygame.display.set_mode([1800, 800])
-worldcolor = (255, 255, 255)
-groccolor = (0, 0, 255)
+worldcolor = groc.World.WHITE
+groccolor = groc.World.BLUE
 screen.fill(worldcolor)
 while True:
   msg = rpipe.read(1)
-  if msg == '\n':
-    movemsg = line.split(",")
+  if msg == groc.World.NEWLINE:
+    movemsg = line.split(groc.World.FIELDSEP)
     grocId = movemsg[0]
     oldX = int(movemsg[1]) 
     oldY = int(movemsg[2])

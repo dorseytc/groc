@@ -10,6 +10,7 @@
 #                           Remainder becomes run.py
 #   TDORSEY     2022-05-02  Move constants to World class
 #                           Move initial code into main
+#   TDORSEY     2022-05-03  Move load/save to World class
 #   
 
 import datetime 
@@ -30,11 +31,7 @@ K_ITER_LIMIT = 1000
 def main():   
   thisWorld = groc.World(1800,800)
   print ("start render to continue")
-  if os.path.exists(thisWorld.PIPENAME):
-    os.unlink(thisWorld.PIPENAME)
-  if not os.path.exists(thisWorld.PIPENAME):
-    os.mkfifo(thisWorld.PIPENAME, 0o600)
-    wpipe = open(thisWorld.PIPENAME, 'w', newline=thisWorld.NEWLINE)
+  renderPipe = thisWorld.renderPipe
   #Command Line Arguments
   numArgs = len(sys.argv)
   print(sys.argv)
@@ -75,10 +72,7 @@ def main():
                           list[3], list[4], list[5], 
                           birthdatetime)
       newGroc.identify()
-      wpipe.write(str(newGroc.id) + "," + 
-                          str(0) + "," + str(0) + "," + 
-                          str(newGroc.x) + "," + str(newGroc.y) + 
-                          thisWorld.NEWLINE)
+      thisWorld.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
       grocList.append(newGroc)
       line = savedFile.readline()
     savedFile.close()      
@@ -90,9 +84,7 @@ def main():
       newX, newY = thisWorld.randomLocation()
       newGroc = groc.Groc(thisWorld, name, 'happy', 'green', newX, newY)
       newGroc.identify()
-      wpipe.write(str(newGroc.id) + "," + 
-                  str(0) + "," + str(0) + "," + 
-                  str(newGroc.x) + "," + str(newGroc.y) + thisWorld.NEWLINE)
+      thisWorld.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
       grocList.append(newGroc)
     
   running = True
@@ -115,10 +107,8 @@ def main():
        if thisGroc.didMove(newX, newY): 
          movingCount += 1
          #world.move
-         wpipe.write(str(thisGroc.id) + "," + 
-                     str(thisGroc.x) + "," + str(thisGroc.y) + "," + 
-                     str(newX) + "," + str(newY) + 
-                          thisWorld.NEWLINE)
+         thisWorld.render(thisGroc.id, thisGroc.x, thisGroc.y, 
+                          newX, newY)
          thisGroc.x = newX
          thisGroc.y = newY
        else: 
@@ -150,12 +140,7 @@ def main():
   #
   # Saving The World
   #
-  wpipe.close()
-  if os.path.exists(thisWorld.PIPENAME):
-    os.unlink(thisWorld.PIPENAME)
-
-
-
+  thisWorld.close() 
             
 if __name__ == '__main__':
     main()

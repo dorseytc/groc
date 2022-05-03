@@ -26,11 +26,12 @@
 #   TDORSEY     2022-05-02  World owns constants now
 #                           Add movement methods to Groc
 #                           Add elapsedTicks and tick() to World
+#   TDORSEY     2022-05-03  Move load/save to World class
+#                           Eliminate numpy import
 
 import datetime 
 import logging
 import math
-import numpy
 import os
 import sys
 
@@ -49,8 +50,10 @@ class World():
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
     LOGLEVEL = logging.ERROR
-    elapsedTicks = 0
-    
+    elapsedTicks = 0    
+    WHITE = (255, 255, 255)
+    BLUE = (0, 0, 255)
+
     def __init__(self, x, y):
         
         super(World, self).__init__()
@@ -64,11 +67,23 @@ class World():
                             level = self.LOGLEVEL)
         self.logger = logging.getLogger()
         if os.path.exists(self.WORLDFILE):
-          worldFile = open(self.WORLDFILE, "r")
-          line = worldFile.readline()
+          self.worldFile = open(self.WORLDFILE, "r")
+          line = self.worldFile.readline()
           World.elapsedTicks = int(line)
         else:
           World.elapsedTicks = 0
+        if os.path.exists(self.PIPENAME):
+          os.unlink(self.PIPENAME)
+        if not os.path.exists(self.PIPENAME):
+          os.mkfifo(self.PIPENAME, 0o600)
+          self.renderPipe = open(self.PIPENAME, 'w', 
+                                 newline=self.NEWLINE)
+
+
+    def close(self):
+        self.renderPipe.close()
+        if os.path.exists(self.PIPENAME):
+          os.unlink(self.PIPENAME) 
 
     def findDistance(self, firstx, firsty, secondx, secondy):
         xDiff = abs(firstx - secondx) 
@@ -82,10 +97,20 @@ class World():
         newY = numpy.random.randint(1, self.MAXY)
         return (newX, newY)
 
+    def render(self, grocId, oldx, oldy, newx, newy, color=None):
+        fs = World.FIELDSEP
+        if color is None:
+          newColor = World.BLUE 
+        else:
+          newColor = color
+        self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
+                         str(oldy) + fs + str(newx) + fs + 
+                         str(newy) + fs + str(color) + self.NEWLINE)
+
     def saveWorld(self):
-        worldFile = open(World.WORLDFILE, "w")
-        worldFile.write(str(self.elapsedTicks) + self.NEWLINE)
-        worldFile.close()
+        self.worldFile = open(World.WORLDFILE, "w")
+        self.worldFile.write(str(self.elapsedTicks) + self.NEWLINE)
+        self.worldFile.close()
 
     def tick(self):
         self.elapsedTicks += 1

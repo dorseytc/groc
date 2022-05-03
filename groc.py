@@ -46,7 +46,7 @@ class World():
     NEWLINE = '\n'
     PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
-    WORLDFILE = "world.dat"
+    WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
     LOGLEVEL = logging.ERROR
     elapsedTicks = 0

@@ -32,6 +32,7 @@
 import datetime 
 import logging
 import math
+import numpy
 import os
 import sys
 
@@ -79,7 +80,6 @@ class World():
           self.renderPipe = open(self.PIPENAME, 'w', 
                                  newline=self.NEWLINE)
 
-
     def close(self):
         self.renderPipe.close()
         if os.path.exists(self.PIPENAME):
@@ -92,6 +92,37 @@ class World():
         return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
 
      
+    def getGrocs(self, numGrocs, grocFile):
+        grocList = []
+        if os.path.exists(grocFile):
+          savedFile = open(grocFile, "r")
+          grocsRead = 0 
+          line = savedFile.readline()
+          while line: 
+            grocsRead += 1
+            list = line.split(self.FIELDSEP)
+            birthdatetime = datetime.datetime.strptime(
+                        list[6].rstrip(self.NEWLINE), "%Y-%m-%d %H:%M")        
+            newGroc = Groc(self, list[0],list[1], list[2], 
+                          list[3], list[4], list[5], 
+                          birthdatetime)
+            newGroc.identify()
+            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
+            grocList.append(newGroc)
+            line = savedFile.readline()
+          savedFile.close()      
+        else:
+          grocsRead = 0
+        if grocsRead < numGrocs:
+          for count in range(0, (numGrocs - grocsRead)):
+            name = 'G' + str(count)
+            newX, newY = self.randomLocation()
+            newGroc = Groc(self, name, 'happy', 'green', newX, newY)
+            newGroc.identify()
+            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
+            grocList.append(newGroc)
+        return grocList
+
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
@@ -106,6 +137,14 @@ class World():
         self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
                          str(oldy) + fs + str(newx) + fs + 
                          str(newy) + fs + str(color) + self.NEWLINE)
+
+    def saveGrocs(self, grocList, grocFile):
+      saveFile = open(grocFile, "w")
+      for thisGroc in grocList:
+        grocText = thisGroc.dump()
+        saveFile.write(grocText+self.NEWLINE)
+        self.logger.debug ("Groc " + str(thisGroc.id) + " saved")
+      saveFile.close()
 
     def saveWorld(self):
         self.worldFile = open(World.WORLDFILE, "w")

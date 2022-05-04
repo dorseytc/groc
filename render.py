@@ -8,19 +8,20 @@
 #
 # TDORSEY 2022-04-28  Created
 # TDORSEY 2022-05-01  Renamed to render.py
-#
+# TDORSEY 2022-05-02  Move pipe definitions to World class
+#                     
 
 import pygame 
 import os
 import groc
 
-pipe = "/tmp/grocpipe"
+pipe = groc.World.PIPENAME
 try:
   print("Looking for the pipe")
   rpipe = open(pipe, "r")
 except Exception as e:
   print(e)
-  print("Start groc.py first")
+  print("Start run.py first")
   exit()
 
 line = ""

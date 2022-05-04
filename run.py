@@ -11,7 +11,7 @@
 #   TDORSEY     2022-05-02  Move constants to World class
 #                           Move initial code into main
 #   TDORSEY     2022-05-03  Move load/save to World class
-#   
+#                           Move pipe definition to World class 
 
 import datetime 
 import logging
@@ -58,34 +58,8 @@ def main():
   # 
   #Reading the world
   #
-  grocList = [] 
-  if os.path.exists(p_grocFile):
-    savedFile = open(p_grocFile, "r")
-    grocsRead = 0 
-    line = savedFile.readline()
-    while line: 
-      grocsRead += 1
-      list = line.split(thisWorld.FIELDSEP)
-      birthdatetime = datetime.datetime.strptime(
-                      list[6].rstrip(thisWorld.NEWLINE), "%Y-%m-%d %H:%M")        
-      newGroc = groc.Groc(thisWorld, list[0],list[1], list[2], 
-                          list[3], list[4], list[5], 
-                          birthdatetime)
-      newGroc.identify()
-      thisWorld.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
-      grocList.append(newGroc)
-      line = savedFile.readline()
-    savedFile.close()      
-  else:
-    grocsRead = 0
-  if grocsRead < p_numGrocs:
-    for count in range(0, (p_numGrocs - grocsRead)):
-      name = 'G' + str(count)
-      newX, newY = thisWorld.randomLocation()
-      newGroc = groc.Groc(thisWorld, name, 'happy', 'green', newX, newY)
-      newGroc.identify()
-      thisWorld.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
-      grocList.append(newGroc)
+  grocList = thisWorld.getGrocs(p_numGrocs, p_grocFile)
+
     
   running = True
   counter = 0 
@@ -115,8 +89,6 @@ def main():
          logger.debug("Groc " + str(thisGroc.id) + 
                       " did not move")
 
-              
-              
     if movingCount == 0:
       running = False
       logger.debug("Nobody is moving")
@@ -127,12 +99,7 @@ def main():
       logger.debug("Iteration count exceeded")
     if counter % 100 == 0 or running == False:
       # write every 100 moves or when iteration limit reached
-      grocFile = open(p_grocFile, "w")
-      for thisGroc in grocList:
-        grocText = thisGroc.dump()
-        grocFile.write(grocText+thisWorld.NEWLINE)
-        logger.debug ("Groc " + str(thisGroc.id) + " saved")
-      grocFile.close()
+      thisWorld.saveGrocs(grocList, p_grocFile)
       thisWorld.saveWorld()
 
     thisWorld.tick()

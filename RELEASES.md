@@ -11,11 +11,11 @@
 - import Groc (into World)
 - environment/movement/location moved to World class
 
-### auto (v0.4.0) -- in progress
+### auto (v0.4.0) -- complete
 
 - behavior/motion/motivation moved to Groc class
 - fix Groc/World interaction regarding movement
-- add age
+- add birthTick (groc world time)
+- remove birthdatetime (gregorian)
 - add gender
-- add randomized preferences
 - augment groc.dat file format

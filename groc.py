@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #
 #   groc.py
 #
@@ -25,9 +24,10 @@
 #   TDORSEY     2022-05-01  Refactor groc into groc.py class file
 #   TDORSEY     2022-05-02  World owns constants now
 #                           Add movement methods to Groc
-#                           Add elapsedTicks and tick() to World
+#                           Add currentTick and tick() to World
 #   TDORSEY     2022-05-03  Move load/save to World class
-#                           Eliminate numpy import
+#   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
+#                           Add birthTick and gender.
 
 import datetime 
 import logging
@@ -51,9 +51,11 @@ class World():
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
     LOGLEVEL = logging.ERROR
-    elapsedTicks = 0    
+    #LOGLEVEL = logging.DEBUG
+    currentTick = 0    
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
+    RED = (128, 0, 0)
 
     def __init__(self, x, y):
         
@@ -70,28 +72,29 @@ class World():
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
-          World.elapsedTicks = int(line)
+          World.currentTick = int(line)
         else:
-          World.elapsedTicks = 0
+          World.currentTick = 0
         if os.path.exists(self.PIPENAME):
           os.unlink(self.PIPENAME)
         if not os.path.exists(self.PIPENAME):
           os.mkfifo(self.PIPENAME, 0o600)
           self.renderPipe = open(self.PIPENAME, 'w', 
                                  newline=self.NEWLINE)
-
+# world.close
     def close(self):
         self.renderPipe.close()
         if os.path.exists(self.PIPENAME):
           os.unlink(self.PIPENAME) 
 
+# world.findDistance
     def findDistance(self, firstx, firsty, secondx, secondy):
         xDiff = abs(firstx - secondx) 
         yDiff = abs(firsty - secondy)
         #return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
         return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
 
-     
+# world.getGrocs
     def getGrocs(self, numGrocs, grocFile):
         grocList = []
         if os.path.exists(grocFile):
@@ -101,13 +104,13 @@ class World():
           while line: 
             grocsRead += 1
             list = line.split(self.FIELDSEP)
-            birthdatetime = datetime.datetime.strptime(
-                        list[6].rstrip(self.NEWLINE), "%Y-%m-%d %H:%M")        
+            print("List: ", list)
             newGroc = Groc(self, list[0],list[1], list[2], 
                           list[3], list[4], list[5], 
-                          birthdatetime)
+                          list[6], list[7])
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
+            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
+                        newGroc.gender)
             grocList.append(newGroc)
             line = savedFile.readline()
           savedFile.close()      
@@ -119,47 +122,53 @@ class World():
             newX, newY = self.randomLocation()
             newGroc = Groc(self, name, 'happy', 'green', newX, newY)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y)
+            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
+                        newGroc.gender)
             grocList.append(newGroc)
         return grocList
 
+# world.randomLocation
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
         return (newX, newY)
 
-    def render(self, grocId, oldx, oldy, newx, newy, color=None):
+# world.render
+    def render(self, grocId, oldx, oldy, newx, newy, gender):
         fs = World.FIELDSEP
-        if color is None:
-          newColor = World.BLUE 
-        else:
-          newColor = color
+        nl = World.NEWLINE
         self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
-                         str(oldy) + fs + str(newx) + fs + 
-                         str(newy) + fs + str(color) + self.NEWLINE)
+                              str(oldy) + fs + str(newx) + fs + 
+                              str(newy) + fs + gender)
 
+# world.saveGrocs
     def saveGrocs(self, grocList, grocFile):
       saveFile = open(grocFile, "w")
       for thisGroc in grocList:
         grocText = thisGroc.dump()
-        saveFile.write(grocText+self.NEWLINE)
+        saveFile.write(grocText)
         self.logger.debug ("Groc " + str(thisGroc.id) + " saved")
       saveFile.close()
 
+# world.saveWorld
     def saveWorld(self):
         self.worldFile = open(World.WORLDFILE, "w")
-        self.worldFile.write(str(self.elapsedTicks) + self.NEWLINE)
+        self.worldFile.write(str(self.currentTick) + self.NEWLINE)
         self.worldFile.close()
 
+# world.tick
     def tick(self):
-        self.elapsedTicks += 1
+        self.currentTick += 1
 
 class Groc():
     'Base class for the groc'
     grocCount = 0    
+    MALE = "M"
+    FEMALE = "F"
     
-    def __init__(self, world, name, mood, color, x, y, id=None, 
-                 birthdatetime=None):
+    def __init__(self, world, name, mood, color, x, y, 
+                 id=None, birthTick=None, 
+                 gender=None):
         
         super(Groc, self).__init__()
 
@@ -170,17 +179,22 @@ class Groc():
         self.color = color
         self.x = int(x)
         self.y = int(y)
-        if id == None:
-            self.id = Groc.grocCount
+        if id is None:
+          self.id = Groc.grocCount
         else:
-            self.id = Groc.grocCount
-        if birthdatetime == None:
-            self.birthdatetime = datetime.datetime.now()
+          self.id = Groc.grocCount
+        if birthTick is None:
+          self.birthTick = self.world.currentTick
         else:
-            self.birthdatetime = birthdatetime
+          self.birthTick = birthTick
+        if gender is None:
+          self.gender = self.geneticAttributes() 
+        else:
+          self.gender = gender
         self.world.logger.debug ("Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
        
+# groc.findNearestGroc
     def findNearestGroc(self, listOfGrocs):
         nearestx = self.world.MAXX
         nearesty = self.world.MAXY 
@@ -199,11 +213,25 @@ class Groc():
               nearestx = anotherGroc.x
               nearesty = anotherGroc.y
         return (nearestx, nearesty)
+    
+# groc.geneticAttributes
+    def geneticAttributes(self):
+        seed = numpy.random.randint(1, self.world.MAXX) 
+        if seed % 2 == 0:
+          gender = Groc.FEMALE
+        else:
+          gender = Groc.MALE
+        # additional attributes added later
+        return gender
 
 
+      
+
+# groc.setMood
     def setMood(self, newMood):
         self.mood = newMood
   
+# groc.didMove
     def didMove(self, x, y):
         if self.x == x and self.y == y:
           result = False
@@ -211,6 +239,7 @@ class Groc():
           result = True
         return (result)
 
+# groc.moveToward
     def moveToward(self, x, y, speed=1):
         newX = self.x
         newY = self.y
@@ -226,18 +255,17 @@ class Groc():
             newY = newY - 1
         return (newX, newY)
  
-# identify
+# groc.identify
     def identify(self):
         self.world.logger.debug ("My ID is " + str(self.id) + 
-                      " and I was born " + 
-                      self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
+                      " and I was born " + str(self.birthTick))
         
-# dump
+# groc.dump
     def dump(self):
         fs = self.world.FIELDSEP
         return ( self.name + fs + self.mood + fs + self.color + fs + 
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
-               self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
+               str(self.birthTick) + fs + self.gender)
 
 
             

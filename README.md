@@ -7,7 +7,7 @@ python3 render.py
 
 ### FYI
 
-- The full syntax of run.py includes optional position parameter names
+- The full syntax of run.py includes optional positional parameters
   - python3 run.py number-of-grocs number-of-iterations filename \
 
 - start the world first with run.py

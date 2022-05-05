@@ -1,17 +1,17 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 #   run
 #
-#      world class for groc, an object-oriented experiment in ai
+#      wrapper for groc, an object-oriented experiment in ai
 #
 #   TDORSEY     2022-05-01  Created run.py by refactoring
-#                           groc.py into "class-specific" files 
-#                           for world.py and groc.py
-#                           Remainder becomes run.py
+#                           groc.py into "class-specific" file 
+#                           for groc.py, remainder becomes run.py
 #   TDORSEY     2022-05-02  Move constants to World class
-#                           Move initial code into main
+#                           Move initialization code into main
 #   TDORSEY     2022-05-03  Move load/save to World class
 #                           Move pipe definition to World class 
+#   TDORSEY     2022-05-04  Render gender
 
 import datetime 
 import logging
@@ -29,8 +29,8 @@ K_ITER_LIMIT = 1000
 # main
 
 def main():   
+  print ("Start render to continue")
   thisWorld = groc.World(1800,800)
-  print ("start render to continue")
   renderPipe = thisWorld.renderPipe
   #Command Line Arguments
   numArgs = len(sys.argv)
@@ -39,17 +39,14 @@ def main():
     p_grocFile = sys.argv[3] 
   else:
     p_grocFile = thisWorld.GROCFILE
-  
   if numArgs > 2:
     p_iterations = int(sys.argv[2])
   else:
     p_iterations = K_ITER_LIMIT
-
   if numArgs > 1:
     p_numGrocs = int(sys.argv[1])
   else:
     p_numGrocs = K_GROC_LIMIT
-  
   print("p_numGrocs: ", p_numGrocs) 
   print("p_iterations: ", p_iterations)
   print("p_grocFile: ", p_grocFile)
@@ -59,18 +56,17 @@ def main():
   #Reading the world
   #
   grocList = thisWorld.getGrocs(p_numGrocs, p_grocFile)
-
-    
   running = True
   counter = 0 
   while running:
     counter += 1
     movingCount = 0 
     for thisGroc in grocList:   
-
        nearestX, nearestY = thisGroc.findNearestGroc(grocList)
        zdist = thisWorld.findDistance(thisGroc.x, thisGroc.y, 
                                       nearestX, nearestY)
+
+       # I still think moods and decisions belong in Groc
        if zdist < 20: 
          thisGroc.setMood('Happy')
          newX, newY = (thisGroc.x, thisGroc.y)
@@ -82,7 +78,7 @@ def main():
          movingCount += 1
          #world.move
          thisWorld.render(thisGroc.id, thisGroc.x, thisGroc.y, 
-                          newX, newY)
+                          newX, newY, thisGroc.gender)
          thisGroc.x = newX
          thisGroc.y = newY
        else: 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # render.py
 #
@@ -9,7 +9,8 @@
 # TDORSEY 2022-04-28  Created
 # TDORSEY 2022-05-01  Renamed to render.py
 # TDORSEY 2022-05-02  Move pipe definitions to World class
-#                     
+# TDORSEY 2022-05-04  Additional fields in renderPipe message
+#                     Support gender-determined coloration
 
 import pygame 
 import os
@@ -24,25 +25,31 @@ except Exception as e:
   print("Start run.py first")
   exit()
 
-line = ""
-msgcount = 0
 print ("Opened pipe")
 pygame.init
 screen = pygame.display.set_mode([1800, 800])
 worldcolor = groc.World.WHITE
-groccolor = groc.World.BLUE
 screen.fill(worldcolor)
+nl = groc.World.NEWLINE
+fs = groc.World.FIELDSEP
+line = ""
+msgcount = 0
 while True:
   msg = rpipe.read(1)
-  if msg == groc.World.NEWLINE:
-    movemsg = line.split(groc.World.FIELDSEP)
+  if msg == nl:
+    movemsg = line.split(fs)
+    x = len(movemsg) 
     grocId = movemsg[0]
     oldX = int(movemsg[1]) 
     oldY = int(movemsg[2])
     newX = int(movemsg[3])
     newY = int(movemsg[4])
-    print (grocId, oldX, oldY, newX, newY)
+    gender = movemsg[5]
     msgcount += 1
+    if gender == groc.Groc.MALE:
+      groccolor = groc.World.BLUE
+    else:
+      groccolor = groc.World.RED
     pygame.draw.circle(screen, worldcolor, (oldX, oldY), 10)
     pygame.draw.circle(screen, groccolor, (newX, newY), 9)
     pygame.display.flip()

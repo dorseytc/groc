@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #
 #   groc.py
 #
@@ -24,6 +23,11 @@
 #                           Exit when nobody is moving 
 #   TDORSEY     2022-05-01  Refactor groc into groc.py class file
 #   TDORSEY     2022-05-02  World owns constants now
+#                           Add movement methods to Groc
+#                           Add currentTick and tick() to World
+#   TDORSEY     2022-05-03  Move load/save to World class
+#   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
+#                           Add birthTick and gender.
 
 import datetime 
 import logging
@@ -33,7 +37,6 @@ import os
 import sys
 
 print("Loading groc")
-
 
 class World():
     'Base class for the world'
@@ -45,9 +48,15 @@ class World():
     NEWLINE = '\n'
     PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
+    WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
-    LOGLEVEL = logging.DEBUG
-    
+    LOGLEVEL = logging.ERROR
+    #LOGLEVEL = logging.DEBUG
+    currentTick = 0    
+    WHITE = (255, 255, 255)
+    BLUE = (0, 0, 255)
+    RED = (128, 0, 0)
+
     def __init__(self, x, y):
         
         super(World, self).__init__()
@@ -60,21 +69,106 @@ class World():
                             format = Log_Format, 
                             level = self.LOGLEVEL)
         self.logger = logging.getLogger()
+        if os.path.exists(self.WORLDFILE):
+          self.worldFile = open(self.WORLDFILE, "r")
+          line = self.worldFile.readline()
+          World.currentTick = int(line)
+        else:
+          World.currentTick = 0
+        if os.path.exists(self.PIPENAME):
+          os.unlink(self.PIPENAME)
+        if not os.path.exists(self.PIPENAME):
+          os.mkfifo(self.PIPENAME, 0o600)
+          self.renderPipe = open(self.PIPENAME, 'w', 
+                                 newline=self.NEWLINE)
+# world.close
+    def close(self):
+        self.renderPipe.close()
+        if os.path.exists(self.PIPENAME):
+          os.unlink(self.PIPENAME) 
 
+# world.findDistance
+    def findDistance(self, firstx, firsty, secondx, secondy):
+        xDiff = abs(firstx - secondx) 
+        yDiff = abs(firsty - secondy)
+        #return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
+        return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
 
-     
+# world.getGrocs
+    def getGrocs(self, numGrocs, grocFile):
+        grocList = []
+        if os.path.exists(grocFile):
+          savedFile = open(grocFile, "r")
+          grocsRead = 0 
+          line = savedFile.readline()
+          while line: 
+            grocsRead += 1
+            list = line.split(self.FIELDSEP)
+            print("List: ", list)
+            newGroc = Groc(self, list[0],list[1], list[2], 
+                          list[3], list[4], list[5], 
+                          list[6], list[7])
+            newGroc.identify()
+            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
+                        newGroc.gender)
+            grocList.append(newGroc)
+            line = savedFile.readline()
+          savedFile.close()      
+        else:
+          grocsRead = 0
+        if grocsRead < numGrocs:
+          for count in range(0, (numGrocs - grocsRead)):
+            name = 'G' + str(count)
+            newX, newY = self.randomLocation()
+            newGroc = Groc(self, name, 'happy', 'green', newX, newY)
+            newGroc.identify()
+            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
+                        newGroc.gender)
+            grocList.append(newGroc)
+        return grocList
+
+# world.randomLocation
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
         return (newX, newY)
 
+# world.render
+    def render(self, grocId, oldx, oldy, newx, newy, gender):
+        fs = World.FIELDSEP
+        nl = World.NEWLINE
+        self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
+                              str(oldy) + fs + str(newx) + fs + 
+                              str(newy) + fs + gender)
+
+# world.saveGrocs
+    def saveGrocs(self, grocList, grocFile):
+      saveFile = open(grocFile, "w")
+      for thisGroc in grocList:
+        grocText = thisGroc.dump()
+        saveFile.write(grocText)
+        self.logger.debug ("Groc " + str(thisGroc.id) + " saved")
+      saveFile.close()
+
+# world.saveWorld
+    def saveWorld(self):
+        self.worldFile = open(World.WORLDFILE, "w")
+        self.worldFile.write(str(self.currentTick) + self.NEWLINE)
+        self.worldFile.close()
+
+# world.tick
+    def tick(self):
+        self.currentTick += 1
 
 class Groc():
     'Base class for the groc'
     grocCount = 0    
+    MALE = "M"
+    FEMALE = "F"
     
-    def __init__(self, world, name, mood, color, x, y, id=None, 
-                 birthdatetime=None, isMoving=False, direction=0):
+    def __init__(self, world, name, mood, color, x, y, 
+                 id=None, birthTick=None, 
+                 gender=None):
         
         super(Groc, self).__init__()
 
@@ -85,99 +179,93 @@ class Groc():
         self.color = color
         self.x = int(x)
         self.y = int(y)
-        if id == None:
-            self.id = Groc.grocCount
+        if id is None:
+          self.id = Groc.grocCount
         else:
-            self.id = Groc.grocCount
-        if birthdatetime == None:
-            self.birthdatetime = datetime.datetime.now()
+          self.id = Groc.grocCount
+        if birthTick is None:
+          self.birthTick = self.world.currentTick
         else:
-            self.birthdatetime = birthdatetime
-        self.isMoving = isMoving
+          self.birthTick = birthTick
+        if gender is None:
+          self.gender = self.geneticAttributes() 
+        else:
+          self.gender = gender
         self.world.logger.debug ("Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
-        self.direction = direction
        
-# setMotion
-    def setMotion(self, pisMoving):
-        self.isMoving = pisMoving
+# groc.findNearestGroc
+    def findNearestGroc(self, listOfGrocs):
+        nearestx = self.world.MAXX
+        nearesty = self.world.MAXY 
+        leastDist = nearestx + nearesty
+        for anotherGroc in listOfGrocs:
+          if anotherGroc.id == self.id:
+            self.world.logger.debug("Groc " + str(self.id) + 
+                          " skip myself")
+          else: 
+            zDist = self.world.findDistance(self.x, self.y, 
+                               anotherGroc.x, anotherGroc.y)
+            self.world.logger.debug("Groc " + str(anotherGroc.id) + 
+                       " is " + str(zDist) + " away")
+            if zDist < leastDist:
+              leastDist = zDist
+              nearestx = anotherGroc.x
+              nearesty = anotherGroc.y
+        return (nearestx, nearesty)
+    
+# groc.geneticAttributes
+    def geneticAttributes(self):
+        seed = numpy.random.randint(1, self.world.MAXX) 
+        if seed % 2 == 0:
+          gender = Groc.FEMALE
+        else:
+          gender = Groc.MALE
+        # additional attributes added later
+        return gender
 
-# setDirection
-    def setDirection(self, pdirection=0):
-        self.direction = pdirection
 
-# update        
-    def move(self):
-        self.world.logger.debug ("update Groc " + str(self.id) + " isMoving? " + 
-                      str(self.isMoving) + " Direction? " + 
-                      str(self.direction) + " " + str(self.x) + "," + 
-                      str( self.y))
+      
+
+# groc.setMood
+    def setMood(self, newMood):
+        self.mood = newMood
+  
+# groc.didMove
+    def didMove(self, x, y):
+        if self.x == x and self.y == y:
+          result = False
+        else:
+          result = True
+        return (result)
+
+# groc.moveToward
+    def moveToward(self, x, y, speed=1):
         newX = self.x
         newY = self.y
-        if self.isMoving == True:
-            if self.direction == self.world.NORTH:
-                newY = self.y + 1
-            elif self.direction == self.world.SOUTH:
-                newY = self.y - 1
-            elif self.direction == self.world.EAST:
-                newX = self.x + 1
-            else:  
-                newX = self.x - 1
-                
-            if newX <= 0:
-                newX = 0;
-                if self.direction == self.world.WEST:
-                    self.direction = self.world.NORTH
-            elif newX > self.world.MAXX:
-                newX = self.world.MAXX
-                if self.direction == self.world.EAST:
-                    self.direction = self.world.SOUTH
-            elif newY <= 0:
-                newY = 1
-                if self.direction == self.world.NORTH:
-                    self.direction = self.world.EAST
-            elif newY >= self.world.MAXY:
-                newY = self.world.MAXY   
-                if self.direction == self.world.SOUTH:
-                    self.direction = self.world.WEST
-        else:
-            self.world.logger.debug ("UPDATE Groc " + str(self.id) + 
-                          " has nothing to do")
-        return (newX, newY) 
+        for step in range(speed):
+          self.world.logger.debug("Step " + str(step))
+          if newX < x:
+            newX = newX + 1
+          elif newX > x:
+            newX = newX - 1
+          elif newY < y:
+            newY = newY + 1
+          elif newY > y:
+            newY = newY - 1
+        return (newX, newY)
  
- 
- 
-# introduce 
-    def introduce(self):
-        self.world.logger.debug ("My name is " + self.name + ".  I am " + self.color + 
-                      " and I am feeling " + self.mood)
-        
-# identify
+# groc.identify
     def identify(self):
-        self.world.logger.debug ("My ID is " + str(self.id) + " and I was born " + 
-                      self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
+        self.world.logger.debug ("My ID is " + str(self.id) + 
+                      " and I was born " + str(self.birthTick))
         
-# locate
-    def locate(self):
-        self.world.logger.debug ("locate Groc " + self.name + " at " + str(self.x) + 
-                      ", " + str(self.y) + " Moving: " + 
-                      str(self.isMoving) +  " Direction: " + 
-                      str(self.direction))
-        
-# census
-    def census(self):
-        self.world.logger.debug ("Total Groc Population is " + str(Groc.grocCount))
-
-# getCount
-    def getCount(self):
-        return self.grocCount
-    
-# dump
+# groc.dump
     def dump(self):
         fs = self.world.FIELDSEP
         return ( self.name + fs + self.mood + fs + self.color + fs + 
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
-               self.birthdatetime.strftime("%Y-%m-%d %H:%M"))
+               str(self.birthTick) + fs + self.gender)
 
 
             

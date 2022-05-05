@@ -11,6 +11,7 @@
 # TDORSEY 2022-04-28  Created
 # TDORSEY 2022-05-01  Renamed render-d to denote its roles as a
 #                     debugging tool
+# TDORSEY 2022-05-02  Show received line message even if '\n'
 #
 import os, sys, time
 
@@ -29,7 +30,7 @@ print ("Opened pipe")
 while True:
   msg = rpipe.read(1)
   if msg == '\n':
-    print(line)
+    print("Line: ", line)
     line = ""
     msgcount += 1
   else:

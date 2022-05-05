@@ -36,6 +36,7 @@ msgcount = 0
 while True:
   msg = rpipe.read(1)
   if msg == groc.World.NEWLINE:
+    print("Line: ", line)
     movemsg = line.split(groc.World.FIELDSEP)
     x = len(movemsg) 
     grocId = movemsg[0]

@@ -33,6 +33,7 @@ def main():
   print ("Start render to continue")
   thisWorld = groc.World(1800,800)
   renderPipe = thisWorld.renderPipe
+  logger = thisWorld.logger
   #Command Line Arguments
   numArgs = len(sys.argv)
   if numArgs > 3:
@@ -47,11 +48,12 @@ def main():
     p_numGrocs = int(sys.argv[1])
   else:
     p_numGrocs = K_GROC_LIMIT
-  print("p_numGrocs: ", p_numGrocs) 
+  print("p_numgrocs: ", p_numGrocs) 
   print("p_iterations: ", p_iterations)
-  print("p_grocFile: ", p_grocFile)
-
-  logger = thisWorld.logger
+  print("p_grocfile: ", p_grocFile)
+  logger.info("Started run with p_numgrocs=" + str(p_numGrocs) + 
+              ", p_iterations=" + str(p_iterations) + 
+              ", p_grocfile=" + str(p_grocFile))
   # 
   #Reading the world
   #
@@ -87,12 +89,12 @@ def main():
 
     if movingCount == 0:
       running = False
-      logger.debug("Nobody is moving")
+      logger.info("Nobody is moving")
     elif p_iterations == 0:
       running = True
     elif counter >= p_iterations:
       running = False
-      logger.debug("Iteration count exceeded")
+      logger.info("Iteration count exceeded")
     if counter % 100 == 0 or running == False:
       # write every 100 moves or when iteration limit reached
       thisWorld.saveGrocs(grocList, p_grocFile)
@@ -104,6 +106,7 @@ def main():
   # Saving The World
   #
   thisWorld.close() 
+  logger.info("World closed")
             
 if __name__ == '__main__':
     main()

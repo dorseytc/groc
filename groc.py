@@ -51,8 +51,9 @@ class World():
     GROCFILE = "grocfile.dat"
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
+    LOGLEVEL = logging.INFO
     #LOGLEVEL = logging.ERROR
-    LOGLEVEL = logging.DEBUG
+    #LOGLEVEL = logging.DEBUG
     currentTick = 0    
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)

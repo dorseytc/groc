@@ -64,21 +64,17 @@ def main():
     counter += 1
     movingCount = 0 
     for thisGroc in grocList:   
-       nearestX, nearestY = thisGroc.findNearestGroc(grocList)
-       zdist = thisWorld.findDistance(thisGroc.x, thisGroc.y, 
-                                      nearestX, nearestY)
-
+       nearestGroc = thisGroc.findNearestGroc(grocList)
        # I still think moods and decisions belong in Groc
-       if zdist < 20: 
-         thisGroc.setMood('Happy')
-         newX, newY = (thisGroc.x, thisGroc.y)
+       targetX, targetY, newMood = thisGroc.decideMovement(nearestGroc)
+       if newMood in (thisGroc.LONELY, thisGroc.CROWDED): 
+         newX, newY = thisGroc.moveToward(targetX, targetY) 
        else:
-         thisGroc.setMood('Lonely')
-         newX, newY = thisGroc.moveToward(nearestX, nearestY)
+         newX, newY = (thisGroc.x, thisGroc.y) 
+       thisGroc.setMood(newMood)
 
-       if thisGroc.didMove(newX, newY): 
+       if thisGroc.didMove(newX, newY):
          movingCount += 1
-         #world.move
          thisWorld.render(thisGroc.id, thisGroc.x, thisGroc.y, 
                           newX, newY, thisGroc.gender)
          thisGroc.x = newX

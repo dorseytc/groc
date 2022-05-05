@@ -41,10 +41,13 @@ print("Loading groc")
 
 class World():
     'Base class for the world'
+    # DIRECTIONS
     NORTH = 1
     EAST = 2
     SOUTH = 3
     WEST = 4
+    
+    # FILE UTILS
     FIELDSEP = '|'
     NEWLINE = '\n'
     PIPENAME = "/tmp/grocpipe"
@@ -54,11 +57,14 @@ class World():
     LOGLEVEL = logging.INFO
     #LOGLEVEL = logging.ERROR
     #LOGLEVEL = logging.DEBUG
+
     currentTick = 0    
+
+    # COLORS
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
     RED = (128, 0, 0)
-
+  
     def __init__(self, x, y):
         
         super(World, self).__init__()
@@ -108,7 +114,7 @@ class World():
             list = line.split(self.FIELDSEP)
             newGroc = Groc(self, list[0],list[1], list[2], 
                           list[3], list[4], list[5], 
-                          list[6], list[7].rstrip(self.NEWLINE))
+                          list[6].rstrip(self.NEWLINE))
             newGroc.identify()
             self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
                         newGroc.gender)
@@ -119,9 +125,8 @@ class World():
           grocsRead = 0
         if grocsRead < numGrocs:
           for count in range(0, (numGrocs - grocsRead)):
-            name = 'G' + str(count)
             newX, newY = self.randomLocation()
-            newGroc = Groc(self, name, 'happy', 'green', newX, newY)
+            newGroc = Groc(self, 'happy', 'green', newX, newY)
             newGroc.identify()
             self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
                         newGroc.gender)
@@ -132,6 +137,7 @@ class World():
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
+        self.logger.info("Random Location " + str(newX) + ", " + str(newY))
         return (newX, newY)
 
 # world.render
@@ -166,8 +172,13 @@ class Groc():
     grocCount = 0    
     MALE = "M"
     FEMALE = "F"
+    # MOODS
+    CROWDED = "Crowded"
+    HAPPY = "Happy"
+    LONELY = "Lonely"
+
     
-    def __init__(self, world, name, mood, color, x, y, 
+    def __init__(self, world, mood, color, x, y, 
                  id=None, birthTick=None, 
                  gender=None):
         
@@ -175,7 +186,6 @@ class Groc():
 
         Groc.grocCount += 1
         self.world = world
-        self.name = name
         self.mood = mood
         self.color = color
         self.x = int(x)
@@ -195,11 +205,29 @@ class Groc():
         self.world.logger.debug ("Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
        
+# groc.decideMovement
+    def decideMovement(self, nearestGroc):
+       zdist = self.world.findDistance(self.x, self.y, 
+                                       nearestGroc.x, nearestGroc.y)
+       comfortZoneLow = 15
+       comfortZoneHigh = 20
+       if comfortZoneLow <= zdist <= comfortZoneHigh:
+         mood = self.HAPPY
+         newX, newY = (self.x, self.y)
+       elif zdist > comfortZoneHigh:
+         mood = self.LONELY 
+         newX, newY = nearestGroc.x, nearestGroc.y
+       else:
+         mood = self.CROWDED
+         newX, newY = self.world.randomLocation()
+       return (newX, newY, mood)
+
 # groc.findNearestGroc
     def findNearestGroc(self, listOfGrocs):
         nearestx = self.world.MAXX
         nearesty = self.world.MAXY 
         leastDist = nearestx + nearesty
+        nearestGroc = None
         for anotherGroc in listOfGrocs:
           if anotherGroc.id == self.id:
             self.world.logger.debug("Groc " + str(self.id) + 
@@ -211,9 +239,9 @@ class Groc():
                        " is " + str(zDist) + " away")
             if zDist < leastDist:
               leastDist = zDist
-              nearestx = anotherGroc.x
-              nearesty = anotherGroc.y
-        return (nearestx, nearesty)
+              nearestGroc = anotherGroc
+              
+        return nearestGroc
     
 # groc.geneticAttributes
     def geneticAttributes(self):
@@ -264,7 +292,7 @@ class Groc():
 # groc.dump
     def dump(self):
         fs = self.world.FIELDSEP
-        return ( self.name + fs + self.mood + fs + self.color + fs + 
+        return ( self.mood + fs + self.color + fs + 
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
                str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
 

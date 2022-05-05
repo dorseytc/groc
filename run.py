@@ -12,6 +12,7 @@
 #   TDORSEY     2022-05-03  Move load/save to World class
 #                           Move pipe definition to World class 
 #   TDORSEY     2022-05-04  Render gender
+#   TDORSEY     2022-05-05  Blank line fix
 
 import datetime 
 import logging
@@ -34,7 +35,6 @@ def main():
   renderPipe = thisWorld.renderPipe
   #Command Line Arguments
   numArgs = len(sys.argv)
-  print(sys.argv)
   if numArgs > 3:
     p_grocFile = sys.argv[3] 
   else:

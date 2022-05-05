@@ -28,6 +28,7 @@
 #   TDORSEY     2022-05-03  Move load/save to World class
 #   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
 #                           Add birthTick and gender.
+#   TDORSEY     2022-05-04  Blank Line fix
 
 import datetime 
 import logging
@@ -50,8 +51,8 @@ class World():
     GROCFILE = "grocfile.dat"
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
-    LOGLEVEL = logging.ERROR
-    #LOGLEVEL = logging.DEBUG
+    #LOGLEVEL = logging.ERROR
+    LOGLEVEL = logging.DEBUG
     currentTick = 0    
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
@@ -104,10 +105,9 @@ class World():
           while line: 
             grocsRead += 1
             list = line.split(self.FIELDSEP)
-            print("List: ", list)
             newGroc = Groc(self, list[0],list[1], list[2], 
                           list[3], list[4], list[5], 
-                          list[6], list[7])
+                          list[6], list[7].rstrip(self.NEWLINE))
             newGroc.identify()
             self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
                         newGroc.gender)
@@ -139,7 +139,7 @@ class World():
         nl = World.NEWLINE
         self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
                               str(oldy) + fs + str(newx) + fs + 
-                              str(newy) + fs + gender)
+                              str(newy) + fs + gender + nl)
 
 # world.saveGrocs
     def saveGrocs(self, grocList, grocFile):
@@ -265,7 +265,7 @@ class Groc():
         fs = self.world.FIELDSEP
         return ( self.name + fs + self.mood + fs + self.color + fs + 
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
-               str(self.birthTick) + fs + self.gender)
+               str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
 
 
             

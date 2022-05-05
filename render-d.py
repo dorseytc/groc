@@ -12,10 +12,14 @@
 # TDORSEY 2022-05-01  Renamed render-d to denote its roles as a
 #                     debugging tool
 # TDORSEY 2022-05-02  Show received line message even if '\n'
+# TDORSEY 2022-05-05  Debug missing messages, use world constants
+#           
 #
-import os, sys, time
+import groc
+import os
+import sys
 
-pipe = "/tmp/grocpipe"
+pipe = groc.World.PIPENAME
 try:
   print("Looking for the pipe")
   rpipe = open(pipe, "r")
@@ -29,7 +33,7 @@ msgcount = 0
 print ("Opened pipe")
 while True:
   msg = rpipe.read(1)
-  if msg == '\n':
+  if msg == groc.World.NEWLINE:
     print("Line: ", line)
     line = ""
     msgcount += 1

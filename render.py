@@ -11,6 +11,7 @@
 # TDORSEY 2022-05-02  Move pipe definitions to World class
 # TDORSEY 2022-05-04  Additional fields in renderPipe message
 #                     Support gender-determined coloration
+# TDORSEY 2022-05-05  Blank Line fix
 
 import pygame 
 import os
@@ -30,14 +31,12 @@ pygame.init
 screen = pygame.display.set_mode([1800, 800])
 worldcolor = groc.World.WHITE
 screen.fill(worldcolor)
-nl = groc.World.NEWLINE
-fs = groc.World.FIELDSEP
 line = ""
 msgcount = 0
 while True:
   msg = rpipe.read(1)
-  if msg == nl:
-    movemsg = line.split(fs)
+  if msg == groc.World.NEWLINE:
+    movemsg = line.split(groc.World.FIELDSEP)
     x = len(movemsg) 
     grocId = movemsg[0]
     oldX = int(movemsg[1]) 
@@ -67,4 +66,3 @@ while running:
     if event.type == pygame.QUIT:
       pygame.quit()
       running = False
-

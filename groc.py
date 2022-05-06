@@ -137,7 +137,6 @@ class World():
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
-        self.logger.info("Random Location " + str(newX) + ", " + str(newY))
         return (newX, newY)
 
 # world.render
@@ -209,7 +208,7 @@ class Groc():
     def decideMovement(self, nearestGroc):
        zdist = self.world.findDistance(self.x, self.y, 
                                        nearestGroc.x, nearestGroc.y)
-       comfortZoneLow = 15
+       comfortZoneLow = 18
        comfortZoneHigh = 20
        if comfortZoneLow <= zdist <= comfortZoneHigh:
          mood = self.HAPPY
@@ -218,8 +217,14 @@ class Groc():
          mood = self.LONELY 
          newX, newY = nearestGroc.x, nearestGroc.y
        else:
-         mood = self.CROWDED
-         newX, newY = self.world.randomLocation()
+         if nearestGroc.mood == self.CROWDED:
+           mood = self.HAPPY
+           newX, newY = self.x, self.y  
+         else:
+           mood = self.CROWDED
+           newX, newY = self.world.randomLocation()
+         self.world.logger.debug(str(self.id) + " is " + self.mood + 
+                                "(" + str(newX) + "," + str(newY) + ")")
        return (newX, newY, mood)
 
 # groc.findNearestGroc

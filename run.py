@@ -26,6 +26,7 @@ import groc
 
 K_GROC_LIMIT = 2
 K_ITER_LIMIT = 1000
+K_LOG_LEVEL = 20
 
 
 # main
@@ -34,13 +35,16 @@ def main():
   print ("Start render to continue")
   thisWorld = groc.World(1800,800)
   renderPipe = thisWorld.renderPipe
-  logger = thisWorld.logger
   #Command Line Arguments
   numArgs = len(sys.argv)
-  if numArgs > 3:
-    p_grocFile = sys.argv[3] 
+  if numArgs > 4:
+    p_grocFile = sys.argv[4] 
   else:
     p_grocFile = thisWorld.GROCFILE
+  if numArgs > 3:
+    p_logLevel = int(sys.argv[3])
+  else:
+    p_logLevel = K_LOG_LEVEL
   if numArgs > 2:
     p_iterations = int(sys.argv[2])
   else:
@@ -49,26 +53,30 @@ def main():
     p_numGrocs = int(sys.argv[1])
   else:
     p_numGrocs = K_GROC_LIMIT
-  print("p_numgrocs: ", p_numGrocs) 
+  print("p_numGrocs: ", p_numGrocs) 
   print("p_iterations: ", p_iterations)
-  print("p_grocfile: ", p_grocFile)
+  print("p_logLevel: ", p_logLevel)
+  print("p_grocFile: ", p_grocFile)
+  logger = thisWorld.getLogger(p_logLevel)
   logger.info("Started run with p_numgrocs=" + str(p_numGrocs) + 
               ", p_iterations=" + str(p_iterations) + 
               ", p_grocfile=" + str(p_grocFile))
   # 
   #Reading the world
   #
-  grocList = thisWorld.getGrocs(p_numGrocs, p_grocFile)
+  thisWorld.getGrocs(p_numGrocs, p_grocFile)
   running = True
   counter = 0 
   while running:
     counter += 1
     movingCount = 0 
-    for thisGroc in grocList:   
-       thisGroc.observe(grocList)
+    for thisGroc in thisWorld.grocList:   
+       oldX = thisGroc.x
+       oldY = thisGroc.y
+       thisGroc.observe()
        thisGroc.decide()
        thisGroc.act()
-       if thisGroc.didMove(newX, newY):
+       if thisGroc.didMove(oldX, oldY):
          movingCount += 1
        else: 
          logger.debug("Groc " + str(thisGroc.id) + 
@@ -84,7 +92,7 @@ def main():
       logger.info("Iteration count exceeded")
     if counter % 100 == 0 or running == False:
       # write every 100 moves or when iteration limit reached
-      thisWorld.saveGrocs(grocList, p_grocFile)
+      thisWorld.saveGrocs(p_grocFile)
       thisWorld.saveWorld()
 
     thisWorld.tick()

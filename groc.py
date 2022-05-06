@@ -189,6 +189,8 @@ class Groc():
         self.color = color
         self.x = int(x)
         self.y = int(y)
+        self.targetX = None
+        self.targetY = None
         if id is None:
           self.id = Groc.grocCount
         else:
@@ -273,27 +275,6 @@ class Groc():
           result = True
         return (result)
 
-# groc.moveToward
-    def moveToward(self, x, y, speed=1):
-        newX = self.x
-        newY = self.y
-        for step in range(speed):
-          self.world.logger.debug("Step " + str(step))
-          if newX < x:
-            newX = newX + 1
-          elif newX > x:
-            newX = newX - 1
-          elif newY < y:
-            newY = newY + 1
-          elif newY > y:
-            newY = newY - 1
-        return (newX, newY)
- 
-# groc.identify
-    def identify(self):
-        self.world.logger.debug ("My ID is " + str(self.id) + 
-                      " and I was born " + str(self.birthTick))
-        
 # groc.dump
     def dump(self):
         fs = self.world.FIELDSEP
@@ -301,6 +282,46 @@ class Groc():
                str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
                str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
 
+# groc.hasTarget
+    def hasTarget(self):
+        if self.targetX is None or self.targetY is None:
+          answer = False
+        elif self.targetX == self.x and self.targetY == self.y:
+          targetX = None
+          targetY = None
+          answer = False
+        else:
+          answer = True
+        return answer
+          
 
-            
+# groc.identify
+    def identify(self):
+        self.world.logger.debug ("My ID is " + str(self.id) + 
+                      " and I was born " + str(self.birthTick))
 
+# groc.moveTowardTarget
+    def moveTowardTarget(self, speed=1):
+        if self.targetX is None or self.targetY is None:
+          self.world.logger.debug(str(self.id) + " has no target")
+          newX = self.x
+          newY = self.y
+        else:
+          newX = self.x
+          newY = self.y
+          for step in range(speed):
+            self.world.logger.debug("Step " + str(step))
+            if newX < self.targetX:
+              newX = newX + 1
+            elif newX > self.targetX:
+              newX = newX - 1
+            elif newY < self.targetY:
+              newY = newY + 1
+            elif newY > self.targetY:
+              newY = newY - 1
+        return (newX, newY)
+
+# groc.setTarget(self, newx, newy)
+    def setTarget(self, newx, newy):
+        self.targetX = newx
+        self.targetY = newy 

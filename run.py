@@ -13,6 +13,7 @@
 #                           Move pipe definition to World class 
 #   TDORSEY     2022-05-04  Render gender
 #   TDORSEY     2022-05-05  Blank line fix
+#   TDORSEY     2022-05-06  Observe, decide, act
 
 import datetime 
 import logging
@@ -64,21 +65,11 @@ def main():
     counter += 1
     movingCount = 0 
     for thisGroc in grocList:   
-       nearestGroc = thisGroc.findNearestGroc(grocList)
-       # I still think moods and decisions belong in Groc
-       targetX, targetY, newMood = thisGroc.decideMovement(nearestGroc)
-       if newMood in (thisGroc.LONELY, thisGroc.CROWDED): 
-         newX, newY = thisGroc.moveToward(targetX, targetY) 
-       else:
-         newX, newY = (thisGroc.x, thisGroc.y) 
-       thisGroc.setMood(newMood)
-
+       thisGroc.observe(grocList)
+       thisGroc.decide()
+       thisGroc.act()
        if thisGroc.didMove(newX, newY):
          movingCount += 1
-         thisWorld.render(thisGroc.id, thisGroc.x, thisGroc.y, 
-                          newX, newY, thisGroc.gender)
-         thisGroc.x = newX
-         thisGroc.y = newY
        else: 
          logger.debug("Groc " + str(thisGroc.id) + 
                       " did not move")

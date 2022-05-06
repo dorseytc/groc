@@ -13,7 +13,8 @@
 #                           Move pipe definition to World class 
 #   TDORSEY     2022-05-04  Render gender
 #   TDORSEY     2022-05-05  Blank line fix
-#   TDORSEY     2022-05-06  Observe, decide, act
+#   TDORSEY     2022-05-06  Observe, decide, act; 
+#                           Added log level arg
 
 import datetime 
 import logging

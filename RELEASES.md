@@ -19,3 +19,10 @@
 - remove birthdatetime (gregorian)
 - add gender
 - augment groc.dat file format
+
+### movers (v0.5.0) -- in progress
+
+- variable speed
+- randomize direction
+- add overcrowding motivator
+- gender-based companionship preference

@@ -39,3 +39,11 @@
 ### death
   - not started
 - death might occur of old age, starvation, predation
+
+### render
+- pygame and debug scripts
+  - done
+- leverage World constants
+  - done
+- encapsulate pipe complexity 
+  - not started

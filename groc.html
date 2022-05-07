@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module groc</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>groc</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/ted/git/groc/groc.py">/home/ted/git/groc/groc.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;&nbsp;&nbsp;groc.py<br>
+#<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python&nbsp;class&nbsp;for&nbsp;an&nbsp;experiment&nbsp;in&nbsp;<a href="builtins.html#object">object</a>-oriented&nbsp;ai<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+#<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2016-10-16&nbsp;&nbsp;Created<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2016-10-16&nbsp;&nbsp;Saving&nbsp;the&nbsp;world<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2016-10-16&nbsp;&nbsp;Retrieving&nbsp;saved&nbsp;world<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2016-10-16&nbsp;&nbsp;Improved&nbsp;class&nbsp;and&nbsp;function&nbsp;structure<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2016-10-17&nbsp;&nbsp;Rendering&nbsp;via&nbsp;pygame<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2016-10-22&nbsp;&nbsp;Some&nbsp;form&nbsp;of&nbsp;pygame&nbsp;hell<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-04-26&nbsp;&nbsp;Removing&nbsp;pygame&nbsp;in&nbsp;favor&nbsp;of&nbsp;text&nbsp;based&nbsp;<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-04-27&nbsp;&nbsp;Adding&nbsp;logging<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configurable&nbsp;loop&nbsp;lengths&nbsp;<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-04-27&nbsp;&nbsp;Log&nbsp;groc&nbsp;moves&nbsp;separately&nbsp;<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-04-28&nbsp;&nbsp;<a href="#Groc">Groc</a>&nbsp;position&nbsp;to&nbsp;stdout&nbsp;for&nbsp;now<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-04-29&nbsp;&nbsp;Pipe&nbsp;location&nbsp;to&nbsp;world.py&nbsp;(later&nbsp;w-debug.py)<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Brownian&nbsp;motion<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ability&nbsp;to&nbsp;iterate&nbsp;forever<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-04-30&nbsp;&nbsp;Grocs&nbsp;seek&nbsp;nearest&nbsp;groc<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generate&nbsp;grocs&nbsp;up&nbsp;to&nbsp;limit&nbsp;when&nbsp;reading&nbsp;a&nbsp;file<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Exit&nbsp;when&nbsp;nobody&nbsp;is&nbsp;moving&nbsp;<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-01&nbsp;&nbsp;Refactor&nbsp;groc&nbsp;into&nbsp;groc.py&nbsp;class&nbsp;file<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-02&nbsp;&nbsp;<a href="#World">World</a>&nbsp;owns&nbsp;constants&nbsp;now<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;movement&nbsp;methods&nbsp;to&nbsp;<a href="#Groc">Groc</a><br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;currentTick&nbsp;and&nbsp;tick()&nbsp;to&nbsp;<a href="#World">World</a><br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-03&nbsp;&nbsp;Move&nbsp;load/save&nbsp;to&nbsp;<a href="#World">World</a>&nbsp;class<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-04&nbsp;&nbsp;New&nbsp;groc&nbsp;file&nbsp;format,&nbsp;remove&nbsp;birthdatetime<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;birthTick&nbsp;and&nbsp;gender.<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-04&nbsp;&nbsp;Blank&nbsp;Line&nbsp;fix<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-06&nbsp;&nbsp;observe,decide,act<br>
+#&nbsp;&nbsp;&nbsp;TDORSEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2022-05-07&nbsp;&nbsp;grocfile.dat&nbsp;contains&nbsp;<a href="#Groc">Groc</a>&nbsp;constructor&nbsp;calls</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="datetime.html">datetime</a><br>
+<a href="logging.html">logging</a><br>
+</td><td width="25%" valign=top><a href="math.html">math</a><br>
+<a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="groc.html#Groc">Groc</a>
+</font></dt><dt><font face="helvetica, arial"><a href="groc.html#World">World</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Groc">class <strong>Groc</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Groc">Groc</a>(world,&nbsp;mood,&nbsp;color,&nbsp;x,&nbsp;y,&nbsp;id=None,&nbsp;birthTick=None,&nbsp;gender=None)<br>
+&nbsp;<br>
+Base&nbsp;class&nbsp;for&nbsp;the&nbsp;groc<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Groc-__init__"><strong>__init__</strong></a>(self, world, mood, color, x, y, id=None, birthTick=None, gender=None)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl><dt><a name="Groc-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><tt>Return&nbsp;repr(self).</tt></dd></dl>
+
+<dl><dt><a name="Groc-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>Return&nbsp;str(self).</tt></dd></dl>
+
+<dl><dt><a name="Groc-act"><strong>act</strong></a>(self)</dt><dd><tt>take&nbsp;action&nbsp;after&nbsp;<a href="#Groc-observe">observe</a>(),&nbsp;<a href="#Groc-decide">decide</a>()</tt></dd></dl>
+
+<dl><dt><a name="Groc-countNearbyGrocs"><strong>countNearbyGrocs</strong></a>(self, searchRadius)</dt><dd><tt>count&nbsp;within&nbsp;a&nbsp;given&nbsp;radius</tt></dd></dl>
+
+<dl><dt><a name="Groc-decide"><strong>decide</strong></a>(self)</dt><dd><tt>after&nbsp;observe,&nbsp;decide&nbsp;what&nbsp;to&nbsp;do&nbsp;before&nbsp;acting</tt></dd></dl>
+
+<dl><dt><a name="Groc-didMove"><strong>didMove</strong></a>(self, x, y)</dt></dl>
+
+<dl><dt><a name="Groc-dump"><strong>dump</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Groc-findNearestGroc"><strong>findNearestGroc</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Groc-geneticAttributes"><strong>geneticAttributes</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Groc-hasTarget"><strong>hasTarget</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Groc-identify"><strong>identify</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Groc-moveTowardTarget"><strong>moveTowardTarget</strong></a>(self, speed=1)</dt></dl>
+
+<dl><dt><a name="Groc-observe"><strong>observe</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Groc-setMood"><strong>setMood</strong></a>(self, newMood)</dt></dl>
+
+<dl><dt><a name="Groc-setTarget"><strong>setTarget</strong></a>(self, newx, newy)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>CROWDED</strong> = 'Crowded'</dl>
+
+<dl><dt><strong>FEMALE</strong> = 'F'</dl>
+
+<dl><dt><strong>HAPPY</strong> = 'Happy'</dl>
+
+<dl><dt><strong>LONELY</strong> = 'Lonely'</dl>
+
+<dl><dt><strong>MALE</strong> = 'M'</dl>
+
+<dl><dt><strong>grocCount</strong> = 0</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="World">class <strong>World</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#World">World</a>(x,&nbsp;y)<br>
+&nbsp;<br>
+Base&nbsp;class&nbsp;for&nbsp;the&nbsp;world<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="World-__init__"><strong>__init__</strong></a>(self, x, y)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl><dt><a name="World-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="World-findDistance"><strong>findDistance</strong></a>(self, firstx, firsty, secondx, secondy)</dt></dl>
+
+<dl><dt><a name="World-getGrocs"><strong>getGrocs</strong></a>(self, numGrocs, grocFile)</dt></dl>
+
+<dl><dt><a name="World-getLogger"><strong>getLogger</strong></a>(self, debugLevel)</dt></dl>
+
+<dl><dt><a name="World-randomLocation"><strong>randomLocation</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="World-render"><strong>render</strong></a>(self, grocId, oldx, oldy, newx, newy, gender)</dt></dl>
+
+<dl><dt><a name="World-saveGrocs"><strong>saveGrocs</strong></a>(self, grocFile)</dt></dl>
+
+<dl><dt><a name="World-saveWorld"><strong>saveWorld</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="World-tick"><strong>tick</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>BLUE</strong> = (0, 0, 255)</dl>
+
+<dl><dt><strong>EAST</strong> = 2</dl>
+
+<dl><dt><strong>FIELDSEP</strong> = '|'</dl>
+
+<dl><dt><strong>GROCFILE</strong> = 'grocfile.dat'</dl>
+
+<dl><dt><strong>LOGFILE</strong> = 'groc.log'</dl>
+
+<dl><dt><strong>NEWLINE</strong> = '<font color="#c040c0">\n</font>'</dl>
+
+<dl><dt><strong>NORTH</strong> = 1</dl>
+
+<dl><dt><strong>PIPENAME</strong> = '/tmp/grocpipe'</dl>
+
+<dl><dt><strong>RED</strong> = (128, 0, 0)</dl>
+
+<dl><dt><strong>SOUTH</strong> = 3</dl>
+
+<dl><dt><strong>WEST</strong> = 4</dl>
+
+<dl><dt><strong>WHITE</strong> = (255, 255, 255)</dl>
+
+<dl><dt><strong>WORLDFILE</strong> = '.world.dat'</dl>
+
+<dl><dt><strong>currentTick</strong> = 0</dl>
+
+</td></tr></table></td></tr></table>
+</body></html>

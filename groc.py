@@ -28,6 +28,9 @@
 #   TDORSEY     2022-05-03  Move load/save to World class
 #   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
 #                           Add birthTick and gender.
+#   TDORSEY     2022-05-04  Blank Line fix
+#   TDORSEY     2022-05-06  observe,decide,act
+#   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
 
 import datetime 
 import logging
@@ -40,35 +43,34 @@ print("Loading groc")
 
 class World():
     'Base class for the world'
+    # DIRECTIONS
     NORTH = 1
     EAST = 2
     SOUTH = 3
     WEST = 4
+    
+    # FILE UTILS
     FIELDSEP = '|'
     NEWLINE = '\n'
     PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
-    LOGLEVEL = logging.ERROR
-    #LOGLEVEL = logging.DEBUG
+
     currentTick = 0    
+
+    # COLORS
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
     RED = (128, 0, 0)
-
+  
     def __init__(self, x, y):
         
         super(World, self).__init__()
          
         self.MAXX = x
         self.MAXY = y
-        Log_Format = "%(levelname)s %(asctime)s - %(message)s"
-        logging.basicConfig(filename = self.LOGFILE,
-                            filemode = "w", 
-                            format = Log_Format, 
-                            level = self.LOGLEVEL)
-        self.logger = logging.getLogger()
+        self.logger = None
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
@@ -96,36 +98,45 @@ class World():
 
 # world.getGrocs
     def getGrocs(self, numGrocs, grocFile):
-        grocList = []
+        builtList = []
         if os.path.exists(grocFile):
           savedFile = open(grocFile, "r")
           grocsRead = 0 
           line = savedFile.readline()
           while line: 
             grocsRead += 1
-            list = line.split(self.FIELDSEP)
-            print("List: ", list)
-            newGroc = Groc(self, list[0],list[1], list[2], 
-                          list[3], list[4], list[5], 
-                          list[6], list[7])
+            #grocfields = line.split(self.FIELDSEP)
+           # newGroc = Groc(self, grocfields[0], grocfields[1], grocfields[2], grocfields[3], grocfields[4], grocfields[5], grocfields[6].rstrip(self.NEWLINE))
+            newGroc = eval(line)
             newGroc.identify()
             self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
                         newGroc.gender)
-            grocList.append(newGroc)
+            builtList.append(newGroc)
             line = savedFile.readline()
           savedFile.close()      
         else:
           grocsRead = 0
         if grocsRead < numGrocs:
           for count in range(0, (numGrocs - grocsRead)):
-            name = 'G' + str(count)
             newX, newY = self.randomLocation()
-            newGroc = Groc(self, name, 'happy', 'green', newX, newY)
+            newGroc = Groc(self, Groc.HAPPY, "green", newX, newY)
             newGroc.identify()
             self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
                         newGroc.gender)
-            grocList.append(newGroc)
-        return grocList
+            builtList.append(newGroc)
+        #return grocList
+        self.grocList = builtList
+
+# world.getLogger
+    def getLogger(self, debugLevel):    
+      if self.logger is None:
+        Log_Format = "%(levelname)s %(asctime)s - %(message)s"
+        logging.basicConfig(filename = self.LOGFILE,
+                            filemode = "w", 
+                            format = Log_Format, 
+                            level = debugLevel)
+        self.logger = logging.getLogger()
+      return self.logger 
 
 # world.randomLocation
     def randomLocation(self):
@@ -139,14 +150,14 @@ class World():
         nl = World.NEWLINE
         self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
                               str(oldy) + fs + str(newx) + fs + 
-                              str(newy) + fs + gender)
+                              str(newy) + fs + gender + nl)
+        self.renderPipe.flush()
 
 # world.saveGrocs
-    def saveGrocs(self, grocList, grocFile):
+    def saveGrocs(self, grocFile):
       saveFile = open(grocFile, "w")
-      for thisGroc in grocList:
-        grocText = thisGroc.dump()
-        saveFile.write(grocText)
+      for thisGroc in self.grocList:
+        saveFile.write(str(thisGroc))
         self.logger.debug ("Groc " + str(thisGroc.id) + " saved")
       saveFile.close()
 
@@ -165,8 +176,13 @@ class Groc():
     grocCount = 0    
     MALE = "M"
     FEMALE = "F"
+    # MOODS
+    CROWDED = "Crowded"
+    HAPPY = "Happy"
+    LONELY = "Lonely"
+
     
-    def __init__(self, world, name, mood, color, x, y, 
+    def __init__(self, world, mood, color, x, y, 
                  id=None, birthTick=None, 
                  gender=None):
         
@@ -174,11 +190,16 @@ class Groc():
 
         Groc.grocCount += 1
         self.world = world
-        self.name = name
         self.mood = mood
         self.color = color
         self.x = int(x)
         self.y = int(y)
+        self.nearestGroc = None
+        self.targetX = None
+        self.targetY = None
+        self.communityRadius = 100
+        self.personalRadius = 20
+        self.preferredCommunitySize = 4
         if id is None:
           self.id = Groc.grocCount
         else:
@@ -191,28 +212,105 @@ class Groc():
           self.gender = self.geneticAttributes() 
         else:
           self.gender = gender
-        self.world.logger.debug ("Groc " + str(self.id) + 
+        self.world.logger.debug ("(init)Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
        
+# groc.__str__
+    def __str__(self):
+      return self.dump()
+
+# groc.__repr__
+    def __repr__(self):
+      return self.dump()
+     
+# groc.act
+    def act(self):
+      'take action after observe(), decide()'
+      if self.mood == self.HAPPY:
+        self.targetX = None
+        self.targetY = None
+      elif self.mood == self.LONELY:
+        self.targetX = self.nearestGroc.x
+        self.targetY = self.nearestGroc.y
+      elif self.mood == self.CROWDED:
+        if self.targetX is None or self.targetY is None:
+          self.targetX, self.targetY = self.world.randomLocation()
+      else:
+        self.world.logger.debug("act:" + str(self.id) + " Unknown mood " + 
+                                self.mood)
+      if self.targetX is None or self.targetY is None:
+        self.world.logger.debug("act: " + str(self.id) + " is " + 
+                                self.mood + " no movement")
+      else:
+        self.moveTowardTarget()
+
+# groc.countNearbyGrocs
+    def countNearbyGrocs(self, searchRadius):
+      'count within a given radius'
+      count = 0
+      for anotherGroc in self.world.grocList:
+        if not (anotherGroc.id == self.id):
+          zdist = self.world.findDistance(self.x, self.y, 
+                                          anotherGroc.x, anotherGroc.y)
+          if zdist <= searchRadius:
+            count += 1
+      return count     
+       
+# groc.decide
+    def decide(self):
+      'after observe, decide what to do before acting'
+      zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, 
+                                      self.nearestGroc.y)
+      communityCount = self.countNearbyGrocs(self.communityRadius)
+      personalCount = self.countNearbyGrocs(self.personalRadius)
+      if zdist <= self.personalRadius:  
+        newMood = self.HAPPY
+      elif zdist > self.personalRadius:
+        newMood = self.LONELY
+      else:
+        newMood = self.HAPPY
+      if self.mood == newMood:
+        self.world.logger.debug("decide: " + str(self.id) + 
+                                " mood is stable at " + 
+                                self.mood)
+      else:
+        self.world.logger.debug("decide: " + str(self.id) + 
+                                " changed mood from " + 
+                                self.mood + " to " + newMood )
+        self.mood = newMood
+
+# groc.didMove
+    def didMove(self, x, y):
+        if self.x == x and self.y == y:
+          result = False
+        else:
+          result = True
+        return (result)
+
+# groc.dump
+    def dump(self):
+        fs = self.world.FIELDSEP
+        #return ( self.mood + fs + self.color + fs + str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
+        return ("Groc(self, '" + self.mood + "', '" + 
+                self.color + "', " + str(self.x) + ", " + 
+                str(self.y) + ", " + str(self.id) + ", " + 
+                str(self.birthTick) + ", '" + 
+                str(self.gender) + "')" + self.world.NEWLINE)
+
 # groc.findNearestGroc
-    def findNearestGroc(self, listOfGrocs):
+    def findNearestGroc(self):
         nearestx = self.world.MAXX
         nearesty = self.world.MAXY 
         leastDist = nearestx + nearesty
-        for anotherGroc in listOfGrocs:
-          if anotherGroc.id == self.id:
-            self.world.logger.debug("Groc " + str(self.id) + 
-                          " skip myself")
-          else: 
+        nearestGroc = None
+        for anotherGroc in self.world.grocList:
+          if not (anotherGroc.id == self.id):
             zDist = self.world.findDistance(self.x, self.y, 
                                anotherGroc.x, anotherGroc.y)
-            self.world.logger.debug("Groc " + str(anotherGroc.id) + 
-                       " is " + str(zDist) + " away")
             if zDist < leastDist:
               leastDist = zDist
-              nearestx = anotherGroc.x
-              nearesty = anotherGroc.y
-        return (nearestx, nearesty)
+              nearestGroc = anotherGroc
+        return nearestGroc
     
 # groc.geneticAttributes
     def geneticAttributes(self):
@@ -224,49 +322,57 @@ class Groc():
         # additional attributes added later
         return gender
 
+# groc.hasTarget
+    def hasTarget(self):
+        if self.targetX is None or self.targetY is None:
+          answer = False
+        elif self.targetX == self.x and self.targetY == self.y:
+          targetX = None
+          targetY = None
+          answer = False
+        else:
+          answer = True
+        return answer
+          
 
-      
+# groc.identify
+    def identify(self):
+        self.world.logger.debug ("Identify " + str(self.id) + 
+                      " was born at " + str(self.birthTick))
+
+# groc.moveTowardTarget
+    def moveTowardTarget(self, speed=1):
+        if self.targetX is None or self.targetY is None:
+          self.world.logger.debug("moveTowardTarget: " + str(self.id) + 
+                                  " has no target")
+        else:
+          newX = self.x
+          newY = self.y
+          for step in range(speed):
+            if newX < self.targetX:
+              newX = newX + 1
+            elif newX > self.targetX:
+              newX = newX - 1
+            elif newY < self.targetY:
+              newY = newY + 1
+            elif newY > self.targetY:
+              newY = newY - 1
+          self.world.render(self.id, self.x, self.y, newX, newY, 
+                            self.gender)
+          self.x = newX
+          self.y = newY
+
+# groc.observe
+    def observe(self):
+        self.nearestGroc = self.findNearestGroc()
+        #other observations eventually
 
 # groc.setMood
     def setMood(self, newMood):
         self.mood = newMood
-  
-# groc.didMove
-    def didMove(self, x, y):
-        if self.x == x and self.y == y:
-          result = False
-        else:
-          result = True
-        return (result)
 
-# groc.moveToward
-    def moveToward(self, x, y, speed=1):
-        newX = self.x
-        newY = self.y
-        for step in range(speed):
-          self.world.logger.debug("Step " + str(step))
-          if newX < x:
-            newX = newX + 1
-          elif newX > x:
-            newX = newX - 1
-          elif newY < y:
-            newY = newY + 1
-          elif newY > y:
-            newY = newY - 1
-        return (newX, newY)
- 
-# groc.identify
-    def identify(self):
-        self.world.logger.debug ("My ID is " + str(self.id) + 
-                      " and I was born " + str(self.birthTick))
-        
-# groc.dump
-    def dump(self):
-        fs = self.world.FIELDSEP
-        return ( self.name + fs + self.mood + fs + self.color + fs + 
-               str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
-               str(self.birthTick) + fs + self.gender)
-
-
-            
+# groc.setTarget(self, newx, newy)
+    def setTarget(self, newx, newy):
+        self.targetX = newx
+        self.targetY = newy 
 

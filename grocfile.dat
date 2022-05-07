@@ -1,10 +1,10 @@
-G0|Happy|green|238|350|1|4709|M
-G1|Happy|green|238|331|2|4709|M
-G0|Happy|green|801|99|3|5180|F
-G1|Happy|green|238|369|4|5180|M
-G2|Happy|green|221|94|5|5180|F
-G3|Happy|green|1674|287|6|5180|M
-G4|Happy|green|801|61|7|5180|M
-G5|Happy|green|221|113|8|5180|M
-G6|Happy|green|801|80|9|5180|M
-G7|Happy|green|1674|268|10|5180|M
+Groc(self, 'Happy', 'green', 786, 722, 1, 34577, 'F')
+Groc(self, 'Happy', 'green', 786, 702, 2, 34577, 'F')
+Groc(self, 'Happy', 'green', 804, 715, 3, 35329, 'M')
+Groc(self, 'Happy', 'green', 786, 682, 4, 35329, 'F')
+Groc(self, 'Happy', 'green', 321, 695, 5, 35329, 'F')
+Groc(self, 'Happy', 'green', 103, 434, 6, 35329, 'F')
+Groc(self, 'Happy', 'green', 340, 694, 7, 35329, 'M')
+Groc(self, 'Happy', 'green', 1335, 181, 8, 35329, 'F')
+Groc(self, 'Happy', 'green', 1335, 201, 9, 35329, 'M')
+Groc(self, 'Happy', 'green', 103, 454, 10, 35329, 'F')

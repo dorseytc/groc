@@ -12,6 +12,9 @@
 #   TDORSEY     2022-05-03  Move load/save to World class
 #                           Move pipe definition to World class 
 #   TDORSEY     2022-05-04  Render gender
+#   TDORSEY     2022-05-05  Blank line fix
+#   TDORSEY     2022-05-06  Observe, decide, act; 
+#                           Added log level arg
 
 import datetime 
 import logging
@@ -24,6 +27,7 @@ import groc
 
 K_GROC_LIMIT = 2
 K_ITER_LIMIT = 1000
+K_LOG_LEVEL = 20
 
 
 # main
@@ -34,11 +38,14 @@ def main():
   renderPipe = thisWorld.renderPipe
   #Command Line Arguments
   numArgs = len(sys.argv)
-  print(sys.argv)
-  if numArgs > 3:
-    p_grocFile = sys.argv[3] 
+  if numArgs > 4:
+    p_grocFile = sys.argv[4] 
   else:
     p_grocFile = thisWorld.GROCFILE
+  if numArgs > 3:
+    p_logLevel = int(sys.argv[3])
+  else:
+    p_logLevel = K_LOG_LEVEL
   if numArgs > 2:
     p_iterations = int(sys.argv[2])
   else:
@@ -49,53 +56,44 @@ def main():
     p_numGrocs = K_GROC_LIMIT
   print("p_numGrocs: ", p_numGrocs) 
   print("p_iterations: ", p_iterations)
+  print("p_logLevel: ", p_logLevel)
   print("p_grocFile: ", p_grocFile)
-
-  logger = thisWorld.logger
+  logger = thisWorld.getLogger(p_logLevel)
+  logger.info("Started run with p_numgrocs=" + str(p_numGrocs) + 
+              ", p_iterations=" + str(p_iterations) + 
+              ", p_grocfile=" + str(p_grocFile))
   # 
   #Reading the world
   #
-  grocList = thisWorld.getGrocs(p_numGrocs, p_grocFile)
+  thisWorld.getGrocs(p_numGrocs, p_grocFile)
   running = True
   counter = 0 
   while running:
     counter += 1
     movingCount = 0 
-    for thisGroc in grocList:   
-       nearestX, nearestY = thisGroc.findNearestGroc(grocList)
-       zdist = thisWorld.findDistance(thisGroc.x, thisGroc.y, 
-                                      nearestX, nearestY)
-
-       # I still think moods and decisions belong in Groc
-       if zdist < 20: 
-         thisGroc.setMood('Happy')
-         newX, newY = (thisGroc.x, thisGroc.y)
-       else:
-         thisGroc.setMood('Lonely')
-         newX, newY = thisGroc.moveToward(nearestX, nearestY)
-
-       if thisGroc.didMove(newX, newY): 
+    for thisGroc in thisWorld.grocList:   
+       oldX = thisGroc.x
+       oldY = thisGroc.y
+       thisGroc.observe()
+       thisGroc.decide()
+       thisGroc.act()
+       if thisGroc.didMove(oldX, oldY):
          movingCount += 1
-         #world.move
-         thisWorld.render(thisGroc.id, thisGroc.x, thisGroc.y, 
-                          newX, newY, thisGroc.gender)
-         thisGroc.x = newX
-         thisGroc.y = newY
        else: 
          logger.debug("Groc " + str(thisGroc.id) + 
                       " did not move")
 
     if movingCount == 0:
       running = False
-      logger.debug("Nobody is moving")
+      logger.info("Nobody is moving")
     elif p_iterations == 0:
       running = True
     elif counter >= p_iterations:
       running = False
-      logger.debug("Iteration count exceeded")
+      logger.info("Iteration count exceeded")
     if counter % 100 == 0 or running == False:
       # write every 100 moves or when iteration limit reached
-      thisWorld.saveGrocs(grocList, p_grocFile)
+      thisWorld.saveGrocs(p_grocFile)
       thisWorld.saveWorld()
 
     thisWorld.tick()
@@ -104,6 +102,7 @@ def main():
   # Saving The World
   #
   thisWorld.close() 
+  logger.info("World closed")
             
 if __name__ == '__main__':
     main()

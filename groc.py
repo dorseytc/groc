@@ -151,6 +151,7 @@ class World():
         self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
                               str(oldy) + fs + str(newx) + fs + 
                               str(newy) + fs + gender + nl)
+        self.renderPipe.flush()
 
 # world.saveGrocs
     def saveGrocs(self, grocFile):

@@ -34,9 +34,9 @@ print ("Opened pipe")
 while True:
   msg = rpipe.read(1)
   if msg == groc.World.NEWLINE:
-    print("Line: ", line)
-    line = ""
     msgcount += 1
+    print("Msg ", msgcount, line)
+    line = ""
   else:
     line = line + msg
   if len(msg) != 1:

@@ -30,6 +30,7 @@
 #                           Add birthTick and gender.
 #   TDORSEY     2022-05-04  Blank Line fix
 #   TDORSEY     2022-05-06  observe,decide,act
+#   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
 
 import datetime 
 import logging
@@ -104,10 +105,9 @@ class World():
           line = savedFile.readline()
           while line: 
             grocsRead += 1
-            list = line.split(self.FIELDSEP)
-            newGroc = Groc(self, list[0],list[1], list[2], 
-                          list[3], list[4], list[5], 
-                          list[6].rstrip(self.NEWLINE))
+            #grocfields = line.split(self.FIELDSEP)
+           # newGroc = Groc(self, grocfields[0], grocfields[1], grocfields[2], grocfields[3], grocfields[4], grocfields[5], grocfields[6].rstrip(self.NEWLINE))
+            newGroc = eval(line)
             newGroc.identify()
             self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
                         newGroc.gender)
@@ -157,8 +157,7 @@ class World():
     def saveGrocs(self, grocFile):
       saveFile = open(grocFile, "w")
       for thisGroc in self.grocList:
-        grocText = thisGroc.dump()
-        saveFile.write(grocText)
+        saveFile.write(str(thisGroc))
         self.logger.debug ("Groc " + str(thisGroc.id) + " saved")
       saveFile.close()
 
@@ -216,8 +215,17 @@ class Groc():
         self.world.logger.debug ("(init)Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
        
+# groc.__str__
+    def __str__(self):
+      return self.dump()
+
+# groc.__repr__
+    def __repr__(self):
+      return self.dump()
+     
 # groc.act
     def act(self):
+      'take action after observe(), decide()'
       if self.mood == self.HAPPY:
         self.targetX = None
         self.targetY = None
@@ -238,6 +246,7 @@ class Groc():
 
 # groc.countNearbyGrocs
     def countNearbyGrocs(self, searchRadius):
+      'count within a given radius'
       count = 0
       for anotherGroc in self.world.grocList:
         if not (anotherGroc.id == self.id):
@@ -249,6 +258,7 @@ class Groc():
        
 # groc.decide
     def decide(self):
+      'after observe, decide what to do before acting'
       zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, 
                                       self.nearestGroc.y)
       communityCount = self.countNearbyGrocs(self.communityRadius)
@@ -280,9 +290,12 @@ class Groc():
 # groc.dump
     def dump(self):
         fs = self.world.FIELDSEP
-        return ( self.mood + fs + self.color + fs + 
-               str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + 
-               str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
+        #return ( self.mood + fs + self.color + fs + str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
+        return ("Groc(self, '" + self.mood + "', '" + 
+                self.color + "', " + str(self.x) + ", " + 
+                str(self.y) + ", " + str(self.id) + ", " + 
+                str(self.birthTick) + ", '" + 
+                str(self.gender) + "')" + self.world.NEWLINE)
 
 # groc.findNearestGroc
     def findNearestGroc(self):

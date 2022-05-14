@@ -66,6 +66,11 @@ class World():
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
     RED = (128, 0, 0)
+ 
+    #COIN TOSS
+    HEADS = 0
+    TAILS = 1
+
   
     def __init__(self, x, y):
         
@@ -168,6 +173,8 @@ class World():
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
+        self.logger.info("randomx, randomy = " + 
+                         str(newX) + "," + str(newY))
         return (newX, newY)
 
 # world.render
@@ -197,6 +204,12 @@ class World():
     def tick(self):
         self.currentTick += 1
 
+# world.tossCoin
+    def tossCoin(self, seed):
+        return ((self.currentTick + seed)% 2)
+        #return (numpy.random.randint(World.HEADS, World.TAILS))
+        
+
 class Groc():
     'Base class for the groc'
     grocCount = 0    
@@ -224,7 +237,7 @@ class Groc():
         self.nearestGroc = None
         self.targetX = None
         self.targetY = None
-        self.communityRadius = 30
+        self.communityRadius = 22
         self.personalRadius = 20
         self.preferredCommunitySize = 4
         self.patience=5
@@ -255,10 +268,9 @@ class Groc():
      
 # groc.act
     def act(self):
-      'take action after observe, decide'
+      'take action'
       if self.targetX is None or self.targetY is None:
-        self.world.logger.debug("act: " + str(self.id) + " is " + 
-                                self.mood + " no movement")
+        pass
       else:
         self.moveTowardTarget()
 
@@ -291,7 +303,11 @@ class Groc():
       
       leastPopulation = 100000
       quadrantPopulation = [0, 0, 0, 0]
-      for i in range(4):
+      if self.gender == Groc.MALE:
+        quadrants = [3, 2, 1, 0]
+      else:
+        quadrants = [0, 1, 2, 3]
+      for i in quadrants:
         quadrantPopulation[i] = self.countNearbyGrocs(radius, 
           self.world.bindX(self.x + (xfactor[i] * radius)), 
           self.world.bindY(self.y + (yfactor[i] * radius)))
@@ -304,6 +320,7 @@ class Groc():
           str(quadrantPopulation[targetQuadrant]))
       newX = self.world.bindX(self.x + (xfactor[targetQuadrant] * radius))
       newY = self.world.bindY(self.y + (yfactor[targetQuadrant] * radius))
+      self.world.logger.info("newx, newy " + str(newX) + "," + str(newY))
       return newX, newY
 
 # groc.countNearbyGrocs
@@ -320,14 +337,13 @@ class Groc():
        
 # groc.decide
     def decide(self):
-      'after observe, decide what to do before acting'
+      'decide what to do'
       zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, 
                                       self.nearestGroc.y)
       if zdist < self.personalRadius:  
         self.setMood(Groc.CROWDED)
-      elif zdist == self.personalRadius:
-        self.setMood(Groc.HAPPY)
       elif zdist > self.communityRadius:
+      #elif zdist > self.personalRadius:
         self.setMood(Groc.LONELY)
       else:
         self.setMood(Groc.HAPPY)
@@ -347,8 +363,13 @@ class Groc():
       elif self.mood == Groc.CROWDED:
         #pick a target one time when crowded
         if self.targetX is None and self.targetY is None:
-          #self.targetX, self.targetY = self.world.randomLocation()
-          self.targetX, self.targetY = self.chooseLessCrowdedSpace(
+          coinToss = self.world.tossCoin(self.id)
+          if coinToss == self.world.HEADS:
+            self.world.logger.info("HEADS")
+            self.targetX, self.targetY = self.world.randomLocation()
+          else:
+            self.world.logger.info("TAILS")
+            self.targetX, self.targetY = self.chooseLessCrowdedSpace(
                                                self.communityRadius)
         else:
           pass
@@ -397,13 +418,11 @@ class Groc():
         # additional attributes added later
         return gender
 
-# groc.hasTarget
-    def hasTarget(self):
-        if self.targetX is None or self.targetY is None:
+# groc.isMoving
+    def isMoving(self, theGroc):
+        if theGroc.targetX is None or theGroc.targetY is None:
           answer = False
-        elif self.targetX == self.x and self.targetY == self.y:
-          self.targetX = None
-          self.targetY = None
+        elif theGroc.targetX == theGroc.x and theGroc.targetY == theGroc.y:
           answer = False
         else:
           answer = True

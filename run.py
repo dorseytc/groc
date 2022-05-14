@@ -95,11 +95,10 @@ def main():
       stillTimer = 0
     else:
       stillTimer += 1
-      logger.info("Still timer is " + str(stillTimer))
 
     if stillTimer > K_STILL_LIMIT:
       running = False
-      logger.info("Nobody is moving")
+      logger.info("Nobody has moved in " + str(K_STILL_LIMIT) + " ticks")
     elif p_iterations == 0:
       running = True
     elif counter >= p_iterations:

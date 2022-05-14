@@ -32,6 +32,8 @@
 #   TDORSEY     2022-05-06  observe,decide,act
 #   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
 #   TDORSEY     2022-05-12  Enabling CROWDED; establishing moodSince
+#   TDORSEY     2022-05-14  Improved target finding for choosing a less
+#                           crowded space when crowded
 
 import datetime 
 import logging
@@ -84,6 +86,25 @@ class World():
           os.mkfifo(self.PIPENAME, 0o600)
           self.renderPipe = open(self.PIPENAME, 'w', 
                                  newline=self.NEWLINE)
+# world.bindX
+    def bindX(self, x):
+        boundx = x
+        if x < 1:
+          boundx = 1 
+        if x > self.MAXX:
+          boundx = self.MAXX
+        return boundx
+
+# world.bindY
+    def bindY(self, y):
+        boundy = y 
+        if y < 1:
+          boundy = 1
+        if y > self.MAXY:
+          boundy = self.MAXY
+        return boundy
+
+ 
 # world.close
     def close(self):
         self.renderPipe.close()
@@ -111,11 +132,10 @@ class World():
           line = savedFile.readline()
           while line: 
             grocsRead += 1
-            #grocfields = line.split(self.FIELDSEP)
-           # newGroc = Groc(self, grocfields[0], grocfields[1], grocfields[2], grocfields[3], grocfields[4], grocfields[5], grocfields[6].rstrip(self.NEWLINE))
             newGroc = eval(line)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
+            self.render(newGroc.id, 0, 0, self.bindX(newGroc.x), 
+                        self.bindY(newGroc.y), 
                         newGroc.gender)
             builtList.append(newGroc)
             line = savedFile.readline()
@@ -242,13 +262,57 @@ class Groc():
       else:
         self.moveTowardTarget()
 
+# groc.chooseLessCrowdedSpace
+    def chooseLessCrowdedSpace(self, radius):
+      'choose a location nearby that is less crowded'
+      count = 0 
+      nw = 0
+      ne = 1
+      sw = 2
+      se = 3
+      quadrant = []
+      xfactor = []
+      yfactor = []
+      quadrant.append('NW')
+      xfactor.append(-1)
+      yfactor.append(-1)
+
+      quadrant.append('NE')
+      xfactor.append(+1)
+      yfactor.append(-1)
+  
+      quadrant.append('SW')
+      xfactor.append(-1)
+      yfactor.append(+1)
+  
+      quadrant.append('SE')
+      xfactor.append(+1)
+      yfactor.append(+1)
+      
+      leastPopulation = 100000
+      quadrantPopulation = [0, 0, 0, 0]
+      for i in range(4):
+        quadrantPopulation[i] = self.countNearbyGrocs(radius, 
+          self.world.bindX(self.x + (xfactor[i] * radius)), 
+          self.world.bindY(self.y + (yfactor[i] * radius)))
+        if quadrantPopulation[i] < leastPopulation:
+          leastPopulation = quadrantPopulation[i]
+          targetQuadrant = i
+      self.world.logger.debug ("Target quadrant is " + 
+          str(targetQuadrant) + " " + 
+          quadrant[targetQuadrant] + " population " +  
+          str(quadrantPopulation[targetQuadrant]))
+      newX = self.world.bindX(self.x + (xfactor[targetQuadrant] * radius))
+      newY = self.world.bindY(self.y + (yfactor[targetQuadrant] * radius))
+      return newX, newY
+
 # groc.countNearbyGrocs
-    def countNearbyGrocs(self, searchRadius):
+    def countNearbyGrocs(self, searchRadius, x, y):
       'count within a given radius'
       count = 0
       for anotherGroc in self.world.grocList:
         if not (anotherGroc.id == self.id):
-          zdist = self.world.findDistance(self.x, self.y, 
+          zdist = self.world.findDistance(x, y, 
                                           anotherGroc.x, anotherGroc.y)
           if zdist <= searchRadius:
             count += 1
@@ -281,9 +345,11 @@ class Groc():
         self.targetX = self.nearestGroc.x
         self.targetY = self.nearestGroc.y
       elif self.mood == Groc.CROWDED:
-        #randomly pick a target one time when crowded
+        #pick a target one time when crowded
         if self.targetX is None and self.targetY is None:
-          self.targetX, self.targetY = self.world.randomLocation()
+          #self.targetX, self.targetY = self.world.randomLocation()
+          self.targetX, self.targetY = self.chooseLessCrowdedSpace(
+                                               self.communityRadius)
         else:
           pass
      
@@ -374,8 +440,10 @@ class Groc():
 # groc.observe
     def observe(self):
         self.nearestGroc = self.findNearestGroc()
-        self.communityCount = self.countNearbyGrocs(self.communityRadius)
-        self.personalCount = self.countNearbyGrocs(self.personalRadius)
+        self.communityCount = self.countNearbyGrocs(self.communityRadius, 
+                                                   self.x, self.y)
+        self.personalCount = self.countNearbyGrocs(self.personalRadius, 
+                                                   self.x, self.y)
         #other observations eventually
 
 # groc.setMood

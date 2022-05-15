@@ -26,10 +26,13 @@
 - add overcrowding motivator
 
 ### shakers (v0.6.0) -- not started
-- variable speed
-=======
-### movers (v0.5.0) -- in progress
 
+- mood indicators in render ui
+- demographic charts by mood
+- click to id a groc
+
+
+### future tbd
 - variable speed
-- randomize direction
-- add overcrowding motivator
+- gender-based companionship preference
+- reproduction

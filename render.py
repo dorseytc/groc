@@ -13,6 +13,7 @@
 #                     Support gender-determined coloration
 # TDORSEY 2022-05-05  Blank Line fix
 # TDORSEY 2022-05-07  pydoc-enabled, import enabled
+# TDORSEY 2022-05-15  visible moods
 
 import pygame 
 import os
@@ -38,7 +39,6 @@ def main():
   while True:
     msg = rpipe.read(1)
     if msg == groc.World.NEWLINE:
-      #print("Line: ", line)
       movemsg = line.split(groc.World.FIELDSEP)
       x = len(movemsg) 
       grocId = movemsg[0]
@@ -47,13 +47,26 @@ def main():
       newX = int(movemsg[3])
       newY = int(movemsg[4])
       gender = movemsg[5]
+      mood = movemsg[6]
       msgcount += 1
       if gender == groc.Groc.MALE:
         groccolor = groc.World.BLUE
       else:
         groccolor = groc.World.RED
-      pygame.draw.circle(screen, worldcolor, (oldX, oldY), 10)
+      if mood == groc.Groc.LONELY:
+        eyecolor = groc.World.WHITE
+      elif mood == groc.Groc.CROWDED:
+        eyecolor = groc.World.BLACK
+      else:
+        # mood == groc.Groc.HAPPY:
+        eyecolor = groccolor
+      if oldX == newX and oldY == newY:
+        'has not moved'
+        pass
+      else:
+        pygame.draw.circle(screen, worldcolor, (oldX, oldY), 10)
       pygame.draw.circle(screen, groccolor, (newX, newY), 9)
+      pygame.draw.circle(screen, eyecolor, (newX, newY), 2)
       pygame.display.flip()
       line = ""
     else:

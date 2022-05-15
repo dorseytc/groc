@@ -1,15 +1,16 @@
-## Releases
+## Release Notes
 
-### brown (v0.2.0) -- complete
+### shakers (v0.6.0) -- in progress
 
-- replace brownian movement with groc-seeking-groc behavior
-- parameterize 
+- mood indicators in render ui
+- demographic charts by mood
+- click to id a groc
 
-### world (v0.3.0) -- complete
+### movers (v0.5.0) -- complete
 
-- separate Groc class and World class
-- import Groc (into World)
-- environment/movement/location moved to World class
+- randomize direction
+- add overcrowding motivator
+- gender based decision ai 
 
 ### auto (v0.4.0) -- complete
 
@@ -20,19 +21,22 @@
 - add gender
 - augment groc.dat file format
 
-### movers (v0.5.0) -- complete
+### world (v0.3.0) -- complete
 
-- randomize direction
-- add overcrowding motivator
+- separate Groc class and World class
+- import Groc (into World)
+- environment/movement/location moved to World class
 
-### shakers (v0.6.0) -- not started
+### brown (v0.2.0) -- complete
 
-- mood indicators in render ui
-- demographic charts by mood
-- click to id a groc
+- replace brownian movement with groc-seeking-groc behavior
+- parameterize 
 
 
-### future tbd
+---
+
+
+### future features
 - variable speed
 - gender-based companionship preference
 - reproduction

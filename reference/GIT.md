@@ -1,8 +1,8 @@
 # Git References
 
 ## new branch
-- git checkout -b <newbranch>
-- git push --set-upstream origin <newbranch>
+- git checkout -b **newbranch**
+- git push --set-upstream origin **newbranch**
   - only needed on first push to the new branch
 
 ## commits
@@ -15,7 +15,7 @@
 ## pull
 - git checkout master
 - git pull
-- git checkout <newbranch>
+- git checkout **newbranch**
 - git pull
   - "Already up to date"
 - git push
@@ -23,7 +23,7 @@
 
 ## merge
 - merges are handled on github.com
-- merge <oldbranch> into master
-- delete <oldbranch> after merging
+- merge **oldbranch** into master
+- delete **oldbranch** after merging
 - repeat "new branch" process
 

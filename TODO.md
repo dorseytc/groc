@@ -3,22 +3,21 @@
 ### movement
 
 - "movement" should be part of the Groc class
-  - done 
+  - done (brown)
 - "movement" should be based on motivation
-  - in progress, additional motivations needed
+  - done (movers)
 - "nearest Groc" should be told to the Groc by the World
-  - done 
+  - done (world)
 - variable speed could be introduced
-  - in progress, moveToward method supports optional speed parm
-  - speed defaults to 1, higher speeds currently not used
+  - in progress (movers)
 - approach direction could be randomized
-  - not started
+  - done (movers)
 
 ### motivation
 - "motivation" should include companionship, food, space (overcrowding)
   - in progress
 - age should be determined by ticks
-  - done
+  - done (auto)
 - hunger should be based on ticks since food
   - not started
 - need for companionship vs need for space should be randomized
@@ -42,8 +41,8 @@
 
 ### render
 - pygame and debug scripts
-  - done
+  - done (world)
 - leverage World constants
-  - done
+  - done (world)
 - encapsulate pipe complexity 
   - not started

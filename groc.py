@@ -274,55 +274,33 @@ class Groc():
       else:
         self.moveTowardTarget()
 
+
 # groc.chooseLessCrowdedSpace
     def chooseLessCrowdedSpace(self, radius):
-      'choose a location nearby that is less crowded'
-      count = 0 
-      nw = 0
-      ne = 1
-      sw = 2
-      se = 3
-      quadrant = []
-      xfactor = []
-      yfactor = []
-      quadrant.append('NW')
-      xfactor.append(-1)
-      yfactor.append(-1)
-
-      quadrant.append('NE')
-      xfactor.append(+1)
-      yfactor.append(-1)
-  
-      quadrant.append('SW')
-      xfactor.append(-1)
-      yfactor.append(+1)
-  
-      quadrant.append('SE')
-      xfactor.append(+1)
-      yfactor.append(+1)
-      
+      quadrantnames = ['NW', 'NE', 'SW', 'SE']
+      quadrantinfo = {"NW":(-1,-1), "NE":(1,-1), "SW":(-1,1), "SE":(1,1)}
       leastPopulation = 100000
-      quadrantPopulation = [0, 0, 0, 0]
       if self.gender == Groc.MALE:
-        quadrants = [3, 2, 1, 0]
+        direction = -1
       else:
-        quadrants = [0, 1, 2, 3]
-      for i in quadrants:
-        quadrantPopulation[i] = self.countNearbyGrocs(radius, 
-          self.world.bindX(self.x + (xfactor[i] * radius)), 
-          self.world.bindY(self.y + (yfactor[i] * radius)))
-        if quadrantPopulation[i] < leastPopulation:
-          leastPopulation = quadrantPopulation[i]
-          targetQuadrant = i
+        direction = 1
+      for quadrantname in quadrantnames[::direction]:   
+        xfactor, yfactor = quadrantinfo[quadrantname]
+        population = self.countNearbyGrocs(radius, 
+          self.world.bindX(self.x + (xfactor * radius)), 
+          self.world.bindY(self.y + (yfactor * radius)))
+        if population < leastPopulation:
+          leastPopulation = population
+          targetQuadrant = quadrantname
       self.world.logger.debug ("Target quadrant is " + 
-          str(targetQuadrant) + " " + 
-          quadrant[targetQuadrant] + " population " +  
-          str(quadrantPopulation[targetQuadrant]))
-      newX = self.world.bindX(self.x + (xfactor[targetQuadrant] * radius))
-      newY = self.world.bindY(self.y + (yfactor[targetQuadrant] * radius))
+          targetQuadrant + " " + 
+          " population " +  str(leastPopulation))
+      xfactor, yfactor = quadrantinfo[targetQuadrant]
+      newX = self.world.bindX(self.x + (xfactor * radius))
+      newY = self.world.bindY(self.y + (yfactor * radius))
       self.world.logger.info("newx, newy " + str(newX) + "," + str(newY))
       return newX, newY
-
+ 
 # groc.countNearbyGrocs
     def countNearbyGrocs(self, searchRadius, x, y):
       'count within a given radius'

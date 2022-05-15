@@ -31,6 +31,9 @@
 #   TDORSEY     2022-05-04  Blank Line fix
 #   TDORSEY     2022-05-06  observe,decide,act
 #   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
+#   TDORSEY     2022-05-12  Enabling CROWDED; establishing moodSince
+#   TDORSEY     2022-05-14  Improved target finding for choosing a less
+#                           crowded space when crowded
 
 import datetime 
 import logging
@@ -63,6 +66,10 @@ class World():
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
     RED = (128, 0, 0)
+    #COIN TOSS
+    HEADS = 0
+    TAILS = 1
+
   
     def __init__(self, x, y):
         
@@ -83,11 +90,35 @@ class World():
           os.mkfifo(self.PIPENAME, 0o600)
           self.renderPipe = open(self.PIPENAME, 'w', 
                                  newline=self.NEWLINE)
+# world.bindX
+    def bindX(self, x):
+        boundx = x
+        if x < 1:
+          boundx = 1 
+        if x > self.MAXX:
+          boundx = self.MAXX
+        return boundx
+
+# world.bindY
+    def bindY(self, y):
+        boundy = y 
+        if y < 1:
+          boundy = 1
+        if y > self.MAXY:
+          boundy = self.MAXY
+        return boundy
+
+ 
 # world.close
     def close(self):
         self.renderPipe.close()
         if os.path.exists(self.PIPENAME):
           os.unlink(self.PIPENAME) 
+
+# world.elapsedTicks
+    def elapsedTicks(self, sinceTick):
+        return abs(self.currentTick - sinceTick)
+        
 
 # world.findDistance
     def findDistance(self, firstx, firsty, secondx, secondy):
@@ -105,11 +136,10 @@ class World():
           line = savedFile.readline()
           while line: 
             grocsRead += 1
-            #grocfields = line.split(self.FIELDSEP)
-           # newGroc = Groc(self, grocfields[0], grocfields[1], grocfields[2], grocfields[3], grocfields[4], grocfields[5], grocfields[6].rstrip(self.NEWLINE))
             newGroc = eval(line)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
+            self.render(newGroc.id, 0, 0, self.bindX(newGroc.x), 
+                        self.bindY(newGroc.y), 
                         newGroc.gender)
             builtList.append(newGroc)
             line = savedFile.readline()
@@ -142,6 +172,8 @@ class World():
     def randomLocation(self):
         newX = numpy.random.randint(1, self.MAXX)  
         newY = numpy.random.randint(1, self.MAXY)
+        self.logger.info("randomx, randomy = " + 
+                         str(newX) + "," + str(newY))
         return (newX, newY)
 
 # world.render
@@ -171,6 +203,12 @@ class World():
     def tick(self):
         self.currentTick += 1
 
+# world.tossCoin
+    def tossCoin(self, seed):
+        return ((self.currentTick + seed)% 2)
+        #return (numpy.random.randint(World.HEADS, World.TAILS))
+        
+
 class Groc():
     'Base class for the groc'
     grocCount = 0    
@@ -191,15 +229,19 @@ class Groc():
         Groc.grocCount += 1
         self.world = world
         self.mood = mood
+        self.moodSince = self.world.currentTick
         self.color = color
         self.x = int(x)
         self.y = int(y)
         self.nearestGroc = None
         self.targetX = None
         self.targetY = None
-        self.communityRadius = 100
+        self.communityRadius = 22
         self.personalRadius = 20
         self.preferredCommunitySize = 4
+        self.patience=5
+        self.communityCount = 0
+        self.personalCount = 0
         if id is None:
           self.id = Groc.grocCount
         else:
@@ -225,32 +267,46 @@ class Groc():
      
 # groc.act
     def act(self):
-      'take action after observe(), decide()'
-      if self.mood == self.HAPPY:
-        self.targetX = None
-        self.targetY = None
-      elif self.mood == self.LONELY:
-        self.targetX = self.nearestGroc.x
-        self.targetY = self.nearestGroc.y
-      elif self.mood == self.CROWDED:
-        if self.targetX is None or self.targetY is None:
-          self.targetX, self.targetY = self.world.randomLocation()
-      else:
-        self.world.logger.debug("act:" + str(self.id) + " Unknown mood " + 
-                                self.mood)
+      'take action'
       if self.targetX is None or self.targetY is None:
-        self.world.logger.debug("act: " + str(self.id) + " is " + 
-                                self.mood + " no movement")
+        pass
       else:
         self.moveTowardTarget()
 
+
+# groc.chooseLessCrowdedSpace
+    def chooseLessCrowdedSpace(self, radius):
+      quadrantnames = ['NW', 'NE', 'SW', 'SE']
+      quadrantinfo = {"NW":(-1,-1), "NE":(1,-1), "SW":(-1,1), "SE":(1,1)}
+      leastPopulation = 100000
+      if self.gender == Groc.MALE:
+        direction = -1
+      else:
+        direction = 1
+      for quadrantname in quadrantnames[::direction]:   
+        xfactor, yfactor = quadrantinfo[quadrantname]
+        population = self.countNearbyGrocs(radius, 
+          self.world.bindX(self.x + (xfactor * radius)), 
+          self.world.bindY(self.y + (yfactor * radius)))
+        if population < leastPopulation:
+          leastPopulation = population
+          targetQuadrant = quadrantname
+      self.world.logger.debug ("Target quadrant is " + 
+          targetQuadrant + " " + 
+          " population " +  str(leastPopulation))
+      xfactor, yfactor = quadrantinfo[targetQuadrant]
+      newX = self.world.bindX(self.x + (xfactor * radius))
+      newY = self.world.bindY(self.y + (yfactor * radius))
+      self.world.logger.info("newx, newy " + str(newX) + "," + str(newY))
+      return newX, newY
+ 
 # groc.countNearbyGrocs
-    def countNearbyGrocs(self, searchRadius):
+    def countNearbyGrocs(self, searchRadius, x, y):
       'count within a given radius'
       count = 0
       for anotherGroc in self.world.grocList:
         if not (anotherGroc.id == self.id):
-          zdist = self.world.findDistance(self.x, self.y, 
+          zdist = self.world.findDistance(x, y, 
                                           anotherGroc.x, anotherGroc.y)
           if zdist <= searchRadius:
             count += 1
@@ -258,26 +314,44 @@ class Groc():
        
 # groc.decide
     def decide(self):
-      'after observe, decide what to do before acting'
+      'decide what to do'
       zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, 
                                       self.nearestGroc.y)
-      communityCount = self.countNearbyGrocs(self.communityRadius)
-      personalCount = self.countNearbyGrocs(self.personalRadius)
-      if zdist <= self.personalRadius:  
-        newMood = self.HAPPY
-      elif zdist > self.personalRadius:
-        newMood = self.LONELY
+      if zdist < self.personalRadius:  
+        self.setMood(Groc.CROWDED)
+      elif zdist > self.communityRadius:
+      #elif zdist > self.personalRadius:
+        self.setMood(Groc.LONELY)
       else:
-        newMood = self.HAPPY
-      if self.mood == newMood:
-        self.world.logger.debug("decide: " + str(self.id) + 
-                                " mood is stable at " + 
-                                self.mood)
-      else:
-        self.world.logger.debug("decide: " + str(self.id) + 
-                                " changed mood from " + 
-                                self.mood + " to " + newMood )
-        self.mood = newMood
+        self.setMood(Groc.HAPPY)
+
+      if self.targetX == self.x and self.targetY == self.y:
+        #arrived
+        self.targetX = None
+        self.targetY = None
+      elif self.mood == Groc.HAPPY:
+        #stay put when you're happy
+        self.targetX = None
+        self.targetY = None
+      elif self.mood == Groc.LONELY:
+        #continually retarget nearest groc when lonely
+        self.targetX = self.nearestGroc.x
+        self.targetY = self.nearestGroc.y
+      elif self.mood == Groc.CROWDED:
+        #pick a target one time when crowded
+        if self.targetX is None and self.targetY is None:
+          coinToss = self.world.tossCoin(self.id)
+          if coinToss == self.world.HEADS:
+            self.world.logger.info("HEADS")
+            self.targetX, self.targetY = self.world.randomLocation()
+          else:
+            self.world.logger.info("TAILS")
+            self.targetX, self.targetY = self.chooseLessCrowdedSpace(
+                                               self.communityRadius)
+        else:
+          pass
+     
+
 
 # groc.didMove
     def didMove(self, x, y):
@@ -289,8 +363,6 @@ class Groc():
 
 # groc.dump
     def dump(self):
-        fs = self.world.FIELDSEP
-        #return ( self.mood + fs + self.color + fs + str(self.x) + fs + str(self.y) + fs + str(self.id) + fs + str(self.birthTick) + fs + self.gender + self.world.NEWLINE)
         return ("Groc(self, '" + self.mood + "', '" + 
                 self.color + "', " + str(self.x) + ", " + 
                 str(self.y) + ", " + str(self.id) + ", " + 
@@ -322,13 +394,11 @@ class Groc():
         # additional attributes added later
         return gender
 
-# groc.hasTarget
-    def hasTarget(self):
-        if self.targetX is None or self.targetY is None:
+# groc.isMoving
+    def isMoving(self, theGroc):
+        if theGroc.targetX is None or theGroc.targetY is None:
           answer = False
-        elif self.targetX == self.x and self.targetY == self.y:
-          targetX = None
-          targetY = None
+        elif theGroc.targetX == theGroc.x and theGroc.targetY == theGroc.y:
           answer = False
         else:
           answer = True
@@ -362,14 +432,23 @@ class Groc():
           self.x = newX
           self.y = newY
 
+
 # groc.observe
     def observe(self):
         self.nearestGroc = self.findNearestGroc()
+        self.communityCount = self.countNearbyGrocs(self.communityRadius, 
+                                                   self.x, self.y)
+        self.personalCount = self.countNearbyGrocs(self.personalRadius, 
+                                                   self.x, self.y)
         #other observations eventually
 
 # groc.setMood
     def setMood(self, newMood):
-        self.mood = newMood
+        if self.mood == newMood:
+          pass
+        else:
+          self.mood = newMood
+          self.moodSince = self.world.currentTick
 
 # groc.setTarget(self, newx, newy)
     def setTarget(self, newx, newy):

@@ -15,6 +15,7 @@
 #   TDORSEY     2022-05-05  Blank line fix
 #   TDORSEY     2022-05-06  Observe, decide, act; 
 #                           Added log level arg
+#   TDORSEY     2022-05-12  Added patience factor, stillness limit
 
 import datetime 
 import logging
@@ -25,10 +26,16 @@ import groc
 
 # default limits
 
+K_STILL_LIMIT = 10
 K_GROC_LIMIT = 2
 K_ITER_LIMIT = 1000
 K_LOG_LEVEL = 20
-
+# 50 CRITICAL
+# 40 ERROR
+# 30 WARNING
+# 20 INFO
+# 10 DEBUG
+# 0  NOTSET
 
 # main
 
@@ -68,6 +75,7 @@ def main():
   thisWorld.getGrocs(p_numGrocs, p_grocFile)
   running = True
   counter = 0 
+  stillTimer = 0
   while running:
     counter += 1
     movingCount = 0 
@@ -83,9 +91,14 @@ def main():
          logger.debug("Groc " + str(thisGroc.id) + 
                       " did not move")
 
-    if movingCount == 0:
+    if movingCount > 0:
+      stillTimer = 0
+    else:
+      stillTimer += 1
+
+    if stillTimer > K_STILL_LIMIT:
       running = False
-      logger.info("Nobody is moving")
+      logger.info("Nobody has moved in " + str(K_STILL_LIMIT) + " ticks")
     elif p_iterations == 0:
       running = True
     elif counter >= p_iterations:

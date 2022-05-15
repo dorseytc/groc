@@ -1,1 +1,1 @@
-pydoc -p 1234
+pydoc -b -p 1234

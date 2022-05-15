@@ -20,9 +20,16 @@
 - add gender
 - augment groc.dat file format
 
+### movers (v0.5.0) -- complete
+
+- randomize direction
+- add overcrowding motivator
+
+### shakers (v0.6.0) -- not started
+- variable speed
+=======
 ### movers (v0.5.0) -- in progress
 
 - variable speed
 - randomize direction
 - add overcrowding motivator
-- gender-based companionship preference

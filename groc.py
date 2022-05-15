@@ -66,7 +66,6 @@ class World():
     WHITE = (255, 255, 255)
     BLUE = (0, 0, 255)
     RED = (128, 0, 0)
- 
     #COIN TOSS
     HEADS = 0
     TAILS = 1
@@ -352,7 +351,7 @@ class Groc():
         else:
           pass
      
-       
+
 
 # groc.didMove
     def didMove(self, x, y):
@@ -364,7 +363,6 @@ class Groc():
 
 # groc.dump
     def dump(self):
-        fs = self.world.FIELDSEP
         return ("Groc(self, '" + self.mood + "', '" + 
                 self.color + "', " + str(self.x) + ", " + 
                 str(self.y) + ", " + str(self.id) + ", " + 
@@ -433,6 +431,7 @@ class Groc():
                             self.gender)
           self.x = newX
           self.y = newY
+
 
 # groc.observe
     def observe(self):

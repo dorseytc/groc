@@ -14,11 +14,10 @@
 # TDORSEY 2022-05-02  Show received line message even if '\n'
 # TDORSEY 2022-05-05  Debug missing messages, use world constants
 # TDORSEY 2022-05-07  import and pydoc enabled, __main__ protected
+# TDORSEY 2022-05-16  removed unused imports
 #           
 #
 import groc
-import os
-import sys
 
 def main():
   pipe = groc.World.PIPENAME

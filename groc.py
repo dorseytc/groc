@@ -35,6 +35,7 @@
 #   TDORSEY     2022-05-14  Improved target finding for choosing a less
 #                           crowded space 
 #   TDORSEY     2022-05-15  visible moods
+#   TDORSEY     2022-05-17  World stats
 #   
 
 import datetime 
@@ -184,10 +185,10 @@ class World():
     def render(self, grocId, oldx, oldy, newx, newy, gender, mood):
         fs = World.FIELDSEP
         nl = World.NEWLINE
-        self.renderPipe.write(str(grocId) + fs + str(oldx) + fs + 
-                              str(oldy) + fs + str(newx) + fs + 
-                              str(newy) + fs + gender + fs + 
-                              mood + nl)
+        self.renderPipe.write("MOVE" + fs + str(grocId) + fs + 
+                              str(oldx) + fs + str(oldy) + fs + 
+                              str(newx) + fs + str(newy) + fs + 
+                              gender + fs + mood + nl)
         self.renderPipe.flush()
 
 # world.saveGrocs
@@ -203,6 +204,15 @@ class World():
         self.worldFile = open(World.WORLDFILE, "w")
         self.worldFile.write(str(self.currentTick) + self.NEWLINE)
         self.worldFile.close()
+
+# world.setStats
+    def setStats(self, happy, lonely, crowded):
+        fs = World.FIELDSEP
+        nl = World.NEWLINE
+        self.renderPipe.write("STAT" + fs + str(self.currentTick) + fs + 
+                              str(happy) + fs + str(lonely) + fs + 
+                              str(crowded) + nl)
+        self.renderPipe.flush()
 
 # world.tick
     def tick(self):

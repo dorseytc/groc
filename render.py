@@ -14,6 +14,7 @@
 # TDORSEY 2022-05-05  Blank Line fix
 # TDORSEY 2022-05-07  pydoc-enabled, import enabled
 # TDORSEY 2022-05-15  visible moods
+# TDORSEY 2022-05-15  pipe receives MOVE and STAT messages
 
 import pygame 
 import os
@@ -41,34 +42,46 @@ def main():
     if msg == groc.World.NEWLINE:
       movemsg = line.split(groc.World.FIELDSEP)
       x = len(movemsg) 
-      grocId = movemsg[0]
-      oldX = int(movemsg[1]) 
-      oldY = int(movemsg[2])
-      newX = int(movemsg[3])
-      newY = int(movemsg[4])
-      gender = movemsg[5]
-      mood = movemsg[6]
+      messageType = movemsg[0] 
       msgcount += 1
-      if gender == groc.Groc.MALE:
-        groccolor = groc.World.BLUE
+      if messageType == "MOVE":
+        grocId = movemsg[1]
+        oldX = int(movemsg[2]) 
+        oldY = int(movemsg[3])
+        newX = int(movemsg[4])
+        newY = int(movemsg[5])
+        gender = movemsg[6]
+        mood = movemsg[7]
+        if gender == groc.Groc.MALE:
+          groccolor = groc.World.BLUE
+        else:
+          groccolor = groc.World.RED
+        if mood == groc.Groc.LONELY:
+          eyecolor = groc.World.WHITE
+        elif mood == groc.Groc.CROWDED:
+          eyecolor = groc.World.BLACK
+        else:
+          # mood == groc.Groc.HAPPY:
+          eyecolor = groccolor
+        if oldX == newX and oldY == newY:
+          'has not moved'
+          pass
+        else:
+          pygame.draw.circle(screen, worldcolor, (oldX, oldY), 10)
+        pygame.draw.circle(screen, groccolor, (newX, newY), 9)
+        pygame.draw.circle(screen, eyecolor, (newX, newY), 2)
+        pygame.display.flip()
+        line = ""
+      elif messageType == "STAT":
+        currentTick = int(movemsg[1])
+        happyCount = int(movemsg[2]) 
+        lonelyCount =  int(movemsg[3])
+        crowdedCount = int(movemsg[4])
+        line = ""
+        print(messageType, currentTick, 
+              happyCount, lonelyCount, crowdedCount) 
       else:
-        groccolor = groc.World.RED
-      if mood == groc.Groc.LONELY:
-        eyecolor = groc.World.WHITE
-      elif mood == groc.Groc.CROWDED:
-        eyecolor = groc.World.BLACK
-      else:
-        # mood == groc.Groc.HAPPY:
-        eyecolor = groccolor
-      if oldX == newX and oldY == newY:
-        'has not moved'
-        pass
-      else:
-        pygame.draw.circle(screen, worldcolor, (oldX, oldY), 10)
-      pygame.draw.circle(screen, groccolor, (newX, newY), 9)
-      pygame.draw.circle(screen, eyecolor, (newX, newY), 2)
-      pygame.display.flip()
-      line = ""
+        print("unrecognized message type: ", messageType)
     else:
       line = line + msg
     if len(msg) != 1:

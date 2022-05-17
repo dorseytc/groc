@@ -1,9 +1,9 @@
 # reference
 
-## reference implementations of various elements
+## sample implementations of various elements
 
 
-### class file implementation reference
+### class files 
 
 - a.py
    - a imports, instantiates b 
@@ -32,3 +32,8 @@
    - uses matplotlib.pyplot and matplotlib.animation
    - creates dynamic graphs 
    - will be used to render STAT gauges in groc
+
+### git
+
+- GIT.md
+   - handy reference for git commands used in this repo 

@@ -16,13 +16,14 @@
 #   TDORSEY     2022-05-06  Observe, decide, act; 
 #                           Added log level arg
 #   TDORSEY     2022-05-12  Added patience factor, stillness limit
+#   TDORSEY     2022-05-17  Added world stats
 
 import datetime 
+import groc
 import logging
 import math
 import os
 import sys
-import groc
 
 # default limits
 
@@ -79,6 +80,9 @@ def main():
   while running:
     counter += 1
     movingCount = 0 
+    happyCount = 0
+    lonelyCount = 0
+    crowdedCount = 0
     for thisGroc in thisWorld.grocList:   
        oldX = thisGroc.x
        oldY = thisGroc.y
@@ -90,6 +94,14 @@ def main():
        else: 
          logger.debug("Groc " + str(thisGroc.id) + 
                       " did not move")
+       if thisGroc.mood == groc.Groc.HAPPY:
+         happyCount += 1
+       elif thisGroc.mood == groc.Groc.LONELY:
+         lonelyCount += 1
+       elif thisGroc.mood == groc.Groc.CROWDED:
+         crowdedCount += 1
+
+    thisWorld.setStats(happyCount, lonelyCount, crowdedCount)
 
     if movingCount > 0:
       stillTimer = 0

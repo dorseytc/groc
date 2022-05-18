@@ -35,6 +35,7 @@ def main():
     ax3.clear()
     ax3.set_title('Crowded')
     ax3.plot(xs, y3s)
+    print(i)
 
   ani = animation.FuncAnimation(fig, animate, interval=1000)
   plt.show()

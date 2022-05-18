@@ -1,6 +1,11 @@
 ## Release Notes
 
-### shakers (v0.6.0) -- in progress
+
+### uno (v0.7.0) -- in progress
+
+- no more pipe; all in one file? 
+
+### shakers (v0.6.0) -- complete
 
 - mood indicators in render ui
 - demographic stats by mood

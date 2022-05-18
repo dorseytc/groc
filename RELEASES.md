@@ -3,7 +3,7 @@
 ### shakers (v0.6.0) -- in progress
 
 - mood indicators in render ui
-- demographic charts by mood
+- demographic stats by mood
 - click to id a groc
 
 ### movers (v0.5.0) -- complete

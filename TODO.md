@@ -1,4 +1,4 @@
-## wish list
+## planned features
  
 ### movement
 
@@ -9,19 +9,27 @@
 - "nearest Groc" should be told to the Groc by the World
   - done (world)
 - variable speed could be introduced
-  - in progress (movers)
+  - started (movers)
 - approach direction could be randomized
   - done (movers)
 
 ### motivation
 - "motivation" should include companionship, food, space (overcrowding)
-  - in progress
+  - LONELY and CROWDED done (shakers)
+  - HUNGRY not started
 - age should be determined by ticks
   - done (auto)
 - hunger should be based on ticks since food
   - not started
 - need for companionship vs need for space should be randomized
   - not started
+
+### food
+  - not started
+- food might appear randomly
+- HUNGRY might override CROWDED
+  - HUNGRY grocs might ignoring CROWDED conditions
+  - once sated, grocs might flee crowds seeking HAPPY condition
 
 ### predators
   - not started
@@ -30,14 +38,16 @@
 - prey might band together to fight predators
 
 ### mood
-  - not started
-- color might indicate mood or health
+- eye color indicates mood or health
+  - done (shakers)
 - color might indicate age
+  - not started
 - health might be affected by food, companionship, mating
+  - not started
 
 ### death
-  - not started
 - death might occur of old age, starvation, predation
+  - not started
 
 ### render
 - pygame and debug scripts
@@ -45,4 +55,4 @@
 - leverage World constants
   - done (world)
 - encapsulate pipe complexity 
-  - not started
+  - done (movers)

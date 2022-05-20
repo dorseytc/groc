@@ -26,17 +26,22 @@
 #   TDORSEY     2022-05-02  World owns constants now
 #                           Add movement methods to Groc
 #                           Add currentTick and tick() to World
+#                           Move initialization code into main
 #   TDORSEY     2022-05-03  Move load/save to World class
+#                           Move pipe definition to World class 
 #   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
-#                           Add birthTick and gender.
+#                           Add birthTick. Render gender.
 #   TDORSEY     2022-05-04  Blank Line fix
 #   TDORSEY     2022-05-06  observe,decide,act
+#                           Added log level arg
 #   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
 #   TDORSEY     2022-05-12  Enabling CROWDED; establishing moodSince
+#                           Added patience factor, stillness limit
 #   TDORSEY     2022-05-14  Improved target finding for choosing a less
 #                           crowded space 
 #   TDORSEY     2022-05-15  visible moods
-#   TDORSEY     2022-05-17  World stats
+#   TDORSEY     2022-05-17  Added world stats
+
 #   
 
 import datetime 
@@ -46,7 +51,17 @@ import numpy
 import os
 import sys
 
-print("Loading groc")
+# default limits
+K_STILL_LIMIT = 10
+K_GROC_LIMIT = 2
+K_ITER_LIMIT = 1000
+K_LOG_LEVEL = 20
+# 50 CRITICAL
+# 40 ERROR
+# 30 WARNING
+# 20 INFO
+# 10 DEBUG
+# 0  NOTSET
 
 class World():
     'Base class for the world'
@@ -484,35 +499,10 @@ class Groc():
 #
 #      wrapper for groc, an object-oriented experiment in ai
 #
-#   TDORSEY     2022-05-01  Created run.py by refactoring
-#                           groc.py into "class-specific" file 
-#                           for groc.py, remainder becomes run.py
-#   TDORSEY     2022-05-02  Move constants to World class
-#                           Move initialization code into main
-#   TDORSEY     2022-05-03  Move load/save to World class
-#                           Move pipe definition to World class 
-#   TDORSEY     2022-05-04  Render gender
-#   TDORSEY     2022-05-05  Blank line fix
-#   TDORSEY     2022-05-06  Observe, decide, act; 
-#                           Added log level arg
-#   TDORSEY     2022-05-12  Added patience factor, stillness limit
-#   TDORSEY     2022-05-17  Added world stats
-
 
 # main
 
 def main():   
-  # default limits
-  K_STILL_LIMIT = 10
-  K_GROC_LIMIT = 2
-  K_ITER_LIMIT = 1000
-  K_LOG_LEVEL = 20
-  # 50 CRITICAL
-  # 40 ERROR
-  # 30 WARNING
-  # 20 INFO
-  # 10 DEBUG
-  # 0  NOTSET
   print ("Start render to continue")
   thisWorld = World(1800,800)
   renderPipe = thisWorld.renderPipe

@@ -41,14 +41,15 @@
 #                           crowded space 
 #   TDORSEY     2022-05-15  visible moods
 #   TDORSEY     2022-05-17  Added world stats
-
+#   TDORSEY     2022-05-20  Combine groc.py and run.py
+#                           Eliminate numpy
 #   
 
 import datetime 
 import logging
 import math
-import numpy
 import os
+import random
 import sys
 
 # default limits
@@ -191,8 +192,8 @@ class World():
 
 # world.randomLocation
     def randomLocation(self):
-        newX = numpy.random.randint(1, self.MAXX)  
-        newY = numpy.random.randint(1, self.MAXY)
+        newX = random.randint(1, self.MAXX)  
+        newY = random.randint(1, self.MAXY)
         self.logger.debug("randomx, randomy = " + 
                          str(newX) + "," + str(newY))
         return (newX, newY)
@@ -237,7 +238,6 @@ class World():
 # world.tossCoin
     def tossCoin(self, seed):
         return ((self.currentTick + seed)% 2)
-        #return (numpy.random.randint(World.HEADS, World.TAILS))
         
 
 class Groc():
@@ -418,7 +418,7 @@ class Groc():
     
 # groc.geneticAttributes
     def geneticAttributes(self):
-        seed = numpy.random.randint(1, self.world.MAXX) 
+        seed = random.randint(1, self.world.MAXX) 
         if seed % 2 == 0:
           gender = Groc.FEMALE
         else:

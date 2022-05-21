@@ -43,6 +43,7 @@
 #   TDORSEY     2022-05-17  Added world stats
 #   TDORSEY     2022-05-20  Combine groc.py and run.py
 #                           Eliminate numpy
+#   TDORSEY     2022-05-21  Import renderxxx as render
 #   
 
 import datetime 
@@ -50,6 +51,9 @@ import logging
 import math
 import os
 import random
+# choose which renderer here
+import renderpygame as render
+#import renderdebug as render
 import sys
 
 # default limits
@@ -75,7 +79,6 @@ class World():
     # FILE UTILS
     FIELDSEP = '|'
     NEWLINE = '\n'
-    PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
@@ -99,19 +102,18 @@ class World():
          
         self.MAXX = x
         self.MAXY = y
+        self.happy = 0
+        self.lonely = 0
+        self.crowded = 0
         self.logger = None
+        self.render = render.Renderer(x, y)
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
           World.currentTick = int(line)
         else:
           World.currentTick = 0
-        if os.path.exists(self.PIPENAME):
-          os.unlink(self.PIPENAME)
-        if not os.path.exists(self.PIPENAME):
-          os.mkfifo(self.PIPENAME, 0o600)
-          self.renderPipe = open(self.PIPENAME, 'w', 
-                                 newline=self.NEWLINE)
+
 # world.bindX
     def bindX(self, x):
         boundx = x
@@ -133,9 +135,7 @@ class World():
  
 # world.close
     def close(self):
-        self.renderPipe.close()
-        if os.path.exists(self.PIPENAME):
-          os.unlink(self.PIPENAME) 
+        self.render.close()  
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
@@ -146,7 +146,6 @@ class World():
     def findDistance(self, firstx, firsty, secondx, secondy):
         xDiff = abs(firstx - secondx) 
         yDiff = abs(firsty - secondy)
-        #return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
         return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
 
 # world.getGrocs
@@ -160,9 +159,8 @@ class World():
             grocsRead += 1
             newGroc = eval(line)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, self.bindX(newGroc.x), 
-                        self.bindY(newGroc.y), 
-                        newGroc.gender, newGroc.mood)
+            self.render.drawStatic(newGroc, self.bindX(newGroc.x), 
+                                   self.bindY(newGroc.y))
             builtList.append(newGroc)
             line = savedFile.readline()
           savedFile.close()      
@@ -173,8 +171,7 @@ class World():
             newX, newY = self.randomLocation()
             newGroc = Groc(self, Groc.HAPPY, "green", newX, newY)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
-                        newGroc.gender, newGroc.mood)
+            self.render.drawStatic(newGroc, newX, newY)
             builtList.append(newGroc)
         #return grocList
         self.grocList = builtList
@@ -201,7 +198,6 @@ class World():
 # world.render
     def render(self, grocId, oldx, oldy, newx, newy, gender, mood):
         fs = World.FIELDSEP
-        nl = World.NEWLINE
         self.renderPipe.write("MOVE" + fs + str(grocId) + fs + 
                               str(oldx) + fs + str(oldy) + fs + 
                               str(newx) + fs + str(newy) + fs + 
@@ -224,16 +220,14 @@ class World():
 
 # world.setStats
     def setStats(self, happy, lonely, crowded):
-        fs = World.FIELDSEP
-        nl = World.NEWLINE
-        self.renderPipe.write("STAT" + fs + str(self.currentTick) + fs + 
-                              str(happy) + fs + str(lonely) + fs + 
-                              str(crowded) + nl)
-        self.renderPipe.flush()
+        self.happy = happy 
+        self.lonely = lonely
+        self.crowded = crowded
 
 # world.tick
     def tick(self):
         self.currentTick += 1
+        self.render.tick()
 
 # world.tossCoin
     def tossCoin(self, seed):
@@ -459,8 +453,7 @@ class Groc():
               newY = newY + 1
             elif newY > self.targetY:
               newY = newY - 1
-          self.world.render(self.id, self.x, self.y, newX, newY, 
-                            self.gender, self.mood)
+          self.world.render.drawMoving(self, self.x, self.y, newX, newY)
           self.x = newX
           self.y = newY
 
@@ -480,8 +473,7 @@ class Groc():
         else:
           self.mood = newMood
           self.moodSince = self.world.currentTick
-          self.world.render(self.id, self.x, self.y, self.x, self.y,
-                            self.gender, self.mood)
+          self.world.render.drawStatic(self, self.x, self.y)
 
 # groc.setTarget(self, newx, newy)
     def setTarget(self, newx, newy):
@@ -489,23 +481,10 @@ class Groc():
         self.targetY = newy 
 
 
-
-
-
-
-
-#
-#   run
-#
-#      wrapper for groc, an object-oriented experiment in ai
-#
-
 # main
 
 def main():   
-  print ("Start render to continue")
   thisWorld = World(1800,800)
-  renderPipe = thisWorld.renderPipe
   #Command Line Arguments
   numArgs = len(sys.argv)
   if numArgs > 4:

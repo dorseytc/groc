@@ -43,13 +43,19 @@ class Renderer():
       eyecolor = groc.World.BLACK
     else:
       eyecolor = groccolor
+    if None in (theGroc.x, theGroc.y, theGroc.targetX, theGroc.targetY):
+      intensity = 2 
+    else:
+      zdist = theGroc.world.findDistance(theGroc.x, theGroc.y, 
+                                    theGroc.targetX, theGroc.targetY) 
+      intensity = 2 + round((zdist / max(self.world.MAXX, self.world.MAXY)) * 6)
     if oldX == newX and oldY == newY:
       'has not moved'
       pass
     else:
       pygame.draw.circle(self.screen, self.worldcolor, (oldX, oldY), 10)
     pygame.draw.circle(self.screen, groccolor, (newX, newY), 9)
-    pygame.draw.circle(self.screen, eyecolor, (newX, newY), 2)
+    pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
     #pygame.display.flip()
 
 #     drawStatic
@@ -72,3 +78,9 @@ class Renderer():
         self.running = False
       if event.type == pygame.MOUSEBUTTONDOWN:
         x, y = event.pos
+        nearestGroc = self.world.findNearbyGroc(x, y) 
+        zdist = self.world.findDistance(x, y, nearestGroc.x, nearestGroc.y)
+        if zdist > nearestGroc.personalRadius:
+          pass
+        else:
+          print(nearestGroc.identify())

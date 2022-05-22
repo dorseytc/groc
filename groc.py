@@ -54,8 +54,8 @@ import math
 import os
 import random
 # choose which renderer here
-#import grr_pyg as render
-import grr_pipe as render
+import grr_pyg as render
+#import grr_pipe as render
 import sys
 
 # default limits
@@ -149,6 +149,17 @@ class World():
         xDiff = abs(firstx - secondx) 
         yDiff = abs(firsty - secondy)
         return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
+
+# world.findNearbyGroc
+    def findNearbyGroc(self, x, y):
+        leastDist = self.findDistance(0, 0, self.MAXX, self.MAXY)
+        nearestGroc = None
+        for thisGroc in self.grocList:
+          zDist = self.findDistance(x, y, thisGroc.x, thisGroc.y)
+          if zDist < leastDist:
+            leastDist = zDist
+            nearestGroc = thisGroc
+        return nearestGroc
 
 # world.getGrocs
     def getGrocs(self, numGrocs, grocFile):
@@ -392,7 +403,7 @@ class Groc():
     def findNearestGroc(self):
         nearestx = self.world.MAXX
         nearesty = self.world.MAXY 
-        leastDist = nearestx + nearesty
+        leastDist = self.world.findDistance(0, 0, nearestx, nearesty)
         nearestGroc = None
         for anotherGroc in self.world.grocList:
           if not (anotherGroc.id == self.id):
@@ -428,6 +439,15 @@ class Groc():
     def identify(self):
         self.world.logger.debug ("Identify " + str(self.id) + 
                       " was born at " + str(self.birthTick))
+        identity = ("Id: " + str(self.id) + 
+                   " Current X,Y: " + str(self.x) + "," + str(self.y) + 
+                   " Target X,Y: " + str(self.targetX) + "," + 
+                                     str(self.targetY) + 
+                   " Mood: " + self.mood + 
+                   " Gender: " + self.gender + 
+                   " Birthtick: " + str(self.birthTick))
+        return identity 
+ 
 
 # groc.moveTowardTarget
     def moveTowardTarget(self, speed=1):

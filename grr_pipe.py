@@ -29,8 +29,10 @@ class Renderer():
   def __init__(self, thisWorld):  
     
     super(Renderer, self).__init__()
+    
+    print("Renderer is grr_pipe 1.0")
     print("This Renderer requires a pipe reader")
-    print("Please start a pipe reader now")
+    print("Please start a pipe reader of your choice now")
     self.theWorld = thisWorld
     if os.path.exists(self.PIPENAME):
       os.unlink(self.PIPENAME)

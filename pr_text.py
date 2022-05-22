@@ -21,9 +21,10 @@
 #           
 #
 import groc
+import grr_pipe
 
 def main():
-  pipe = groc.World.PIPENAME
+  pipe = grr_pipe.Renderer.PIPENAME
   try:
     print("Looking for the pipe")
     rpipe = open(pipe, "r")

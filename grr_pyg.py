@@ -23,6 +23,7 @@ class Renderer():
 
     super(Renderer, self).__init__()
 
+    print("Renderer is grr_pyg 1.0")
     self.world = thisWorld
     self.screen = pygame.display.set_mode([self.world.MAXX, 
                                           self.world.MAXY])

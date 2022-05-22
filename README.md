@@ -2,14 +2,28 @@
 
 ## to run, try something like 
 
-python3 run.py 
+python3 groc.py 
 
 ### FYI
 
-- The full syntax of run.py includes optional positional parameters
-  - python3 run.py number-of-grocs number-of-iterations filename \
+- The full syntax of groc.py includes optional positional parameters
+- One of these lines will work best for you
+  - python3 groc.py number-of-grocs number-of-iterations filename 
+  - ./groc.py number-of-grocs number-of-iterations filename 
 
-- start the world first with run.py
+### Sample Syntax
+- ./groc.py 100 0 
+  - 100 grocs 
+  - 0 means unlimited iterations
+  - filename is omitted which means it uses the default grocfile.dat
+- ./groc.py 10 10 testfile.dat
+  - 10 grocs
+  - limit to 10 iterations
+  - use testfile.dat instead of grocfile.dat
+- ./groc.py 
+  - omit groc count, use default 
+  - omit iteration limit, use default of unlimited
+  - omit filename, use default of grocfile.dat
 
 
 ### Renderer grr\_pipe

@@ -1,18 +1,23 @@
 #!/usr/bin/python3
 #
-# renderpygame.py
+# grr_pyg
 #
 #   receive messages from world.py containing instructions
 #   on groc movement.  Uses pygame. (Other versions may use other
 #   rendering mechanisms) 
 #
+#   grr_pyg means
+#       groc renderer - pygame
+#
 # TDORSEY 2022-05-21  Created from the bones of render.py
+#     
 
 import pygame 
 import groc
 
 class Renderer():
   pygame.init
+  pygame.display.set_caption("Grocs")
 
   def __init__(self, x, y):
 
@@ -42,7 +47,7 @@ class Renderer():
       pygame.draw.circle(self.screen, self.worldcolor, (oldX, oldY), 10)
     pygame.draw.circle(self.screen, groccolor, (newX, newY), 9)
     pygame.draw.circle(self.screen, eyecolor, (newX, newY), 2)
-    pygame.display.flip()
+    #pygame.display.flip()
 
 #     drawStatic
   def drawStatic(self, theGroc, newX, newY):
@@ -57,6 +62,7 @@ class Renderer():
     pygame.quit()
 
   def tick(self):
+    pygame.display.flip()
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         self.quit()

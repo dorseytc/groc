@@ -52,7 +52,7 @@ import math
 import os
 import random
 # choose which renderer here
-import renderpygame as render
+import grr_pyg as render
 #import renderdebug as render
 import sys
 
@@ -567,6 +567,7 @@ def main():
   #
   # Saving The World
   #
+  print("Nothing is moving")
   thisWorld.close() 
   logger.info("World closed")
             

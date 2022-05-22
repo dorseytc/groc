@@ -21,8 +21,8 @@ python3 groc.py
   - limit to 10 iterations
   - use testfile.dat instead of grocfile.dat
 - ./groc.py 
-  - omit groc count, use default 
-  - omit iteration limit, use default of unlimited
+  - omit groc count, use default of 2
+  - omit iteration limit, use default of 1000
   - omit filename, use default of grocfile.dat
 
 
@@ -48,12 +48,12 @@ The files present in this project are:
   - requires the use of a pipe reader
 
 #### the Pipe Readers
-- pr\_pygame.py - pygame-based render engine using grr\_pipe renderer
+- only required when using pipe-based renderer grr\_pipe
+- pr\_pygame.py - pygame-based render engine 
 - pr\_text.py - text based "render" engine for debugging
 
   
 ### See Also
 
-- README.md - this document
 - RELEASES.md - a compilation of features in each release
 - TODO.md - a list of planned enhancements

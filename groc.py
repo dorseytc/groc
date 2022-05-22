@@ -45,6 +45,7 @@
 #                           Eliminate numpy
 #   TDORSEY     2022-05-21  Support external renderers via a standard
 #                           class and set of methods
+#   TDORSEY     2022-05-22  Pass the world to the renderer for reference
 #   
 
 import datetime 
@@ -107,7 +108,7 @@ class World():
         self.lonely = 0
         self.crowded = 0
         self.logger = None
-        self.render = render.Renderer(x, y)
+        self.render = render.Renderer(self)
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
@@ -196,15 +197,6 @@ class World():
                          str(newX) + "," + str(newY))
         return (newX, newY)
 
-# world.render
-    def render(self, grocId, oldx, oldy, newx, newy, gender, mood):
-        fs = World.FIELDSEP
-        self.renderPipe.write("MOVE" + fs + str(grocId) + fs + 
-                              str(oldx) + fs + str(oldy) + fs + 
-                              str(newx) + fs + str(newy) + fs + 
-                              gender + fs + mood + nl)
-        self.renderPipe.flush()
-
 # world.saveGrocs
     def saveGrocs(self, grocFile):
       saveFile = open(grocFile, "w")
@@ -228,7 +220,7 @@ class World():
 # world.tick
     def tick(self):
         self.currentTick += 1
-        self.render.tick(self)
+        self.render.tick()
 
 # world.tossCoin
     def tossCoin(self, seed):

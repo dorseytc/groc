@@ -19,12 +19,14 @@ class Renderer():
   pygame.init
   pygame.display.set_caption("Grocs")
 
-  def __init__(self, x, y):
+  def __init__(self, thisWorld):
 
     super(Renderer, self).__init__()
 
-    self.screen = pygame.display.set_mode([x, y])
-    self.worldcolor = groc.World.WHITE
+    self.world = thisWorld
+    self.screen = pygame.display.set_mode([self.world.MAXX, 
+                                          self.world.MAXY])
+    self.worldcolor = self.world.WHITE
     self.screen.fill(self.worldcolor)
     self.running = True
 

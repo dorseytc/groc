@@ -43,7 +43,8 @@
 #   TDORSEY     2022-05-17  Added world stats
 #   TDORSEY     2022-05-20  Combine groc.py and run.py
 #                           Eliminate numpy
-#   TDORSEY     2022-05-21  Import renderxxx as render
+#   TDORSEY     2022-05-21  Support external renderers via a standard
+#                           class and set of methods
 #   
 
 import datetime 
@@ -52,8 +53,8 @@ import math
 import os
 import random
 # choose which renderer here
-import grr_pyg as render
-#import renderdebug as render
+#import grr_pyg as render
+import grr_pipe as render
 import sys
 
 # default limits
@@ -227,7 +228,7 @@ class World():
 # world.tick
     def tick(self):
         self.currentTick += 1
-        self.render.tick()
+        self.render.tick(self)
 
 # world.tossCoin
     def tossCoin(self, seed):

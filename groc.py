@@ -150,13 +150,16 @@ class World():
 
 # world.findDistance
     def findDistance(self, x1, y1, x2, y2):
-        assert not None in (x1, y1, x2, y2), 'Coordinates of None not allowed'
-        xDiff = abs(x1 - x2) 
-        yDiff = abs(y1 - y2)
-        return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
+        if None in (x1, x2, y1, y2):
+          result = 0
+        else:
+          xDiff = abs(x1 - x2) 
+          yDiff = abs(y1 - y2)
+          result = (((xDiff ** 2) + (yDiff ** 2)) ** .5)
+        return result
 
-# world.findNearbyGroc
-    def findNearbyGroc(self, x, y):
+# world.findGrocNearXY
+    def findGrocNearXY(self, x, y):
         leastDist = self.findDistance(0, 0, self.MAXX, self.MAXY)
         nearestGroc = None
         for thisGroc in self.grocList:
@@ -316,12 +319,19 @@ class Groc():
     def act(self):
       'take action'
       if self.mood == self.DEAD:  
-        pass
-      elif self.targetX is None or self.targetY is None:
+        moved = False
+      elif 0 == self.world.findDistance(self.x, self.y, self.targetX, self.targetY):
         self.fp = self.fp - self.metabolism
+        moved = False
       else:
+        moved = True
         self.moveTowardTarget()
         self.fp = self.fp - (2 * self.metabolism)
+      if moved == False:
+        zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, self.nearestGroc.y) 
+        if zdist < self.personalRadius:
+           self.world.render.drawStatic(self, self.x, self.y)
+
 
 
 # groc.chooseLessCrowdedSpace

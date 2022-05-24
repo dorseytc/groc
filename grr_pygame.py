@@ -39,11 +39,8 @@ class Renderer():
       groccolor = groc.World.BLUE
     else:
       groccolor = groc.World.RED
-    if not None in (theGroc.x, theGroc.y, theGroc.targetX, theGroc.targetY):
-      distanceFromTarget = theGroc.world.findDistance(theGroc.x, theGroc.y, 
-                            theGroc.targetX, theGroc.targetY) 
-    else:
-      distanceFromTarget = 0
+    distanceFromTarget = theGroc.world.findDistance(theGroc.x, theGroc.y, 
+                                                    theGroc.targetX, theGroc.targetY) 
     hunger = theGroc.hungerThreshold - theGroc.fp 
     if theGroc.mood == groc.Groc.DEAD:
       eyecolor = groccolor
@@ -92,7 +89,7 @@ class Renderer():
         self.running = False
       if event.type == pygame.MOUSEBUTTONDOWN:
         x, y = event.pos
-        nearestGroc = self.world.findNearbyGroc(x, y) 
+        nearestGroc = self.world.findGrocNearXY(x, y) 
         zdist = self.world.findDistance(x, y, nearestGroc.x, nearestGroc.y)
         if zdist > nearestGroc.personalRadius:
           pass

@@ -232,11 +232,11 @@ class World():
 
 # world.setStats
     def setStats(self, happy, lonely, crowded, hungry, dead):
-        self.happy = happy 
-        self.lonely = lonely
-        self.crowded = crowded
-        self.hungry = hungry
-        self.dead = dead
+        self.happyCount = happy 
+        self.lonelyCount = lonely
+        self.crowdedCount = crowded
+        self.hungryCount = hungry
+        self.deadCount = dead
 
 # world.tick
     def tick(self, waitSeconds=0):
@@ -430,7 +430,7 @@ class Groc():
                 self.color + "', " + str(self.x) + ", " + 
                 str(self.y) + ", " + str(self.id) + ", " + 
                 str(self.birthTick) + ", '" + str(self.gender) +  "'," + 
-                str(self.fp) + ")" + self.world.NEWLINE)
+                str(round(self.fp, 9)) + ")" + self.world.NEWLINE)
 
 # groc.findNearestGroc
     def findNearestGroc(self):
@@ -620,7 +620,7 @@ def main():
   #
   # Saving The World
   #
-  print("End Time:  ", time.ctime())
+  print("End Time: ", time.ctime())
   endTimeSeconds = time.time()
   endTick = thisWorld.currentTick
   print("Elapsed seconds: " + str(int(endTimeSeconds - startTimeSeconds)))

@@ -19,6 +19,7 @@
 # TDORSEY 2022-05-15  pipe receives MOVE and STAT messages
 # TDORSEY 2022-05-22  Modify to use grr_pipe.py Renderer class
 #                     Rename to pr_pygame to align with new framework
+# TDORSEY 2022-05-24  Support HUNGRY and DEAD
 
 import pygame 
 import os
@@ -64,10 +65,15 @@ def main():
             groccolor = groc.World.BLUE
           else:
             groccolor = groc.World.RED
-          if mood == groc.Groc.LONELY:
+          if mood == groc.Groc.DEAD: 
+            groccolor = groc.World.BLACK
+            eyecolor = groc.World.BLACK
+          elif mood == groc.Groc.LONELY:
             eyecolor = groc.World.WHITE
           elif mood == groc.Groc.CROWDED:
             eyecolor = groc.World.BLACK
+          elif mood == groc.Groc.HUNGRY:
+            eyecolor = groc.World.GRAY
           else:
             # mood == groc.Groc.HAPPY:
             eyecolor = groccolor

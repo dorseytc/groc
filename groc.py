@@ -59,8 +59,8 @@ import time
 #
 # choose a renderer here
 #
-import grr_pygame as render
-#import grr_pipe as render
+#import grr_pygame as render
+import grr_pipe as render
 #
 #
 #

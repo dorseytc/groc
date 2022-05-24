@@ -3,7 +3,7 @@
 
 ### hunger (v0.8.0) -- in progress
  
-- HUNGER as a state of being
+- HUNGRY as a state of being
 - Food as a class of item in the World
 - Food Points and Hit Points
 - Genetic metabolism factors

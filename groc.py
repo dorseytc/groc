@@ -25,7 +25,7 @@
 #   TDORSEY     2022-05-01  Refactor groc into groc.py class file
 #   TDORSEY     2022-05-02  World owns constants now
 #                           Add movement methods to Groc
-#                           Add currentTick and tick() to World
+#                           Add currentTick and tick to World
 #                           Move initialization code into main
 #   TDORSEY     2022-05-03  Move load/save to World class
 #                           Move pipe definition to World class 
@@ -46,6 +46,7 @@
 #   TDORSEY     2022-05-21  Support external renderers via a standard
 #                           class and set of methods
 #   TDORSEY     2022-05-22  Pass the world to the renderer for reference
+#   TDORSEY     2022-05-24  Add HUNGRY and DEAD moods
 #   
 
 import datetime 
@@ -53,11 +54,16 @@ import logging
 import math
 import os
 import random
-# choose which renderer here
-import grr_pyg as render
-#import grr_pipe as render
 import sys
-
+import time
+#
+# choose a renderer here
+#
+import grr_pygame as render
+#import grr_pipe as render
+#
+#
+#
 # default limits
 K_STILL_LIMIT = 10
 K_GROC_LIMIT = 2
@@ -86,16 +92,19 @@ class World():
     LOGFILE = "groc.log"
 
     currentTick = 0    
+    currentTime = time.time()
+    defaultTick = .1
 
     # COLORS
     BLACK = (0, 0, 0)
     BLUE = (0, 0, 255)
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
+    GRAY = (159, 159, 159)
  
     def __init__(self, x, y):
         
-        super(World, self).__init__()
+        #super(World, self).__init__()
          
         self.MAXX = x
         self.MAXY = y
@@ -218,15 +227,24 @@ class World():
         self.worldFile.close()
 
 # world.setStats
-    def setStats(self, happy, lonely, crowded):
+    def setStats(self, happy, lonely, crowded, hungry, dead):
         self.happy = happy 
         self.lonely = lonely
         self.crowded = crowded
+        self.hungry = hungry
+        self.dead = dead
 
 # world.tick
-    def tick(self):
+    def tick(self, waitSeconds=0):
         self.currentTick += 1
         self.render.tick()
+        if waitSeconds > 0:
+          print("Slow tick ", waitSeconds, " seconds")
+        nowTime = time.time()
+        if nowTime < self.currentTime + self.defaultTick + waitSeconds:
+          time.sleep(self.currentTime + self.defaultTick + waitSeconds - nowTime)
+        self.currentTime = time.time()
+        
 
 # world.percentage
     def percentage(self):
@@ -242,30 +260,34 @@ class Groc():
     CROWDED = "Crowded"
     HAPPY = "Happy"
     LONELY = "Lonely"
+    HUNGRY = "Hungry"
+    DEAD = "Dead"
 
     
     def __init__(self, world, mood, color, x, y, 
                  id=None, birthTick=None, 
-                 gender=None):
+                 gender=None, 
+                 fp=20):
         
-        super(Groc, self).__init__()
+        #super(Groc, self).__init__()
 
         Groc.grocCount += 1
         self.world = world
         self.mood = mood
-        self.moodSince = self.world.currentTick
         self.color = color
         self.x = int(x)
         self.y = int(y)
         self.nearestGroc = None
         self.targetX = None
         self.targetY = None
+        self.fp = fp
+        self.hungerThreshold = 4
         self.communityRadius = 22
         self.personalRadius = 20
         self.preferredCommunitySize = 4
-        self.patience=5
         self.communityCount = 0
         self.personalCount = 0
+        self.metabolism = .01
         if id is None:
           self.id = Groc.grocCount
         else:
@@ -292,10 +314,13 @@ class Groc():
 # groc.act
     def act(self):
       'take action'
-      if self.targetX is None or self.targetY is None:
+      if self.mood == self.DEAD:  
         pass
+      elif self.targetX is None or self.targetY is None:
+        self.fp = self.fp - self.metabolism
       else:
         self.moveTowardTarget()
+        self.fp = self.fp - (2 * self.metabolism)
 
 
 # groc.chooseLessCrowdedSpace
@@ -341,7 +366,11 @@ class Groc():
       'decide what to do'
       zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, 
                                       self.nearestGroc.y)
-      if zdist < self.personalRadius:  
+      if self.fp < 0:
+        self.setMood(Groc.DEAD)
+      elif self.fp < self.hungerThreshold:
+        self.setMood(Groc.HUNGRY)
+      elif zdist < self.personalRadius:  
         self.setMood(Groc.CROWDED)
       elif zdist > self.communityRadius:
       #elif zdist > self.personalRadius:
@@ -389,8 +418,8 @@ class Groc():
         return ("Groc(self, '" + self.mood + "', '" + 
                 self.color + "', " + str(self.x) + ", " + 
                 str(self.y) + ", " + str(self.id) + ", " + 
-                str(self.birthTick) + ", '" + 
-                str(self.gender) + "')" + self.world.NEWLINE)
+                str(self.birthTick) + ", '" + str(self.gender) +  "'," + 
+                str(self.fp) + ")" + self.world.NEWLINE)
 
 # groc.findNearestGroc
     def findNearestGroc(self):
@@ -438,7 +467,8 @@ class Groc():
                                      str(self.targetY) + 
                    " Mood: " + self.mood + 
                    " Gender: " + self.gender + 
-                   " Birthtick: " + str(self.birthTick))
+                   " Birthtick: " + str(self.birthTick) + 
+                   " Food Points: " + str(self.fp))
         return identity 
  
 
@@ -491,6 +521,9 @@ class Groc():
 
 def main():   
   thisWorld = World(1800,800)
+  print("Start Time is ", time.ctime())
+  startTimeSeconds = time.time()
+  startTick = thisWorld.currentTick
   #Command Line Arguments
   numArgs = len(sys.argv)
   if numArgs > 4:
@@ -526,10 +559,12 @@ def main():
   stillTimer = 0
   while running:
     counter += 1
-    movingCount = 0 
+    movingCount = 0
     happyCount = 0
     lonelyCount = 0
     crowdedCount = 0
+    hungryCount = 0 
+    deadCount = 0
     for thisGroc in thisWorld.grocList:   
        oldX = thisGroc.x
        oldY = thisGroc.y
@@ -538,18 +573,18 @@ def main():
        thisGroc.act()
        if thisGroc.didMove(oldX, oldY):
          movingCount += 1
-       else: 
-         logger.debug("Groc " + str(thisGroc.id) + 
-                      " did not move")
        if thisGroc.mood == Groc.HAPPY:
          happyCount += 1
        elif thisGroc.mood == Groc.LONELY:
          lonelyCount += 1
        elif thisGroc.mood == Groc.CROWDED:
          crowdedCount += 1
+       elif thisGroc.mood == Groc.HUNGRY:
+         hungryCount += 1
+       elif thisGroc.mood == Groc.DEAD:
+         deadCount += 1
 
-    thisWorld.setStats(happyCount, lonelyCount, crowdedCount)
-
+    thisWorld.setStats(happyCount, lonelyCount, crowdedCount, hungryCount, deadCount)
     if movingCount > 0:
       stillTimer = 0
     else:
@@ -557,12 +592,13 @@ def main():
 
     if stillTimer > K_STILL_LIMIT:
       running = False
-      logger.info("Nobody has moved in " + str(K_STILL_LIMIT) + " ticks")
+      logger.info("No movement in " + str(K_STILL_LIMIT) + " ticks")
     elif p_iterations == 0:
       running = True
     elif counter >= p_iterations:
       running = False
       logger.info("Iteration count exceeded")
+      print("Iteration count exceeded")
     if counter % 100 == 0 or running == False:
       # write every 100 moves or when iteration limit reached
       thisWorld.saveGrocs(p_grocFile)
@@ -573,9 +609,12 @@ def main():
   #
   # Saving The World
   #
-  print("Nothing is moving")
+  print("End Time:  ", time.ctime())
+  endTimeSeconds = time.time()
+  endTick = thisWorld.currentTick
+  print("Elapsed seconds: " + str(int(endTimeSeconds - startTimeSeconds)))
+  print("Elapsed ticks: " + str(endTick - startTick))
   thisWorld.close() 
-  logger.info("World closed")
             
 if __name__ == '__main__':
     main()

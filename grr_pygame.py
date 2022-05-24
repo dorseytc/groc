@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 #
-# grr_pyg
+# grr_pygame
 #
 #   receive messages from world.py containing instructions
 #   on groc movement.  Uses pygame. (Other versions may use other
 #   rendering mechanisms) 
 #
-#   grr_pyg means
+#   grr_pygame means
 #       groc renderer - pygame
 #
 # TDORSEY 2022-05-21  Created from the bones of render.py
+# TDORSEY 2022-05-24  Support HUNGRY and DEAD
 #     
 
 import pygame 
@@ -37,10 +38,15 @@ class Renderer():
       groccolor = groc.World.BLUE
     else:
       groccolor = groc.World.RED
-    if theGroc.mood == groc.Groc.LONELY:
+    if theGroc.mood == groc.Groc.DEAD:
+      groccolor = groc.World.BLACK
+      eyecolor = groc.World.BLACK
+    elif theGroc.mood == groc.Groc.LONELY:
       eyecolor = groc.World.WHITE
     elif theGroc.mood == groc.Groc.CROWDED:
       eyecolor = groc.World.BLACK
+    elif theGroc.mood == groc.Groc.HUNGRY:
+      eyecolor = groc.World.GRAY
     else:
       eyecolor = groccolor
     if None in (theGroc.x, theGroc.y, theGroc.targetX, theGroc.targetY):
@@ -63,6 +69,7 @@ class Renderer():
     self.drawMoving(theGroc, newX, newY, newX, newY)
 
   def close(self):
+    print("Awaiting user input to close")
     while (self.running):
       self.tick()
     self.quit()

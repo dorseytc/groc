@@ -93,11 +93,6 @@ class World():
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
  
-    #COIN TOSS
-    HEADS = 0
-    TAILS = 1
-
-  
     def __init__(self, x, y):
         
         super(World, self).__init__()
@@ -233,9 +228,9 @@ class World():
         self.currentTick += 1
         self.render.tick()
 
-# world.tossCoin
-    def tossCoin(self, seed):
-        return ((self.currentTick + seed)% 2)
+# world.percentage
+    def percentage(self):
+        return(random.randint(1,100))
         
 
 class Groc():
@@ -369,12 +364,10 @@ class Groc():
       elif self.mood == Groc.CROWDED:
         #pick a target one time when crowded
         if self.targetX is None and self.targetY is None:
-          coinToss = self.world.tossCoin(self.id)
-          if coinToss == self.world.HEADS:
-            self.world.logger.debug("HEADS")
+          pct = self.world.percentage()
+          if pct <= 50:
             self.targetX, self.targetY = self.world.randomLocation()
           else:
-            self.world.logger.debug("TAILS")
             self.targetX, self.targetY = self.chooseLessCrowdedSpace(
                                                self.communityRadius)
         else:

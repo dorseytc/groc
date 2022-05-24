@@ -34,27 +34,33 @@ class Renderer():
 
  #pygame1.drawMoving
   def drawMoving(self, theGroc, oldX, oldY, newX, newY):
+    assert not None in (oldX, oldY, newX, newY), 'Cannot move to None coordinates'
     if theGroc.gender == groc.Groc.MALE:
       groccolor = groc.World.BLUE
     else:
       groccolor = groc.World.RED
+    if not None in (theGroc.x, theGroc.y, theGroc.targetX, theGroc.targetY):
+      distanceFromTarget = theGroc.world.findDistance(theGroc.x, theGroc.y, 
+                            theGroc.targetX, theGroc.targetY) 
+    else:
+      distanceFromTarget = 0
+    hunger = theGroc.hungerThreshold - theGroc.fp 
     if theGroc.mood == groc.Groc.DEAD:
+      eyecolor = groccolor
       groccolor = groc.World.BLACK
-      eyecolor = groc.World.BLACK
+      intensity = 2
     elif theGroc.mood == groc.Groc.LONELY:
       eyecolor = groc.World.WHITE
+      intensity = 2 + round(distanceFromTarget / max(self.world.MAXX, self.world.MAXY) * 6)
     elif theGroc.mood == groc.Groc.CROWDED:
       eyecolor = groc.World.BLACK
+      intensity = 2 + round(distanceFromTarget / max(self.world.MAXX, self.world.MAXY) * 6)
     elif theGroc.mood == groc.Groc.HUNGRY:
       eyecolor = groc.World.GRAY
+      intensity = 2 + round(hunger/theGroc.hungerThreshold * 6)
     else:
       eyecolor = groccolor
-    if None in (theGroc.x, theGroc.y, theGroc.targetX, theGroc.targetY):
       intensity = 2 
-    else:
-      zdist = theGroc.world.findDistance(theGroc.x, theGroc.y, 
-                                    theGroc.targetX, theGroc.targetY) 
-      intensity = 2 + round((zdist / max(self.world.MAXX, self.world.MAXY)) * 6)
     if oldX == newX and oldY == newY:
       'has not moved'
       pass
@@ -66,6 +72,7 @@ class Renderer():
 
 #     drawStatic
   def drawStatic(self, theGroc, newX, newY):
+    assert not None in (newX, newY), 'Cannot render coordinates of None'
     self.drawMoving(theGroc, newX, newY, newX, newY)
 
   def close(self):

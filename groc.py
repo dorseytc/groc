@@ -59,8 +59,8 @@ import time
 #
 # choose a renderer here
 #
-#import grr_pygame as render
-import grr_pipe as render
+import grr_pygame as render
+#import grr_pipe as render
 #
 #
 #
@@ -149,9 +149,10 @@ class World():
         
 
 # world.findDistance
-    def findDistance(self, firstx, firsty, secondx, secondy):
-        xDiff = abs(firstx - secondx) 
-        yDiff = abs(firsty - secondy)
+    def findDistance(self, x1, y1, x2, y2):
+        assert not None in (x1, y1, x2, y2), 'Coordinates of None not allowed'
+        xDiff = abs(x1 - x2) 
+        yDiff = abs(y1 - y2)
         return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
 
 # world.findNearbyGroc

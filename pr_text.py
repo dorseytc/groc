@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #
-# render-d.py
+# pr_text
+#
+# Pipe Reader for groc using Text output
 #
 # text based "render" of a groc world. 
 # receives messages from world.py containing instructions on
@@ -15,12 +17,14 @@
 # TDORSEY 2022-05-05  Debug missing messages, use world constants
 # TDORSEY 2022-05-07  import and pydoc enabled, __main__ protected
 # TDORSEY 2022-05-16  removed unused imports
+# TDORSEY 2022-05-22  Converted to work with grr_pipe framework
 #           
 #
 import groc
+import grr_pipe
 
 def main():
-  pipe = groc.World.PIPENAME
+  pipe = grr_pipe.Renderer.PIPENAME
   try:
     print("Looking for the pipe")
     rpipe = open(pipe, "r")

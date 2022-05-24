@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #
 #   groc.py
 #
@@ -25,27 +26,49 @@
 #   TDORSEY     2022-05-02  World owns constants now
 #                           Add movement methods to Groc
 #                           Add currentTick and tick() to World
+#                           Move initialization code into main
 #   TDORSEY     2022-05-03  Move load/save to World class
+#                           Move pipe definition to World class 
 #   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
-#                           Add birthTick and gender.
+#                           Add birthTick. Render gender.
 #   TDORSEY     2022-05-04  Blank Line fix
 #   TDORSEY     2022-05-06  observe,decide,act
+#                           Added log level arg
 #   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
 #   TDORSEY     2022-05-12  Enabling CROWDED; establishing moodSince
+#                           Added patience factor, stillness limit
 #   TDORSEY     2022-05-14  Improved target finding for choosing a less
 #                           crowded space 
 #   TDORSEY     2022-05-15  visible moods
-#   TDORSEY     2022-05-17  World stats
+#   TDORSEY     2022-05-17  Added world stats
+#   TDORSEY     2022-05-20  Combine groc.py and run.py
+#                           Eliminate numpy
+#   TDORSEY     2022-05-21  Support external renderers via a standard
+#                           class and set of methods
+#   TDORSEY     2022-05-22  Pass the world to the renderer for reference
 #   
 
 import datetime 
 import logging
 import math
-import numpy
 import os
+import random
+# choose which renderer here
+import grr_pyg as render
+#import grr_pipe as render
 import sys
 
-print("Loading groc")
+# default limits
+K_STILL_LIMIT = 10
+K_GROC_LIMIT = 2
+K_ITER_LIMIT = 1000
+K_LOG_LEVEL = 20
+# 50 CRITICAL
+# 40 ERROR
+# 30 WARNING
+# 20 INFO
+# 10 DEBUG
+# 0  NOTSET
 
 class World():
     'Base class for the world'
@@ -58,7 +81,6 @@ class World():
     # FILE UTILS
     FIELDSEP = '|'
     NEWLINE = '\n'
-    PIPENAME = "/tmp/grocpipe"
     GROCFILE = "grocfile.dat"
     WORLDFILE = ".world.dat"
     LOGFILE = "groc.log"
@@ -71,30 +93,24 @@ class World():
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
  
-    #COIN TOSS
-    HEADS = 0
-    TAILS = 1
-
-  
     def __init__(self, x, y):
         
         super(World, self).__init__()
          
         self.MAXX = x
         self.MAXY = y
+        self.happy = 0
+        self.lonely = 0
+        self.crowded = 0
         self.logger = None
+        self.render = render.Renderer(self)
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
           World.currentTick = int(line)
         else:
           World.currentTick = 0
-        if os.path.exists(self.PIPENAME):
-          os.unlink(self.PIPENAME)
-        if not os.path.exists(self.PIPENAME):
-          os.mkfifo(self.PIPENAME, 0o600)
-          self.renderPipe = open(self.PIPENAME, 'w', 
-                                 newline=self.NEWLINE)
+
 # world.bindX
     def bindX(self, x):
         boundx = x
@@ -116,9 +132,7 @@ class World():
  
 # world.close
     def close(self):
-        self.renderPipe.close()
-        if os.path.exists(self.PIPENAME):
-          os.unlink(self.PIPENAME) 
+        self.render.close()  
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
@@ -129,8 +143,18 @@ class World():
     def findDistance(self, firstx, firsty, secondx, secondy):
         xDiff = abs(firstx - secondx) 
         yDiff = abs(firsty - secondy)
-        #return (math.sqrt((xDiff ** 2) + (yDiff ** 2)))
         return (((xDiff ** 2) + (yDiff ** 2)) ** .5)
+
+# world.findNearbyGroc
+    def findNearbyGroc(self, x, y):
+        leastDist = self.findDistance(0, 0, self.MAXX, self.MAXY)
+        nearestGroc = None
+        for thisGroc in self.grocList:
+          zDist = self.findDistance(x, y, thisGroc.x, thisGroc.y)
+          if zDist < leastDist:
+            leastDist = zDist
+            nearestGroc = thisGroc
+        return nearestGroc
 
 # world.getGrocs
     def getGrocs(self, numGrocs, grocFile):
@@ -143,9 +167,8 @@ class World():
             grocsRead += 1
             newGroc = eval(line)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, self.bindX(newGroc.x), 
-                        self.bindY(newGroc.y), 
-                        newGroc.gender, newGroc.mood)
+            self.render.drawStatic(newGroc, self.bindX(newGroc.x), 
+                                   self.bindY(newGroc.y))
             builtList.append(newGroc)
             line = savedFile.readline()
           savedFile.close()      
@@ -156,8 +179,7 @@ class World():
             newX, newY = self.randomLocation()
             newGroc = Groc(self, Groc.HAPPY, "green", newX, newY)
             newGroc.identify()
-            self.render(newGroc.id, 0, 0, newGroc.x, newGroc.y, 
-                        newGroc.gender, newGroc.mood)
+            self.render.drawStatic(newGroc, newX, newY)
             builtList.append(newGroc)
         #return grocList
         self.grocList = builtList
@@ -175,21 +197,11 @@ class World():
 
 # world.randomLocation
     def randomLocation(self):
-        newX = numpy.random.randint(1, self.MAXX)  
-        newY = numpy.random.randint(1, self.MAXY)
+        newX = random.randint(1, self.MAXX)  
+        newY = random.randint(1, self.MAXY)
         self.logger.debug("randomx, randomy = " + 
                          str(newX) + "," + str(newY))
         return (newX, newY)
-
-# world.render
-    def render(self, grocId, oldx, oldy, newx, newy, gender, mood):
-        fs = World.FIELDSEP
-        nl = World.NEWLINE
-        self.renderPipe.write("MOVE" + fs + str(grocId) + fs + 
-                              str(oldx) + fs + str(oldy) + fs + 
-                              str(newx) + fs + str(newy) + fs + 
-                              gender + fs + mood + nl)
-        self.renderPipe.flush()
 
 # world.saveGrocs
     def saveGrocs(self, grocFile):
@@ -207,21 +219,18 @@ class World():
 
 # world.setStats
     def setStats(self, happy, lonely, crowded):
-        fs = World.FIELDSEP
-        nl = World.NEWLINE
-        self.renderPipe.write("STAT" + fs + str(self.currentTick) + fs + 
-                              str(happy) + fs + str(lonely) + fs + 
-                              str(crowded) + nl)
-        self.renderPipe.flush()
+        self.happy = happy 
+        self.lonely = lonely
+        self.crowded = crowded
 
 # world.tick
     def tick(self):
         self.currentTick += 1
+        self.render.tick()
 
-# world.tossCoin
-    def tossCoin(self, seed):
-        return ((self.currentTick + seed)% 2)
-        #return (numpy.random.randint(World.HEADS, World.TAILS))
+# world.percentage
+    def percentage(self):
+        return(random.randint(1,100))
         
 
 class Groc():
@@ -355,12 +364,10 @@ class Groc():
       elif self.mood == Groc.CROWDED:
         #pick a target one time when crowded
         if self.targetX is None and self.targetY is None:
-          coinToss = self.world.tossCoin(self.id)
-          if coinToss == self.world.HEADS:
-            self.world.logger.debug("HEADS")
+          pct = self.world.percentage()
+          if pct <= 50:
             self.targetX, self.targetY = self.world.randomLocation()
           else:
-            self.world.logger.debug("TAILS")
             self.targetX, self.targetY = self.chooseLessCrowdedSpace(
                                                self.communityRadius)
         else:
@@ -389,7 +396,7 @@ class Groc():
     def findNearestGroc(self):
         nearestx = self.world.MAXX
         nearesty = self.world.MAXY 
-        leastDist = nearestx + nearesty
+        leastDist = self.world.findDistance(0, 0, nearestx, nearesty)
         nearestGroc = None
         for anotherGroc in self.world.grocList:
           if not (anotherGroc.id == self.id):
@@ -402,7 +409,7 @@ class Groc():
     
 # groc.geneticAttributes
     def geneticAttributes(self):
-        seed = numpy.random.randint(1, self.world.MAXX) 
+        seed = random.randint(1, self.world.MAXX) 
         if seed % 2 == 0:
           gender = Groc.FEMALE
         else:
@@ -425,6 +432,15 @@ class Groc():
     def identify(self):
         self.world.logger.debug ("Identify " + str(self.id) + 
                       " was born at " + str(self.birthTick))
+        identity = ("Id: " + str(self.id) + 
+                   " Current X,Y: " + str(self.x) + "," + str(self.y) + 
+                   " Target X,Y: " + str(self.targetX) + "," + 
+                                     str(self.targetY) + 
+                   " Mood: " + self.mood + 
+                   " Gender: " + self.gender + 
+                   " Birthtick: " + str(self.birthTick))
+        return identity 
+ 
 
 # groc.moveTowardTarget
     def moveTowardTarget(self, speed=1):
@@ -443,8 +459,7 @@ class Groc():
               newY = newY + 1
             elif newY > self.targetY:
               newY = newY - 1
-          self.world.render(self.id, self.x, self.y, newX, newY, 
-                            self.gender, self.mood)
+          self.world.render.drawMoving(self, self.x, self.y, newX, newY)
           self.x = newX
           self.y = newY
 
@@ -464,11 +479,103 @@ class Groc():
         else:
           self.mood = newMood
           self.moodSince = self.world.currentTick
-          self.world.render(self.id, self.x, self.y, self.x, self.y,
-                            self.gender, self.mood)
+          self.world.render.drawStatic(self, self.x, self.y)
 
 # groc.setTarget(self, newx, newy)
     def setTarget(self, newx, newy):
         self.targetX = newx
         self.targetY = newy 
 
+
+# main
+
+def main():   
+  thisWorld = World(1800,800)
+  #Command Line Arguments
+  numArgs = len(sys.argv)
+  if numArgs > 4:
+    p_grocFile = sys.argv[4] 
+  else:
+    p_grocFile = thisWorld.GROCFILE
+  if numArgs > 3:
+    p_logLevel = int(sys.argv[3])
+  else:
+    p_logLevel = K_LOG_LEVEL
+  if numArgs > 2:
+    p_iterations = int(sys.argv[2])
+  else:
+    p_iterations = K_ITER_LIMIT
+  if numArgs > 1:
+    p_numGrocs = int(sys.argv[1])
+  else:
+    p_numGrocs = K_GROC_LIMIT
+  print("p_numGrocs: ", p_numGrocs) 
+  print("p_iterations: ", p_iterations)
+  print("p_logLevel: ", p_logLevel)
+  print("p_grocFile: ", p_grocFile)
+  logger = thisWorld.getLogger(p_logLevel)
+  logger.info("Started run with p_numgrocs=" + str(p_numGrocs) + 
+              ", p_iterations=" + str(p_iterations) + 
+              ", p_grocfile=" + str(p_grocFile))
+  # 
+  #Reading the world
+  #
+  thisWorld.getGrocs(p_numGrocs, p_grocFile)
+  running = True
+  counter = 0 
+  stillTimer = 0
+  while running:
+    counter += 1
+    movingCount = 0 
+    happyCount = 0
+    lonelyCount = 0
+    crowdedCount = 0
+    for thisGroc in thisWorld.grocList:   
+       oldX = thisGroc.x
+       oldY = thisGroc.y
+       thisGroc.observe()
+       thisGroc.decide()
+       thisGroc.act()
+       if thisGroc.didMove(oldX, oldY):
+         movingCount += 1
+       else: 
+         logger.debug("Groc " + str(thisGroc.id) + 
+                      " did not move")
+       if thisGroc.mood == Groc.HAPPY:
+         happyCount += 1
+       elif thisGroc.mood == Groc.LONELY:
+         lonelyCount += 1
+       elif thisGroc.mood == Groc.CROWDED:
+         crowdedCount += 1
+
+    thisWorld.setStats(happyCount, lonelyCount, crowdedCount)
+
+    if movingCount > 0:
+      stillTimer = 0
+    else:
+      stillTimer += 1
+
+    if stillTimer > K_STILL_LIMIT:
+      running = False
+      logger.info("Nobody has moved in " + str(K_STILL_LIMIT) + " ticks")
+    elif p_iterations == 0:
+      running = True
+    elif counter >= p_iterations:
+      running = False
+      logger.info("Iteration count exceeded")
+    if counter % 100 == 0 or running == False:
+      # write every 100 moves or when iteration limit reached
+      thisWorld.saveGrocs(p_grocFile)
+      thisWorld.saveWorld()
+
+    thisWorld.tick()
+
+  #
+  # Saving The World
+  #
+  print("Nothing is moving")
+  thisWorld.close() 
+  logger.info("World closed")
+            
+if __name__ == '__main__':
+    main()

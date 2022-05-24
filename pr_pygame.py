@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 #
-# render.py
+# pr_pygame
+#
+# Pipe Renderer using Pygame
 #
 #   receive messages from world.py containing instructions
 #   on groc movement.  Uses pygame. (Other versions may use other
@@ -15,13 +17,16 @@
 # TDORSEY 2022-05-07  pydoc-enabled, import enabled
 # TDORSEY 2022-05-15  visible moods
 # TDORSEY 2022-05-15  pipe receives MOVE and STAT messages
+# TDORSEY 2022-05-22  Modify to use grr_pipe.py Renderer class
+#                     Rename to pr_pygame to align with new framework
 
 import pygame 
 import os
 import groc
+import grr_pipe 
 
 def main():
-  pipe = groc.World.PIPENAME
+  pipe = grr_pipe.Renderer.PIPENAME
   try:
     print("Looking for the pipe")
     rpipe = open(pipe, "r")

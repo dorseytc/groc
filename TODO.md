@@ -16,20 +16,24 @@
 ### motivation
 - "motivation" should include companionship, food, space (overcrowding)
   - LONELY and CROWDED done (shakers)
-  - HUNGRY not started
+  - HUNGRY started in (hunger)
 - age should be determined by ticks
   - done (auto)
-- hunger should be based on ticks since food
-  - not started
+- hunger should be based on food points
+  - started in (hunger)
 - need for companionship vs need for space should be randomized
   - not started
 
 ### food
-  - not started
-- food might appear randomly
+
+- Food appears randomly
 - HUNGRY might override CROWDED
   - HUNGRY grocs might ignoring CROWDED conditions
   - once sated, grocs might flee crowds seeking HAPPY condition
+- Food restores food points
+- Genetic factors affect metabolism
+- Genetic factors affect eating
+- Random food value (calories)
 
 ### predators
   - not started

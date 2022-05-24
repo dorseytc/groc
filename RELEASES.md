@@ -1,7 +1,16 @@
 ## Release Notes
 
 
-### uno (v0.7.0) -- in progress
+### hunger (v0.8.0) -- in progress
+ 
+- HUNGER as a state of being
+- Food as a class of item in the World
+- Food Points and Hit Points
+- Genetic metabolism factors
+- Genetic eating factors
+- Variable food value (calories per bite)
+
+### uno (v0.7.0) -- complete
 
 - no more pipe; all in one file? 
 

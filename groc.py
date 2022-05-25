@@ -5,49 +5,50 @@
 #     python class for an experiment in object-oriented ai
 #     
 #
-#   TDORSEY     2016-10-16  Created
-#   TDORSEY     2016-10-16  Saving the world
-#   TDORSEY     2016-10-16  Retrieving saved world
-#   TDORSEY     2016-10-16  Improved class and function structure
-#   TDORSEY     2016-10-17  Rendering via pygame
-#   TDORSEY     2016-10-22  Some form of pygame hell
-#   TDORSEY     2022-04-26  Removing pygame in favor of text based 
-#   TDORSEY     2022-04-27  Adding logging
-#                           Configurable loop lengths 
-#   TDORSEY     2022-04-27  Log groc moves separately 
-#   TDORSEY     2022-04-28  Groc position to stdout for now
-#   TDORSEY     2022-04-29  Pipe location to world.py (later w-debug.py)
-#                           Brownian motion
-#                           Ability to iterate forever
-#   TDORSEY     2022-04-30  Grocs seek nearest groc
-#                           Generate grocs up to limit when reading a file
-#                           Exit when nobody is moving 
-#   TDORSEY     2022-05-01  Refactor groc into groc.py class file
-#   TDORSEY     2022-05-02  World owns constants now
-#                           Add movement methods to Groc
-#                           Add currentTick and tick to World
-#                           Move initialization code into main
-#   TDORSEY     2022-05-03  Move load/save to World class
-#                           Move pipe definition to World class 
-#   TDORSEY     2022-05-04  New groc file format, remove birthdatetime
-#                           Add birthTick. Render gender.
-#   TDORSEY     2022-05-04  Blank Line fix
-#   TDORSEY     2022-05-06  observe,decide,act
-#                           Added log level arg
-#   TDORSEY     2022-05-07  grocfile.dat contains Groc constructor calls
-#   TDORSEY     2022-05-12  Enabling CROWDED; establishing moodSince
-#                           Added patience factor, stillness limit
-#   TDORSEY     2022-05-14  Improved target finding for choosing a less
-#                           crowded space 
-#   TDORSEY     2022-05-15  visible moods
-#   TDORSEY     2022-05-17  Added world stats
-#   TDORSEY     2022-05-20  Combine groc.py and run.py
-#                           Eliminate numpy
-#   TDORSEY     2022-05-21  Support external renderers via a standard
-#                           class and set of methods
-#   TDORSEY     2022-05-22  Pass the world to the renderer for reference
-#   TDORSEY     2022-05-24  Add HUNGRY and DEAD moods
-#   
+#   TDORSEY  2016-10-16  Created
+#   TDORSEY  2016-10-16  Saving the world
+#   TDORSEY  2016-10-16  Retrieving saved world
+#   TDORSEY  2016-10-16  Improved class and function structure
+#   TDORSEY  2016-10-17  Rendering via pygame
+#   TDORSEY  2016-10-22  Some form of pygame hell
+#   TDORSEY  2022-04-26  Removing pygame in favor of text based 
+#   TDORSEY  2022-04-27  Adding logging
+#                        Configurable loop lengths 
+#   TDORSEY  2022-04-27  Log groc moves separately 
+#   TDORSEY  2022-04-28  Groc position to stdout for now
+#   TDORSEY  2022-04-29  Pipe location to world.py (later w-debug.py)
+#                        Brownian motion
+#                        Ability to iterate forever
+#   TDORSEY  2022-04-30  Grocs seek nearest groc
+#                        Generate grocs up to limit when reading a file
+#                        Exit when nobody is moving 
+#   TDORSEY  2022-05-01  Refactor groc into groc.py class file
+#   TDORSEY  2022-05-02  World owns constants now
+#                        Add movement methods to Groc
+#                        Add currentTick and tick to World
+#                        Move initialization code into main
+#   TDORSEY  2022-05-03  Move load/save to World class
+#                        Move pipe definition to World class 
+#   TDORSEY  2022-05-04  New groc file format, remove birthdatetime
+#                        Add birthTick. Render gender.
+#   TDORSEY  2022-05-04  Blank Line fix
+#   TDORSEY  2022-05-06  observe,decide,act
+#                        Added log level arg
+#   TDORSEY  2022-05-07  grocfile.dat contains Groc constructor calls
+#   TDORSEY  2022-05-12  Enabling CROWDED; establishing moodSince
+#                        Added patience factor, stillness limit
+#   TDORSEY  2022-05-14  Improved target finding for choosing a less
+#                        crowded space 
+#   TDORSEY  2022-05-15  visible moods
+#   TDORSEY  2022-05-17  Added world stats
+#   TDORSEY  2022-05-20  Combine groc.py and run.py
+#                        Eliminate numpy
+#   TDORSEY  2022-05-21  Support external renderers via a standard
+#                        class and set of methods
+#   TDORSEY  2022-05-22  Pass the world to the renderer for reference
+#   TDORSEY  2022-05-24  Add HUNGRY and DEAD moods
+#   TDORSEY  2022-05-25  Fix HUNGRY actions
+
 
 import datetime 
 import logging
@@ -108,20 +109,21 @@ class World():
          
         self.MAXX = x
         self.MAXY = y
+        #population counts
         self.happy = 0
         self.lonely = 0
         self.crowded = 0
+        self.hungry = 0
+        self.dead = 0
+        self.population = 0
+        self.foodList = []
+        #technical pointers
         self.logger = None
         self.render = render.Renderer(self)
-        if os.path.exists(self.WORLDFILE):
-          self.worldFile = open(self.WORLDFILE, "r")
-          line = self.worldFile.readline()
-          World.currentTick = int(line)
-        else:
-          World.currentTick = 0
 
 # world.bindX
     def bindX(self, x):
+
         boundx = x
         if x < 1:
           boundx = 1 
@@ -142,14 +144,21 @@ class World():
 # world.close
     def close(self):
         self.render.close()  
+        
+# world.createFood
+    def createFood(self, fp=100, x=None, y=None):
+        self.foodList.append(Food(fp, x, y))
+        
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
+        'measure elapsed ticks subtracting sinceTicks from current value'
         return abs(self.currentTick - sinceTick)
         
 
 # world.findDistance
     def findDistance(self, x1, y1, x2, y2):
+        'measure the distance between a two pairs of coordinates'
         if None in (x1, x2, y1, y2):
           result = 0
         else:
@@ -160,6 +169,7 @@ class World():
 
 # world.findGrocNearXY
     def findGrocNearXY(self, x, y):
+        'supply coordinates, find nearest Groc'
         leastDist = self.findDistance(0, 0, self.MAXX, self.MAXY)
         nearestGroc = None
         for thisGroc in self.grocList:
@@ -168,6 +178,17 @@ class World():
             leastDist = zDist
             nearestGroc = thisGroc
         return nearestGroc
+
+# world.foodTick
+    def foodTick(self):
+        'handle Food items' 
+        for i in range(len(self.foodList)):
+          if self.foodList[i].fp <= 0:
+            del self.foodList[i]
+          self.render.drawFood(self.foodList[i])
+        if self.currentTick % 20 == 0:
+          if len(self.foodList) < .1 * self.population:
+            self.foodList.append(Food(self, 100))
 
 # world.getGrocs
     def getGrocs(self, numGrocs, grocFile):
@@ -232,15 +253,16 @@ class World():
 
 # world.setStats
     def setStats(self, happy, lonely, crowded, hungry, dead):
-        self.happyCount = happy 
-        self.lonelyCount = lonely
-        self.crowdedCount = crowded
-        self.hungryCount = hungry
-        self.deadCount = dead
+        self.happy = happy 
+        self.lonely = lonely
+        self.crowded = crowded
+        self.hungry = hungry
+        self.dead = dead
 
 # world.tick
     def tick(self, waitSeconds=0):
         self.currentTick += 1
+        self.foodTick()
         self.render.tick()
         if waitSeconds > 0:
           print("Slow tick ", waitSeconds, " seconds")
@@ -250,14 +272,36 @@ class World():
         self.currentTime = time.time()
         
 
+        
+        
 # world.percentage
     def percentage(self):
         return(random.randint(1,100))
         
 
+class Food():
+    'New class for food'
+    def __init__(self, world, fp, x=None, y=None): 
+        self.fp = fp
+        self.value = 1
+        self.world = world
+        if None in (x, y):
+          x, y = self.world.randomLocation()
+        self.x = x
+        self.y = y
+
+    def bite(self, biteSize=1):
+        calories = biteSize * self.value
+        if self.fp < calories:
+          calories = max(self.fp, 0)
+        self.fp = self.fp - calories
+        return calories
+        
+ 
+        
+
 class Groc():
     'Base class for the groc'
-    grocCount = 0    
     MALE = "M"
     FEMALE = "F"
     # MOODS
@@ -275,8 +319,8 @@ class Groc():
         
         #super(Groc, self).__init__()
 
-        Groc.grocCount += 1
         self.world = world
+        self.world.population += 1
         self.mood = mood
         self.color = color
         self.x = int(x)
@@ -292,10 +336,7 @@ class Groc():
         self.communityCount = 0
         self.personalCount = 0
         self.metabolism = .01
-        if id is None:
-          self.id = Groc.grocCount
-        else:
-          self.id = Groc.grocCount
+        self.id = self.world.population
         if birthTick is None:
           self.birthTick = self.world.currentTick
         else:
@@ -320,7 +361,8 @@ class Groc():
       'take action'
       if self.mood == self.DEAD:  
         moved = False
-      elif 0 == self.world.findDistance(self.x, self.y, self.targetX, self.targetY):
+      elif 0 == self.world.findDistance(self.x, self.y, 
+                                        self.targetX, self.targetY):
         self.fp = self.fp - self.metabolism
         moved = False
       else:
@@ -375,15 +417,17 @@ class Groc():
 # groc.decide
     def decide(self):
       'decide what to do'
-      zdist = self.world.findDistance(self.x, self.y, self.nearestGroc.x, 
-                                      self.nearestGroc.y)
+      distToGroc = self.world.findDistance(self.x, self.y, 
+                                           self.nearestGroc.x, 
+                                           self.nearestGroc.y)
+      distToFood = None
       if self.fp < 0:
         self.setMood(Groc.DEAD)
       elif self.fp < self.hungerThreshold:
         self.setMood(Groc.HUNGRY)
-      elif zdist < self.personalRadius:  
+      elif distToGroc < self.personalRadius:  
         self.setMood(Groc.CROWDED)
-      elif zdist > self.communityRadius:
+      elif distToGroc > self.communityRadius:
       #elif zdist > self.personalRadius:
         self.setMood(Groc.LONELY)
       else:
@@ -395,6 +439,10 @@ class Groc():
         self.targetY = None
       elif self.mood == Groc.HAPPY:
         #stay put when you're happy
+        self.targetX = None
+        self.targetY = None
+      elif self.mood == Groc.HUNGRY:
+        #hunker down when you're hungry
         self.targetX = None
         self.targetY = None
       elif self.mood == Groc.LONELY:
@@ -432,6 +480,20 @@ class Groc():
                 str(self.birthTick) + ", '" + str(self.gender) +  "'," + 
                 str(round(self.fp, 9)) + ")" + self.world.NEWLINE)
 
+# groc.findNearestFood
+    def findNearestFood (self):
+        nearestx = self.world.MAXX
+        nearesty = self.world.MAXY 
+        leastDist = self.world.findDistance(0, 0, nearestx, nearesty)
+        nearestFood = None
+        for someFood in self.world.foodList:
+          zDist = self.world.findDistance(self.x, self.y, 
+                               someFood.x, someFood.y)
+          if zDist < leastDist:
+            leastDist = zDist
+            nearestFood = someFood
+        return nearestFood
+    
 # groc.findNearestGroc
     def findNearestGroc(self):
         nearestx = self.world.MAXX

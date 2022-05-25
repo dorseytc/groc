@@ -11,6 +11,7 @@
 #
 # TDORSEY 2022-05-21  Created from the bones of render.py
 # TDORSEY 2022-05-24  Support HUNGRY and DEAD
+# TDORSEY 2022-05-25  Add Food
 #     
 
 import pygame 
@@ -32,7 +33,15 @@ class Renderer():
     self.screen.fill(self.worldcolor)
     self.running = True
 
- #pygame1.drawMoving
+  def drawFood(self, theFood): 
+    if theFood.fp <= 0:
+      color = self.worldcolor
+    else:
+      color = (255, 0, 0)
+    pygame.draw.rect(self.screen, color, pygame.Rect(theFood.x - 10,
+                                                     theFood.y - 10, 
+                                                     20, 20))
+      
   def drawMoving(self, theGroc, oldX, oldY, newX, newY):
     assert not None in (oldX, oldY, newX, newY), 'Cannot move to None coordinates'
     if theGroc.gender == groc.Groc.MALE:

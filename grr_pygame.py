@@ -1,15 +1,18 @@
 #!/usr/bin/python3
 #
-# grr_pyg
+# grr_pygame
 #
 #   receive messages from world.py containing instructions
 #   on groc movement.  Uses pygame. (Other versions may use other
 #   rendering mechanisms) 
 #
-#   grr_pyg means
+#   grr_pygame means
 #       groc renderer - pygame
 #
 # TDORSEY 2022-05-21  Created from the bones of render.py
+# TDORSEY 2022-05-24  Support HUNGRY and DEAD
+# TDORSEY 2022-05-25  Add Food
+# TDORSEY 2022-05-26  Improve Food rendering
 #     
 
 import pygame 
@@ -31,24 +34,45 @@ class Renderer():
     self.screen.fill(self.worldcolor)
     self.running = True
 
- #pygame1.drawMoving
+  def drawFood(self, theFood): 
+    if theFood.calories <= 0:
+      color = self.worldcolor
+    else:
+      color = (255, 0, 0)
+    size = 1 + round((theFood.calories / 500) * 9)
+    pygame.draw.rect(self.screen, self.worldcolor, pygame.Rect(
+                          theFood.x - size+1, 
+                          theFood.y - size+1,
+                          size+2, size+2))
+    pygame.draw.rect(self.screen, color, pygame.Rect(theFood.x - size,
+                                                     theFood.y - size, 
+                                                     size*2, size*2))
+      
   def drawMoving(self, theGroc, oldX, oldY, newX, newY):
+    assert not None in (oldX, oldY, newX, newY), 'Cannot move to None coordinates'
     if theGroc.gender == groc.Groc.MALE:
       groccolor = groc.World.BLUE
     else:
       groccolor = groc.World.RED
-    if theGroc.mood == groc.Groc.LONELY:
+    distanceFromTarget = theGroc.world.findDistance(theGroc.x, theGroc.y, 
+                                                    theGroc.targetX, theGroc.targetY) 
+    hunger = theGroc.hungerThreshold - theGroc.fp 
+    if theGroc.mood == groc.Groc.DEAD:
+      eyecolor = groccolor
+      groccolor = groc.World.BLACK
+      intensity = 2
+    elif theGroc.mood == groc.Groc.LONELY:
       eyecolor = groc.World.WHITE
+      intensity = 2 + round(distanceFromTarget / max(self.world.MAXX, self.world.MAXY) * 6)
     elif theGroc.mood == groc.Groc.CROWDED:
       eyecolor = groc.World.BLACK
+      intensity = 2 + round(distanceFromTarget / max(self.world.MAXX, self.world.MAXY) * 6)
+    elif theGroc.mood == groc.Groc.HUNGRY:
+      eyecolor = groc.World.GRAY
+      intensity = 2 + round(hunger/theGroc.hungerThreshold * 6)
     else:
       eyecolor = groccolor
-    if None in (theGroc.x, theGroc.y, theGroc.targetX, theGroc.targetY):
       intensity = 2 
-    else:
-      zdist = theGroc.world.findDistance(theGroc.x, theGroc.y, 
-                                    theGroc.targetX, theGroc.targetY) 
-      intensity = 2 + round((zdist / max(self.world.MAXX, self.world.MAXY)) * 6)
     if oldX == newX and oldY == newY:
       'has not moved'
       pass
@@ -60,9 +84,11 @@ class Renderer():
 
 #     drawStatic
   def drawStatic(self, theGroc, newX, newY):
+    assert not None in (newX, newY), 'Cannot render coordinates of None'
     self.drawMoving(theGroc, newX, newY, newX, newY)
 
   def close(self):
+    print("Awaiting user input to close")
     while (self.running):
       self.tick()
     self.quit()
@@ -78,7 +104,7 @@ class Renderer():
         self.running = False
       if event.type == pygame.MOUSEBUTTONDOWN:
         x, y = event.pos
-        nearestGroc = self.world.findNearbyGroc(x, y) 
+        nearestGroc = self.world.findGrocNearXY(x, y) 
         zdist = self.world.findDistance(x, y, nearestGroc.x, nearestGroc.y)
         if zdist > nearestGroc.personalRadius:
           pass

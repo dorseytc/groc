@@ -48,6 +48,7 @@
 #   TDORSEY  2022-05-22  Pass the world to the renderer for reference
 #   TDORSEY  2022-05-24  Add HUNGRY and DEAD moods
 #   TDORSEY  2022-05-25  Fix HUNGRY actions
+#   TDORSEY  2022-05-26  Food has calories; Groc have foodpoints
 
 
 import datetime 
@@ -89,7 +90,7 @@ class World():
     FIELDSEP = '|'
     NEWLINE = '\n'
     GROCFILE = "grocfile.dat"
-    WORLDFILE = ".world.dat"
+    WORLDFILE = "world.dat"
     LOGFILE = "groc.log"
 
     currentTick = 0    
@@ -153,10 +154,10 @@ class World():
         self.render.close()  
         
 # world.createFood
-    def createFood(self, fp=100, x=None, y=None):
-        newFood = Food(fp, x, y)
+    def createFood(self, calories=100, x=None, y=None):
+        newFood = Food(calories, x, y)
         self.foodList.append(newFood)
-        print("food created at ", newFood.x, "," , newFood.y)
+        print("food created at " + str(newFood.x) + "," + str(newFood.y))
         
 
 # world.elapsedTicks
@@ -193,17 +194,17 @@ class World():
         'handle Food items' 
         i = 0
         while i < len(self.foodList):
-          if self.foodList[i].fp <= 0:
+          if self.foodList[i].calories <= 0:
             deadFood = self.foodList.pop(i)
             self.render.drawFood(deadFood) 
           else:
             self.render.drawFood(self.foodList[i])
             i += 1
-        if self.currentTick % 100 == 0:
+        if self.currentTick % 10 == 0:
           if len(self.foodList) < .1 * self.population:
-            self.createFood(self, 100)
+            self.createFood(self, 500)
         if len(self.foodList) == 0:
-            self.createFood(self, 100)
+            self.createFood(self, 500)
 
             
 
@@ -298,10 +299,10 @@ class World():
 
 class Food():
     'New class for food'
-    def __init__(self, world, fp=100, x=None, y=None): 
-        self.fp = fp
-        self.value = 1
+    def __init__(self, world, calories=500, x=None, y=None): 
+        self.calories = calories
         self.world = world
+        self.value = 1
         if None in (x, y):
           x, y = world.randomLocation()
         self.x = x
@@ -309,11 +310,11 @@ class Food():
 
     def bite(self, biteSize=1):
         'food returns calories to the consumer'
-        calories = biteSize * self.value
-        if self.fp < calories:
-          calories = max(self.fp, 0)
-        self.fp = self.fp - calories
-        return calories
+        biteCalories = biteSize * self.value
+        if self.calories < biteCalories:
+          biteCalories = max(self.calories, 0)
+        self.calories = self.calories - biteCalories
+        return biteCalories
         
  
         
@@ -333,7 +334,7 @@ class Groc():
     def __init__(self, world, mood, color, x, y, 
                  id=None, birthTick=None, 
                  gender=None, 
-                 fp=20):
+                 fp=80):
         
         #super(Groc, self).__init__()
 
@@ -348,8 +349,8 @@ class Groc():
         self.targetY = None
         self.fp = fp
         # constants 
-        self.maxfp = 20
-        self.hungerThreshold = 7
+        self.maxfp = 100
+        self.hungerThreshold = 75
         self.communityRadius = 22
         self.personalRadius = 20
         self.preferredCommunitySize = 4

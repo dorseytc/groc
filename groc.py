@@ -49,6 +49,7 @@
 #   TDORSEY  2022-05-24  Add HUNGRY and DEAD moods
 #   TDORSEY  2022-05-25  Fix HUNGRY actions
 #   TDORSEY  2022-05-26  Food has calories; Groc have foodpoints
+#                        main loop simplified
 
 
 import datetime 
@@ -66,11 +67,7 @@ import grr_pygame as render
 #
 #
 #
-# default limits
-K_STILL_LIMIT = 10
-K_GROC_LIMIT = 2
-K_ITER_LIMIT = 1000
-K_LOG_LEVEL = 20
+K_LOG_LEVEL = 50
 # 50 CRITICAL
 # 40 ERROR
 # 30 WARNING
@@ -103,7 +100,8 @@ class World():
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
     GRAY = (159, 159, 159)
- 
+
+
     def __init__(self, x, y):
         
         #super(World, self).__init__()
@@ -149,22 +147,28 @@ class World():
         return boundy
 
  
-# world.close
-    def close(self):
-        self.render.close()  
         
 # world.createFood
     def createFood(self, calories=100, x=None, y=None):
         newFood = Food(calories, x, y)
         self.foodList.append(newFood)
-        print("food created at " + str(newFood.x) + "," + str(newFood.y))
-        
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
         'measure elapsed ticks subtracting sinceTicks from current value'
         return abs(self.currentTick - sinceTick)
         
+# world.end
+    def end(self):
+        self.saveGrocs()
+        self.saveWorld()
+        self.endTimeSeconds = time.time()
+        self.endTick = self.currentTick
+        print("Elapsed seconds: " + 
+              str(int(self.endTimeSeconds - self.startTimeSeconds)))
+        print("Elapsed ticks: " + 
+              str(self.endTick - self.startTick))
+        self.render.close()  
 
 # world.findDistance
     def findDistance(self, x1, y1, x2, y2):
@@ -209,10 +213,10 @@ class World():
             
 
 # world.getGrocs
-    def getGrocs(self, numGrocs, grocFile):
+    def getGrocs(self, numGrocs):
         builtList = []
-        if os.path.exists(grocFile):
-          savedFile = open(grocFile, "r")
+        if os.path.exists(World.GROCFILE):
+          savedFile = open(World.GROCFILE, "r")
           grocsRead = 0 
           line = savedFile.readline()
           while line: 
@@ -245,8 +249,31 @@ class World():
                             format = Log_Format, 
                             level = debugLevel)
         self.logger = logging.getLogger()
-      return self.logger 
 
+# world.interimSave
+    def interimSave(self):
+        if (self.currentTick - self.startTick) % 100:
+          self.saveGrocs()
+          self.saveWorld()
+
+# world.keepRunning
+    def keepRunning(self): 
+        result = True
+        tickCount = self.currentTick - self.startTick
+        if self.loopMode == "LIFE" and self.population <= 0:
+          print("No life remaining")
+          result = False
+        elif self.loopMode == "MOTION" and self.motionCount <= 0:
+          print("No motion remaining")
+          result = False
+        elif self.iterationLimit > 0 and tickCount > self.iterationLimit:
+          print("Iteration limit " + str(self.iterationLimit) + 
+                " exceeded")
+          result = False
+        return result
+
+     
+    
 # world.randomLocation
     def randomLocation(self):
         newX = random.randint(1, self.MAXX)  
@@ -256,8 +283,8 @@ class World():
         return (newX, newY)
 
 # world.saveGrocs
-    def saveGrocs(self, grocFile):
-      saveFile = open(grocFile, "w")
+    def saveGrocs(self):
+      saveFile = open(World.GROCFILE, "w")
       for thisGroc in self.grocList:
         saveFile.write(str(thisGroc))
         self.logger.debug ("Groc " + str(thisGroc.id) + " saved")
@@ -276,10 +303,69 @@ class World():
         self.crowded = crowded
         self.hungry = hungry
         self.dead = dead
+        self.population = happy + lonely + crowded + hungry
+
+# world.start
+    def start(self, argv):
+      numArgs = len(argv)
+      if numArgs > 4:
+        p_logLevel = int(argv[4])
+      else:
+        p_logLevel = 50
+      assert 10 <= p_logLevel <= 50, "Invalid Log Level"
+      if numArgs > 3:
+        p_loopMode = argv[3]
+      else:
+        p_loopMode = "LIFE"
+      assert p_loopMode in ("LIFE", "MOTION"), "Mode must be 'LIFE' or 'MOTION'"
+      if numArgs > 2:
+        p_iterationLimit = int(argv[2])
+      else:
+        p_iterationLimit = 0
+      assert type(p_iterationLimit) is int, "Iterations must be an integer"
+      if numArgs > 1:
+        p_numGrocs = int(argv[1])
+      else:
+        p_numGrocs = 2
+      assert type(p_numGrocs) is int, "Number of Grocs must be an integer"
+      self.iterationLimit = p_iterationLimit
+      self.numGrocs = p_numGrocs
+      self.loopMode = p_loopMode
+      self.startTimeSeconds = time.time()
+      self.startTick = self.currentTick
+      self.getLogger(p_logLevel)
+      self.getGrocs(self.numGrocs)
 
 # world.tick
     def tick(self, waitSeconds=0):
         self.currentTick += 1
+        movingCount = 0
+        happyCount = 0
+        lonelyCount = 0
+        crowdedCount = 0
+        hungryCount = 0
+        deadCount = 0
+        for thisGroc in self.grocList: 
+          oldX = thisGroc.x
+          oldY = thisGroc.y
+          thisGroc.observe() 
+          thisGroc.decide()
+          thisGroc.act()
+          if thisGroc.didMove(oldX, oldY):
+            movingCount += 1
+          if thisGroc.mood == Groc.HAPPY:
+            happyCount += 1
+          elif thisGroc.mood == Groc.LONELY:
+            lonelyCount += 1
+          elif thisGroc.mood == Groc.CROWDED:
+            crowdedCount += 1
+          elif thisGroc.mood == Groc.HUNGRY:
+            hungryCount += 1
+          elif thisGroc.mood == Groc.DEAD:
+            deadCount += 1 
+        self.setStats(happyCount, lonelyCount, crowdedCount, 
+                      hungryCount, deadCount)
+        self.interimSave()
         self.foodTick()
         self.render.tick()
         if waitSeconds > 0:
@@ -652,100 +738,10 @@ class Groc():
 
 def main():   
   thisWorld = World(1800,800)
-  print("Start Time is ", time.ctime())
-  startTimeSeconds = time.time()
-  startTick = thisWorld.currentTick
-  #Command Line Arguments
-  numArgs = len(sys.argv)
-  if numArgs > 4:
-    p_grocFile = sys.argv[4] 
-  else:
-    p_grocFile = thisWorld.GROCFILE
-  if numArgs > 3:
-    p_logLevel = int(sys.argv[3])
-  else:
-    p_logLevel = K_LOG_LEVEL
-  if numArgs > 2:
-    p_iterations = int(sys.argv[2])
-  else:
-    p_iterations = K_ITER_LIMIT
-  if numArgs > 1:
-    p_numGrocs = int(sys.argv[1])
-  else:
-    p_numGrocs = K_GROC_LIMIT
-  print("p_numGrocs: ", p_numGrocs) 
-  print("p_iterations: ", p_iterations)
-  print("p_logLevel: ", p_logLevel)
-  print("p_grocFile: ", p_grocFile)
-  logger = thisWorld.getLogger(p_logLevel)
-  logger.info("Started run with p_numgrocs=" + str(p_numGrocs) + 
-              ", p_iterations=" + str(p_iterations) + 
-              ", p_grocfile=" + str(p_grocFile))
-  # 
-  #Reading the world
-  #
-  thisWorld.getGrocs(p_numGrocs, p_grocFile)
-  running = True
-  counter = 0 
-  stillTimer = 0
-  while running:
-    counter += 1
-    movingCount = 0
-    happyCount = 0
-    lonelyCount = 0
-    crowdedCount = 0
-    hungryCount = 0 
-    deadCount = 0
-    for thisGroc in thisWorld.grocList:   
-       oldX = thisGroc.x
-       oldY = thisGroc.y
-       thisGroc.observe()
-       thisGroc.decide()
-       thisGroc.act()
-       if thisGroc.didMove(oldX, oldY):
-         movingCount += 1
-       if thisGroc.mood == Groc.HAPPY:
-         happyCount += 1
-       elif thisGroc.mood == Groc.LONELY:
-         lonelyCount += 1
-       elif thisGroc.mood == Groc.CROWDED:
-         crowdedCount += 1
-       elif thisGroc.mood == Groc.HUNGRY:
-         hungryCount += 1
-       elif thisGroc.mood == Groc.DEAD:
-         deadCount += 1
-
-    thisWorld.setStats(happyCount, lonelyCount, crowdedCount, hungryCount, deadCount)
-    if movingCount > 0:
-      stillTimer = 0
-    else:
-      stillTimer += 1
-
-    if stillTimer > K_STILL_LIMIT:
-      running = False
-      logger.info("No movement in " + str(K_STILL_LIMIT) + " ticks")
-    elif p_iterations == 0:
-      running = True
-    elif counter >= p_iterations:
-      running = False
-      logger.info("Iteration count exceeded")
-      print("Iteration count exceeded")
-    if counter % 100 == 0 or running == False:
-      # write every 100 moves or when iteration limit reached
-      thisWorld.saveGrocs(p_grocFile)
-      thisWorld.saveWorld()
-
+  thisWorld.start(sys.argv)
+  while thisWorld.keepRunning():
     thisWorld.tick()
-
-  #
-  # Saving The World
-  #
-  print("End Time: ", time.ctime())
-  endTimeSeconds = time.time()
-  endTick = thisWorld.currentTick
-  print("Elapsed seconds: " + str(int(endTimeSeconds - startTimeSeconds)))
-  print("Elapsed ticks: " + str(endTick - startTick))
-  thisWorld.close() 
+  thisWorld.end()
             
 if __name__ == '__main__':
     main()

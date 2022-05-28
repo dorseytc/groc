@@ -50,6 +50,8 @@
 #   TDORSEY  2022-05-25  Fix HUNGRY actions
 #   TDORSEY  2022-05-26  Food has calories; Groc have foodpoints
 #                        main loop simplified
+#   TDORSEY  2022-05-27  handleFood and handleGrocs to simplify
+#                        tick
 
 
 import datetime 
@@ -68,6 +70,7 @@ import grr_pygame as render
 #
 #
 K_LOG_LEVEL = 50
+K_MUTE = True
 # 50 CRITICAL
 # 40 ERROR
 # 30 WARNING
@@ -101,7 +104,6 @@ class World():
     WHITE = (255, 255, 255)
     GRAY = (159, 159, 159)
 
-
     def __init__(self, x, y):
         
         #super(World, self).__init__()
@@ -119,6 +121,7 @@ class World():
         #technical pointers
         self.logger = None
         self.render = render.Renderer(self)
+        self.mute = K_MUTE
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
@@ -150,8 +153,9 @@ class World():
         
 # world.createFood
     def createFood(self, calories=100, x=None, y=None):
-        newFood = Food(calories, x, y)
+        newFood = Food(self, calories, x, y)
         self.foodList.append(newFood)
+        self.render.soundFood()
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
@@ -193,25 +197,6 @@ class World():
             nearestGroc = thisGroc
         return nearestGroc
 
-# world.foodTick
-    def foodTick(self):
-        'handle Food items' 
-        i = 0
-        while i < len(self.foodList):
-          if self.foodList[i].calories <= 0:
-            deadFood = self.foodList.pop(i)
-            self.render.drawFood(deadFood) 
-          else:
-            self.render.drawFood(self.foodList[i])
-            i += 1
-        if self.currentTick % 10 == 0:
-          if len(self.foodList) < .1 * self.population:
-            self.createFood(self, 500)
-        if len(self.foodList) == 0:
-            self.createFood(self, 500)
-
-            
-
 # world.getGrocs
     def getGrocs(self, numGrocs):
         builtList = []
@@ -237,7 +222,6 @@ class World():
             newGroc.identify()
             self.render.drawStatic(newGroc, newX, newY)
             builtList.append(newGroc)
-        #return grocList
         self.grocList = builtList
 
 # world.getLogger
@@ -249,6 +233,52 @@ class World():
                             format = Log_Format, 
                             level = debugLevel)
         self.logger = logging.getLogger()
+
+# world.handleFood
+    def handleFood(self):
+        'handle Food items' 
+        i = 0
+        while i < len(self.foodList):
+          if self.foodList[i].calories <= 0:
+            deadFood = self.foodList.pop(i)
+            self.render.drawFood(deadFood) 
+          else:
+            self.render.drawFood(self.foodList[i])
+            i += 1
+        if self.currentTick % 10 == 0:
+          if len(self.foodList) < .1 * self.population:
+            self.createFood(500)
+        if len(self.foodList) == 0:
+            self.createFood(500)
+
+# world.handleGrocs
+    def handleGrocs(self):
+        movingCount = 0
+        happyCount = 0
+        lonelyCount = 0
+        crowdedCount = 0
+        hungryCount = 0
+        deadCount = 0
+        for thisGroc in self.grocList: 
+          oldX = thisGroc.x
+          oldY = thisGroc.y
+          thisGroc.observe() 
+          thisGroc.decide()
+          thisGroc.act()
+          if thisGroc.didMove(oldX, oldY):
+            movingCount += 1
+          if thisGroc.mood == Groc.HAPPY:
+            happyCount += 1
+          elif thisGroc.mood == Groc.LONELY:
+            lonelyCount += 1
+          elif thisGroc.mood == Groc.CROWDED:
+            crowdedCount += 1
+          elif thisGroc.mood == Groc.HUNGRY:
+            hungryCount += 1
+          elif thisGroc.mood == Groc.DEAD:
+            deadCount += 1 
+        self.setStats(happyCount, lonelyCount, crowdedCount, 
+                      hungryCount, deadCount)
 
 # world.interimSave
     def interimSave(self):
@@ -339,34 +369,9 @@ class World():
 # world.tick
     def tick(self, waitSeconds=0):
         self.currentTick += 1
-        movingCount = 0
-        happyCount = 0
-        lonelyCount = 0
-        crowdedCount = 0
-        hungryCount = 0
-        deadCount = 0
-        for thisGroc in self.grocList: 
-          oldX = thisGroc.x
-          oldY = thisGroc.y
-          thisGroc.observe() 
-          thisGroc.decide()
-          thisGroc.act()
-          if thisGroc.didMove(oldX, oldY):
-            movingCount += 1
-          if thisGroc.mood == Groc.HAPPY:
-            happyCount += 1
-          elif thisGroc.mood == Groc.LONELY:
-            lonelyCount += 1
-          elif thisGroc.mood == Groc.CROWDED:
-            crowdedCount += 1
-          elif thisGroc.mood == Groc.HUNGRY:
-            hungryCount += 1
-          elif thisGroc.mood == Groc.DEAD:
-            deadCount += 1 
-        self.setStats(happyCount, lonelyCount, crowdedCount, 
-                      hungryCount, deadCount)
+        self.handleGrocs()
+        self.handleFood()
         self.interimSave()
-        self.foodTick()
         self.render.tick()
         if waitSeconds > 0:
           print("Slow tick ", waitSeconds, " seconds")
@@ -393,15 +398,18 @@ class Food():
           x, y = world.randomLocation()
         self.x = x
         self.y = y
+         
+         
 
+#food.bite
     def bite(self, biteSize=1):
         'food returns calories to the consumer'
         biteCalories = biteSize * self.value
         if self.calories < biteCalories:
           biteCalories = max(self.calories, 0)
         self.calories = self.calories - biteCalories
+        self.world.render.soundEat()
         return biteCalories
-        
  
         
 
@@ -625,16 +633,30 @@ class Groc():
 
 # groc.findNearestFood
     def findNearestFood(self):
-        nearestx = self.world.MAXX
-        nearesty = self.world.MAXY 
-        leastDist = self.world.findDistance(0, 0, nearestx, nearesty)
-        nearestFood = None
-        for someFood in self.world.foodList:
-          zDist = self.world.findDistance(self.x, self.y, 
+        if self.gender == self.FEMALE:
+          nearestx = self.world.MAXX
+          nearesty = self.world.MAXY 
+          leastDist = self.world.findDistance(0, 0, nearestx, nearesty)
+          nearestFood = None
+          for someFood in self.world.foodList:
+            zDist = self.world.findDistance(self.x, self.y, 
                                someFood.x, someFood.y)
-          if zDist < leastDist:
-            leastDist = zDist
-            nearestFood = someFood
+            if zDist < leastDist:
+              leastDist = zDist
+              nearestFood = someFood
+        else:
+          strongestOdor = 0
+          nearestFood = None
+          for someFood in self.world.foodList:
+            zDist = self.world.findDistance(self.x, self.y, 
+                               someFood.x, someFood.y)
+            if zDist == 0:
+              odor = 100
+            else:
+              odor = someFood.calories / (2*zDist)
+            if odor > strongestOdor:
+              strongestOdor = odor
+              nearestFood = someFood
         return nearestFood
 
 # groc.findNearestGroc
@@ -697,14 +719,18 @@ class Groc():
           newX = self.x
           newY = self.y
           for step in range(speed):
-            if newX < self.targetX:
-              newX = newX + 1
-            elif newX > self.targetX:
-              newX = newX - 1
-            elif newY < self.targetY:
-              newY = newY + 1
-            elif newY > self.targetY:
-              newY = newY - 1
+            xdiff = abs(self.targetX - newX)
+            ydiff = abs(self.targetY - newY)
+            if xdiff > ydiff:
+              if newX < self.targetX:
+                newX = newX + 1
+              elif newX > self.targetX:
+                newX = newX - 1
+            else:
+              if newY < self.targetY:
+                newY = newY + 1
+              elif newY > self.targetY:
+                newY = newY - 1
           self.world.render.drawMoving(self, self.x, self.y, newX, newY)
           self.x = newX
           self.y = newY

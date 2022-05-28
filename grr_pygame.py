@@ -13,7 +13,7 @@
 # TDORSEY 2022-05-24  Support HUNGRY and DEAD
 # TDORSEY 2022-05-25  Add Food
 # TDORSEY 2022-05-26  Improve Food rendering
-#     
+# TDORSEY 2022-05-27  Added sound
 
 import pygame 
 import groc
@@ -26,13 +26,17 @@ class Renderer():
 
     super(Renderer, self).__init__()
 
-    print("Renderer is grr_pyg 1.0")
+    print("Renderer is grr_pygame 1.0")
     self.world = thisWorld
     self.screen = pygame.display.set_mode([self.world.MAXX, 
                                           self.world.MAXY])
     self.worldcolor = self.world.WHITE
     self.screen.fill(self.worldcolor)
     self.running = True
+    pygame.mixer.init()
+    self.eat=pygame.mixer.Sound('eat.ogg')
+    self.food=pygame.mixer.Sound('food.ogg')
+    self.lastSoundTick = self.world.currentTick
 
   def drawFood(self, theFood): 
     if theFood.calories <= 0:
@@ -96,6 +100,20 @@ class Renderer():
   def quit(self):
     pygame.quit()
 
+  def soundEat(self):
+    if self.world.mute:
+      pass
+    elif (self.lastSoundTick + 
+        round(2*self.world.percentage())) < self.world.currentTick:
+      self.eat.play()
+      self.lastSoundTick = self.world.currentTick
+
+  def soundFood(self):
+    if self.world.mute:
+      pass 
+    else:
+      self.food.play()
+
   def tick(self):
     pygame.display.flip()
     for event in pygame.event.get():
@@ -110,3 +128,4 @@ class Renderer():
           pass
         else:
           print(nearestGroc.identify())
+ 

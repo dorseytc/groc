@@ -30,10 +30,17 @@
 - HUNGRY might override CROWDED
   - HUNGRY grocs might ignoring CROWDED conditions
   - once sated, grocs might flee crowds seeking HAPPY condition
+  - done (tick)
 - Food restores food points
+  - done (tick)
 - Genetic factors affect metabolism
+  - done (tick)
 - Genetic factors affect eating
+  - done (tick)
 - Random food value (calories)
+  - done (tick)
+- starvation should be more rare
+- metabolism and hunger should be adjusted to support day/night cycle
 
 ### predators
   - not started
@@ -52,6 +59,11 @@
 ### death
 - death might occur of old age, starvation, predation
   - not started
+
+### light
+- food might spawn during the day
+- grocs might have limited vision at night
+- grocs would need to have enough stamina to withstand a nightly fast
 
 ### render
 - pygame and debug scripts

@@ -108,6 +108,10 @@ class Renderer():
   def maybeDraw(self, theGroc, newX, newY):
     if 0 < self.world.lightLevel < 1:
       self.drawStatic(theGroc, newX, newY)
+    else:
+      pass
+      'theoretically not needed when light levels are steady'
+      self.drawStatic(theGroc, newX, newY)
       
 #render.quit
   def quit(self):

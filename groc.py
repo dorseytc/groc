@@ -249,12 +249,10 @@ class World():
         relevantTick = self.currentTick % 10000
         if 0 <= relevantTick < 1000:
           result = relevantTick/1000
-          print(relevantTick, result)
         elif 1000 <= relevantTick < 5000:
           result = 1
         elif 5000 <= relevantTick < 6000:
           result = (6000-relevantTick)/1000
-          print(relevantTick, result)
         elif 6000 <= relevantTick < 10000:
           result = 0 
         return result

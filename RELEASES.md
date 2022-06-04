@@ -8,6 +8,9 @@
 - Food shall have tick
 - World shall have tick
 - Groc shall have observe/decide/act
+- Genetic metabolism factors - randomized
+- Genetic eating factors - randomized
+- Variable food value - randomized
 
 ### hunger (v0.8.0) -- complete
  

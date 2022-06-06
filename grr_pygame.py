@@ -62,7 +62,7 @@ class Renderer():
       groccolor = groc.World.BLUE
     else:
       groccolor = groc.World.RED
-    distanceFromTarget = theGroc.world.findDistance(theGroc.x, 
+    distanceFromTarget = theGroc.world.findDistanceXY(theGroc.x, 
                                  theGroc.y, theGroc.targetX, 
                                  theGroc.targetY) 
     hunger = theGroc.hungerThreshold - theGroc.fp 
@@ -150,9 +150,9 @@ class Renderer():
         x, y = event.pos
         nearestGroc = self.world.findGrocNearXY(x, y) 
         nearestFood = self.world.findFoodNearXY(x, y)
-        gdist = self.world.findDistance(x, y, 
+        gdist = self.world.findDistanceXY(x, y, 
                                         nearestGroc.x, nearestGroc.y)
-        fdist = self.world.findDistance(x, y, 
+        fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
         if gdist > nearestGroc.personalRadius:
           pass

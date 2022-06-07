@@ -135,6 +135,7 @@ class Renderer():
 
 #render.tick
   def tick(self):
+    pygame.display.set_caption(str(self.world.population) + " Grocs")
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()

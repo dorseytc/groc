@@ -305,13 +305,15 @@ class World():
             self.render.drawFood(self.foodList[i])
             i += 1
         if self.currentTick % 100 == 0:
+          """
           if self.lightLevel == 1:
             if len(self.foodList) < .1 * self.population:
               self.spawnFood()
           else:
-            allCalories = sum(foodItem.calories for foodItem 
+          """
+          allCalories = sum(foodItem.calories for foodItem 
                  in self.foodList)
-            if allCalories < 50 * self.population:
+          if allCalories < 50 * self.population:
               self.spawnFood()
         if len(self.foodList) == 0:
           for i in range(max(2,int(.05 * self.population))):
@@ -413,7 +415,7 @@ class World():
           foodCalories = foodCalories * self.lightLevel
         else:
           foodCalories = calories * self.lightLevel
-        if foodCalories > 299:
+        if foodCalories > 0:
           newFood = Food(self, foodCalories, x, y)
           self.foodList.append(newFood)
           self.render.soundFood()

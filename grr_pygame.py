@@ -155,7 +155,7 @@ class Renderer():
                                         nearestGroc.x, nearestGroc.y)
         fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
-        if gdist > nearestGroc.personalRadius:
+        if gdist > nearestGroc.getPersonalRadius():
           pass
         else:
           print(nearestGroc.identify())

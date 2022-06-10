@@ -1,7 +1,15 @@
 ## Release Notes
 
 
-### tick (v0.9.0) -- in progress
+### light (v0.10.0) -- in progress
+- food shall spawn in the day
+- grocs shall huddle for warmth at night
+- vision is limited at night
+- starvation shall take longer
+- food shall sustain grocs longer
+- possible alternate world images as backgrounds
+
+### tick (v0.9.0) -- complete
 
 - the World shall tick, and all things shall proceed from there
 - the main() loop shall be simplified further

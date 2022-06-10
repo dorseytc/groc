@@ -1,13 +1,18 @@
 ## Release Notes
 
+### order (v0.11.0) -- in progress
+- possible alternate world images as backgrounds
+- world, groc, and food class get their own files 
+- pipe renderer gets feature parity with integrated renderer
+- immutable world with decorator methods?
+- property file as alternative to command line arguments
 
-### light (v0.10.0) -- in progress
+### light (v0.10.0) -- completed
 - food shall spawn in the day
 - grocs shall huddle for warmth at night
 - vision is limited at night
 - starvation shall take longer
 - food shall sustain grocs longer
-- possible alternate world images as backgrounds
 
 ### tick (v0.9.0) -- complete
 

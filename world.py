@@ -8,21 +8,14 @@
 #   TDORSEY  2022-06-08  Split from groc.py
 
 
-import datetime 
 import logging
-import math
 import os
 import random
-import sys
 import time
-#
 import groc
 import food
-#
-# choose a renderer here
-#
 import grr_pygame as render
-#import grr_pipe as render
+##import grr_pipe as render
 #
 #
 #

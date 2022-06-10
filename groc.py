@@ -61,31 +61,6 @@
 #   TDORSEY  2022-06-09  Split apart into separate files again
 
 
-import datetime 
-import logging
-import math
-import os
-import random
-import sys
-import time
-#
-# choose a renderer here
-#
-import grr_pygame as render
-#import grr_pipe as render
-#
-#
-#
-K_LOG_LEVEL = 50
-K_MUTE = True
-# 50 CRITICAL
-# 40 ERROR
-# 30 WARNING
-# 20 INFO
-# 10 DEBUG
-# 0  NOTSET
-
-
 class Groc():
     'Base class for the groc'
     MALE = "M"

@@ -8,15 +8,7 @@
 #   TDORSEY  2022-06-09  Split from groc.py
 
 
-import datetime 
-import logging
-import math
-import os
-import random
-import sys
 import time
-#
-# choose a renderer here
 
 class Food():
     'New class for food'

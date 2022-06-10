@@ -18,7 +18,7 @@
 # TDORSEY 2022-06-03  Day and night
 
 import pygame 
-import groc
+
 
 class Renderer():
   pygame.init
@@ -58,28 +58,28 @@ class Renderer():
 #render.drawMoving 
   def drawMoving(self, theGroc, oldX, oldY, newX, newY):
     assert not None in (oldX, oldY, newX, newY), 'Cannot move to None coordinates'
-    if theGroc.gender == groc.Groc.MALE:
-      groccolor = groc.World.BLUE
+    if theGroc.gender == theGroc.MALE:
+      groccolor = self.world.BLUE
     else:
-      groccolor = groc.World.RED
-    distanceFromTarget = theGroc.world.findDistanceXY(theGroc.x, 
+      groccolor = self.world.RED
+    distanceFromTarget = self.world.findDistanceXY(theGroc.x, 
                                  theGroc.y, theGroc.targetX, 
                                  theGroc.targetY) 
     hunger = theGroc.hungerThreshold - theGroc.fp 
-    if theGroc.mood == groc.Groc.DEAD:
+    if theGroc.mood == theGroc.DEAD:
       eyecolor = groccolor
-      groccolor = groc.World.BLACK
+      groccolor = self.world.BLACK
       intensity = 2
-    elif theGroc.mood == groc.Groc.LONELY:
-      eyecolor = groc.World.WHITE
+    elif theGroc.mood == theGroc.LONELY:
+      eyecolor = self.world.WHITE
       intensity = 2 + round(distanceFromTarget / 
                       max(self.world.MAXX, self.world.MAXY) * 6)
-    elif theGroc.mood == groc.Groc.CROWDED:
-      eyecolor = groc.World.BLACK
+    elif theGroc.mood == theGroc.CROWDED:
+      eyecolor = self.world.BLACK
       intensity = 2 + round(distanceFromTarget / 
                       max(self.world.MAXX, self.world.MAXY) * 6)
-    elif theGroc.mood == groc.Groc.HUNGRY:
-      eyecolor = groc.World.GRAY
+    elif theGroc.mood == theGroc.HUNGRY:
+      eyecolor = self.world.GRAY
       intensity = 2 + round(hunger / theGroc.hungerThreshold * 6)
     else:
       eyecolor = groccolor

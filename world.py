@@ -203,7 +203,7 @@ class World():
         if grocsRead < numGrocs:
           for count in range(0, (numGrocs - grocsRead)):
             newX, newY = self.randomLocation()
-            newGroc = groc.Groc(self, groc.HAPPY, "green", newX, newY)
+            newGroc = groc.Groc(self, groc.Groc.HAPPY, "green", newX, newY)
             newGroc.identify()
             self.render.drawStatic(newGroc, newX, newY)
             builtList.append(newGroc)
@@ -366,7 +366,7 @@ class World():
         else:
           foodCalories = calories * self.lightLevel
         if foodCalories > 0:
-          newFood = Food(self, foodCalories, x, y)
+          newFood = food.Food(self, foodCalories, x, y)
           self.foodList.append(newFood)
           self.render.soundFood()
 

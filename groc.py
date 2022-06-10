@@ -60,6 +60,7 @@
 #   TDORSEY  2022-06-08  Huddle for warmth at night
 #   TDORSEY  2022-06-09  Split apart into separate files again
 
+import random
 
 class Groc():
     'Base class for the groc'
@@ -73,7 +74,7 @@ class Groc():
     DEAD = "Dead"
 
     
-    def __init__(self, world, mood, color, x, y, 
+    def __init__(self, world, mood, x, y, 
                  id=None, birthTick=None, 
                  gender=None, 
                  fp=80):
@@ -83,7 +84,6 @@ class Groc():
         self.world = world
         self.world.population += 1
         self.mood = mood
-        self.color = color
         self.x = int(x)
         self.y = int(y)
         self.nearestGroc = None
@@ -295,11 +295,11 @@ class Groc():
 
 # groc.dump
     def dump(self):
-        return ("Groc(self, '" + self.mood + "', '" + 
-                self.color + "', " + str(self.x) + ", " + 
-                str(self.y) + ", " + str(self.id) + ", " + 
-                str(self.birthTick) + ", '" + str(self.gender) +  "'," + 
-                str(round(self.fp, 3)) + ")" + self.world.NEWLINE)
+        return ("groc.Groc(self, '" + self.mood + "', '" + 
+                str(self.x) + ", " + str(self.y) + ", " + 
+                str(self.id) + ", " + str(self.birthTick) + ", '" + 
+                str(self.gender) +  "'," + str(round(self.fp, 3)) + ")" + 
+                self.world.NEWLINE)
 
 # groc.findNearestFood
     def findNearestFood(self):

@@ -18,9 +18,11 @@
 # TDORSEY 2022-05-07  import and pydoc enabled, __main__ protected
 # TDORSEY 2022-05-16  removed unused imports
 # TDORSEY 2022-05-22  Converted to work with grr_pipe framework
+# TDORSEY 2022-06-11  Updated to work with class files
 #           
 #
 import groc
+import world
 import grr_pipe
 
 def main():
@@ -38,7 +40,7 @@ def main():
   print ("Opened pipe")
   while True:
     msg = rpipe.read(1)
-    if msg == groc.World.NEWLINE:
+    if msg == world.World.NEWLINE:
       msgcount += 1
       print("Msg ", msgcount, line)
       line = ""

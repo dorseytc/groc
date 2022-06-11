@@ -15,7 +15,7 @@ import time
 import groc
 import food
 import grr_pygame as render
-##import grr_pipe as render
+#import grr_pipe as render
 #
 #
 #

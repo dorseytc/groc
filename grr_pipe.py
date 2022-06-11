@@ -49,6 +49,9 @@ class Renderer():
     # destroy the pipe
     self.quit()
 
+  def drawFood(self, theFood):
+    pass
+
   def drawMoving(self, theGroc, oldX, oldY, newX, newY):
     '''this method gets called once for each groc that moves'''
     fs = self.FIELDSEP
@@ -63,6 +66,18 @@ class Renderer():
     '''this gets called each time a groc must be rendered without moving;
      for example, his mood changes'''
     self.drawMoving(theGroc, newX, newY, newX, newY)
+
+  def maybeDraw(self, theGroc, newX, newY):
+    '''this gets called any tick the Groc does not move.  
+    May not be necessary to redraw'''
+    self.drawStatic(theGroc, newX, newY)
+
+  def soundEat(self):
+    pass
+
+  def soundFood(self):
+    pass
+
 
   def tick(self): 
     '''the main procedure calls tick once after all grocs are iterated;

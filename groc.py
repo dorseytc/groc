@@ -59,6 +59,7 @@
 #   TDORSEY  2022-06-07  Fear of the dark
 #   TDORSEY  2022-06-08  Huddle for warmth at night
 #   TDORSEY  2022-06-09  Split apart into separate files again
+#   TDORSEY  2022-06-11  Update save file constructor syntax
 
 import random
 
@@ -295,7 +296,7 @@ class Groc():
 
 # groc.dump
     def dump(self):
-        return ("groc.Groc(self, '" + self.mood + "', '" + 
+        return ("groc.Groc(self, '" + self.mood + "', " + 
                 str(self.x) + ", " + str(self.y) + ", " + 
                 str(self.id) + ", " + str(self.birthTick) + ", '" + 
                 str(self.gender) +  "'," + str(round(self.fp, 3)) + ")" + 

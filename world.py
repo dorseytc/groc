@@ -203,7 +203,7 @@ class World():
         if grocsRead < numGrocs:
           for count in range(0, (numGrocs - grocsRead)):
             newX, newY = self.randomLocation()
-            newGroc = groc.Groc(self, groc.Groc.HAPPY, "green", newX, newY)
+            newGroc = groc.Groc(self, groc.Groc.HAPPY, newX, newY)
             newGroc.identify()
             self.render.drawStatic(newGroc, newX, newY)
             builtList.append(newGroc)

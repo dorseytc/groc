@@ -20,13 +20,13 @@
 # TDORSEY 2022-05-22  Modify to use grr_pipe.py Renderer class
 #                     Rename to pr_pygame to align with new framework
 # TDORSEY 2022-05-24  Support HUNGRY and DEAD
-# TDORSEY 2022-06-11  Import grr_pygame for feature parity
+# TDORSEY 2022-06-13  Compatibility with new class structures
 
+import pygame 
 import os
 import groc
 import world
 import grr_pipe 
-import grr_pygame
 
 def main():
   pipe = grr_pipe.Renderer.PIPENAME
@@ -39,8 +39,10 @@ def main():
     exit()
 
   print ("Opened pipe")
-  theWorld = world.World(1800, 800) 
-  render = render.Renderer(theWorld)
+  pygame.init
+  screen = pygame.display.set_mode([1800, 800])
+  worldcolor = world.World.WHITE
+  screen.fill(worldcolor)
   line = ""
   msgcount = 0
   running = True

@@ -85,10 +85,31 @@ class Renderer():
       eyecolor = groccolor
       intensity = 2 
     if oldX == newX and oldY == newY:
-      'has not moved'
-      pass
+      isMoving = False
     else:
       pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 10)
+      isMoving = True
+    if True:
+      'turn off visualRange circle'
+      pass
+    elif theGroc.touchedTick == None:
+      pass
+    elif self.world.currentTick - theGroc.touchedTick < 50:
+      if isMoving:
+        pygame.draw.circle(self.screen, self.worldColor, 
+                         (oldX, oldY), theGroc.visualRange())
+      pygame.draw.circle(self.screen, self.world.YELLOW, 
+                         (newX, newY), theGroc.visualRange())
+      pygame.draw.circle(self.screen, self.worldColor, 
+                         (newX, newY), theGroc.visualRange() - 1)
+       
+    elif self.world.currentTick - theGroc.touchedTick == 50: 
+      if isMoving:
+        pygame.draw.circle(self.screen, self.worldColor, 
+                         (oldX, oldY), theGroc.visualRange())
+      pygame.draw.circle(self.screen, self.worldColor,
+                         (newX, newY), theGroc.visualRange())
+      
     pygame.draw.circle(self.screen, groccolor, (newX, newY), 9)
     pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
 
@@ -140,7 +161,7 @@ class Renderer():
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()
     if oldColor == self.worldColor:
-      pass
+      self.screen.fill(self.worldColor)
     else:
       self.screen.fill(self.worldColor)
     for event in pygame.event.get():
@@ -158,6 +179,7 @@ class Renderer():
         if gdist > nearestGroc.getPersonalRadius():
           pass
         else:
+          nearestGroc.touch()
           print(nearestGroc.identify())
         if fdist > 30:
           pass

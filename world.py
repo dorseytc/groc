@@ -5,7 +5,28 @@
 #     python class for an experiment in object-oriented ai
 #     
 #
+#   TDORSEY  2016-10-16  Created
+#   TDORSEY  2016-10-16  Saving the world
+#   TDORSEY  2016-10-16  Retrieving saved world
+#   TDORSEY  2016-10-16  Improved class and function structure
+#   TDORSEY  2016-10-17  Rendering via pygame
+#   TDORSEY  2016-10-22  Some form of pygame hell
+#   TDORSEY  2022-04-29  Pipe location to world.py 
+#   TDORSEY  2022-04-30  Generate grocs up to limit when reading a file
+#   TDORSEY  2022-05-01  Refactor groc into groc.py class file
+#   TDORSEY  2022-05-02  World owns constants now
+#                        Add currentTick and tick to World
+#   TDORSEY  2022-05-03  Move load/save to World class
+#                        Move pipe definition to World class 
+#   TDORSEY  2022-05-04  New groc file format, remove birthdatetime
+#   TDORSEY  2022-05-06  Added log level arg
+#   TDORSEY  2022-05-07  grocfile.dat contains Groc constructor calls
+#   TDORSEY  2022-05-17  Added world stats
+#   TDORSEY  2022-05-21  Support external renderers via a standard
+#                        class and set of methods
+#   TDORSEY  2022-05-22  Pass the world to the renderer for reference
 #   TDORSEY  2022-06-08  Split from groc.py
+
 
 
 import logging
@@ -30,12 +51,6 @@ K_MUTE = True
 
 class World():
     'Base class for the world'
-    # DIRECTIONS
-    NORTH = 1
-    EAST = 2
-    SOUTH = 3
-    WEST = 4
-    
     # FILE UTILS
     FIELDSEP = '|'
     NEWLINE = '\n'
@@ -46,14 +61,14 @@ class World():
     currentTick = 0    
     currentTime = time.time()
     defaultTick = .1
-    #defaultTick = 0
 
     # COLORS
     BLACK = (0, 0, 0)
     BLUE = (0, 0, 255)
+    GRAY = (159, 159, 159)
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
-    GRAY = (159, 159, 159)
+    YELLOW = (255,233,0) 
 
     def __init__(self, x, y):
         
@@ -255,15 +270,10 @@ class World():
             self.render.drawFood(self.foodList[i])
             i += 1
         if self.currentTick % 100 == 0:
-          """
-          if self.lightLevel == 1:
-            if len(self.foodList) < .1 * self.population:
-              self.spawnFood()
-          else:
-          """
           allCalories = sum(foodItem.calories for foodItem 
                  in self.foodList)
-          if allCalories < 50 * self.population:
+          if (allCalories < 50 * self.population and
+             len(self.foodList) < .1 * self.population):
               self.spawnFood()
         if len(self.foodList) == 0:
           for i in range(max(2,int(.05 * self.population))):

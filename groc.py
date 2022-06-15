@@ -73,6 +73,7 @@ class Groc():
     LONELY = "Lonely"
     HUNGRY = "Hungry"
     DEAD = "Dead"
+    SLEEPING = "Sleeping"
 
     
     def __init__(self, world, mood, x, y, 
@@ -110,6 +111,7 @@ class Groc():
           self.birthTick = self.world.currentTick
         else:
           self.birthTick = birthTick
+        self.touchedTick = None
         if gender is None:
           self.gender = self.geneticAttributes() 
         else:
@@ -213,10 +215,12 @@ class Groc():
         distToGroc = self.world.maxDistance
       else:
         distToGroc = self.world.findDistance(self, self.nearestGroc)
+
       if self.nearestFood == None:
         distToFood = self.world.maxDistance
       else:
         distToFood = self.world.findDistance(self, self.nearestFood)
+
       if self.fp < 0:
         self.setMood(Groc.DEAD)
       elif self.fp < self.hungerThreshold and not self.nearestFood is None:
@@ -225,13 +229,13 @@ class Groc():
       elif self.fp < self.maxfp and distToFood < self.getPersonalRadius():
         'HUNGRY since there is food right here'
         self.setMood(Groc.HUNGRY)
+      elif self.fp < self.hungerThreshold:
+        'HUNGRY even if there is no food since I am not crowded or lonely'
+        self.setMood(Groc.HUNGRY)
       elif distToGroc < self.getPersonalRadius():
         self.setMood(Groc.CROWDED)
       elif distToGroc > self.getCommunityRadius():
         self.setMood(Groc.LONELY)
-      elif self.fp < self.hungerThreshold:
-        'HUNGRY even if there is no food since I am not crowded or lonely'
-        self.setMood(Groc.HUNGRY)
       else:
         self.setMood(Groc.HAPPY)
 
@@ -466,6 +470,10 @@ class Groc():
     def setTarget(self, newx, newy):
         self.targetX = newx
         self.targetY = newy 
+
+# groc.touch
+    def touch(self):
+        self.touchedTick = self.world.currentTick
 
 # groc.visualRange
     def visualRange(self):

@@ -16,16 +16,12 @@
 #                        Configurable loop lengths 
 #   TDORSEY  2022-04-27  Log groc moves separately 
 #   TDORSEY  2022-04-28  Groc position to stdout for now
-#   TDORSEY  2022-04-29  Pipe location to world.py (later w-debug.py)
-#                        Brownian motion
-#                        Ability to iterate forever
+#   TDORSEY  2022-04-29  Brownian motion.  Ability to iterate forever
 #   TDORSEY  2022-04-30  Grocs seek nearest groc
 #                        Generate grocs up to limit when reading a file
 #                        Exit when nobody is moving 
 #   TDORSEY  2022-05-01  Refactor groc into groc.py class file
-#   TDORSEY  2022-05-02  World owns constants now
-#                        Add movement methods to Groc
-#                        Add currentTick and tick to World
+#   TDORSEY  2022-05-02  Add movement methods to Groc
 #                        Move initialization code into main
 #   TDORSEY  2022-05-03  Move load/save to World class
 #                        Move pipe definition to World class 
@@ -40,18 +36,10 @@
 #   TDORSEY  2022-05-14  Improved target finding for choosing a less
 #                        crowded space 
 #   TDORSEY  2022-05-15  visible moods
-#   TDORSEY  2022-05-17  Added world stats
-#   TDORSEY  2022-05-20  Combine groc.py and run.py
-#                        Eliminate numpy
-#   TDORSEY  2022-05-21  Support external renderers via a standard
-#                        class and set of methods
-#   TDORSEY  2022-05-22  Pass the world to the renderer for reference
+#   TDORSEY  2022-05-20  Eliminate numpy
 #   TDORSEY  2022-05-24  Add HUNGRY and DEAD moods
 #   TDORSEY  2022-05-25  Fix HUNGRY actions
 #   TDORSEY  2022-05-26  Food has calories; Groc have foodpoints
-#                        main loop simplified
-#   TDORSEY  2022-05-27  handleFood and handleGrocs to simplify
-#                        tick
 #   TDORSEY  2022-06-01  variable bite and metabolism
 #   TDORSEY  2022-06-03  Day and night
 #   TDORSEY  2022-06-05  Limited vision at night
@@ -133,8 +121,6 @@ class Groc():
 # groc.act
     def act(self):
       'take action'
-      distToGroc = self.distanceTo(self.nearestGroc)
-       
       'determine motion'
       if self.mood == self.DEAD:  
         moving = False
@@ -144,12 +130,10 @@ class Groc():
         moving = True
 
       'determine eating'
-      if self.mood == self.HUNGRY and not (self.nearestFood is None):
-         distToFood = self.world.findDistance(self, self.nearestFood)
-      else:
-         distToFood = self.world.maxDistance
-
-      if distToFood < self.getPersonalRadius() and self.fp < self.maxfp:
+      if self.nearestFood == None:
+        pass
+      elif (self.distToFood < self.getPersonalRadius() and 
+            self.fp < self.maxfp):
         calories = self.nearestFood.bite(self.bite)
         self.fp = self.fp + calories
 
@@ -164,8 +148,7 @@ class Groc():
           self.fp = self.fp - (self.metabolism/2)
         else:
           self.fp = self.fp - self.metabolism
-        zdist = self.world.findDistance(self, self.nearestGroc)
-        if zdist < self.getPersonalRadius():
+        if self.world.ifNone(self.distToGroc, self.world.maxDistance) < self.getPersonalRadius():
            self.world.render.drawStatic(self, self.x, self.y)
         else:
            self.world.render.maybeDraw(self, self.x, self.y)
@@ -223,44 +206,25 @@ class Groc():
 # groc.decide
     def decide(self):
       'decide what to do'
-      if self.nearestGroc == None:
-        distToGroc = self.world.maxDistance
-      else:
-        distToGroc = self.world.findDistance(self, self.nearestGroc)
-
-      if self.nearestFood == None:
-        distToFood = self.world.maxDistance
-      else:
-        distToFood = self.world.findDistance(self, self.nearestFood)
-
-      if self.world.airTemperature > .45:
-        warmEnough = True
-      elif distToGroc < self.getCommunityRadius():
-        warmEnough = True
-      else:
-        warmEnough = False
-        
       'set mood'
+      maxDistance = self.world.maxDistance
       if self.fp < 0:
         self.setMood(Groc.DEAD)
-      elif self.fp < self.hungerThreshold and not self.nearestFood is None:
+      elif (self.fp < self.hungerThreshold and 
+            not self.nearestFood is None):
         'HUNGRY if I can find food'
         self.setMood(Groc.HUNGRY)
-      elif self.fp < self.maxfp and distToFood < self.getPersonalRadius():
+      elif (self.fp < self.maxfp and 
+            self.world.ifNone(self.distToFood, maxDistance) < self.getPersonalRadius()):
         'HUNGRY since there is food right here'
         self.setMood(Groc.HUNGRY)
-      elif distToGroc < self.getPersonalRadius():
+      elif self.world.ifNone(self.distToGroc, maxDistance) < self.getPersonalRadius():
         self.setMood(Groc.CROWDED)
-      elif distToGroc > self.getCommunityRadius():
-        if warmEnough:
-          self.setMood(Groc.LONELY)
-        else:
-          self.setMood(Groc.COLD)
+      elif self.world.ifNone(self.distToGroc, maxDistance) > self.getCommunityRadius():
+        self.setMood(Groc.LONELY)
       elif self.fp < self.hungerThreshold:
         'HUNGRY even if there is no food since I am not crowded or lonely'
         self.setMood(Groc.HUNGRY)
-      elif not warmEnough:
-        self.setMood(Groc.COLD)
       else:
         self.setMood(Groc.HAPPY)
 
@@ -275,16 +239,11 @@ class Groc():
         self.targetX, self.targetY = None, None
       elif self.mood == Groc.HUNGRY:
         if self.nearestFood is None:
-          'this violates the observe/decide/act protocol'
-          'but I will accept it for now'
-          nearestHungryGroc = self.findNearestGroc(Groc.HUNGRY, True)
-          if None == nearestHungryGroc:
+          if None == self.nearestHungryGroc:
             self.targetX, self.targetY = None, None
-          else:
-            zdist = self.world.findDistance(self, nearestHungryGroc)
-            if zdist > self.getPersonalRadius():
-              self.targetX = nearestHungryGroc.targetX
-              self.targetY = nearestHungryGroc.targetY
+          elif self.distToNearestHungryGroc > self.getPersonalRadius():
+            self.targetX = nearestHungryGroc.targetX
+            self.targetY = nearestHungryGroc.targetY
         elif self.nearestGroc is None:
           'do not venture out for food alone'
           self.targetX, self.targetY = None, None
@@ -297,7 +256,11 @@ class Groc():
           if self.mood == Groc.COLD:
             if None in (self.targetX, self.targetY):
               if self.nearestFood == None:
-                self.targetX, self.targetY = self.world.randomLocation()
+                if self.nearestHungryGroc == None:
+                  self.targetX, self.targetY = self.world.randomLocation()
+                else:
+                  self.targetX, self.targetY = (self.nearestHungryGroc.x, 
+                                                self.nearestHungryGroc.y)
               else:
                 self.targetX, self.targetY = (self.nearestFood.x, 
                                               self.nearestFood.y)
@@ -374,13 +337,14 @@ class Groc():
         return nearestFood
 
 # groc.findNearestGroc
-    def findNearestGroc(self, mood=None, movingOnly=False):
+    def findNearestGroc(self, mood=None, mustHaveTarget=False):
         leastDist = self.world.maxDistance
         nearestGroc = None
         for anotherGroc in self.world.grocList:
           if (anotherGroc.id == self.id):
             pass
-          elif None in (anotherGroc.x, anotherGroc.y) and movingOnly == True:
+          elif (None in (anotherGroc.targetX, anotherGroc.targetY) and 
+                mustHaveTarget == True):
             pass
           elif (anotherGroc.mood == mood or mood == None):
             zDist = self.world.findDistance(self, anotherGroc)
@@ -486,13 +450,21 @@ class Groc():
 # groc.observe
     def observe(self):
         self.nearestGroc = self.findNearestGroc()
+        self.distToGroc = self.world.findDistance(self, 
+                                              self.nearestGroc)
         self.nearestFood = self.findNearestFood()
+        self.distToFood = self.world.findDistance(self, 
+                                              self.nearestFood)
+        self.nearestHungryGroc = self.findNearestGroc(Groc.HUNGRY, True)
+        self.distToHungryGroc = self.world.findDistance(self, 
+                                              self.nearestHungryGroc)
         self.communityCount = self.countNearbyGrocs(
                                    self.getCommunityRadius(), 
                                    self.x, self.y)
         self.personalCount = self.countNearbyGrocs(
                                    self.getPersonalRadius(), 
                                    self.x, self.y)
+        
         #other observations eventually
 
 # groc.setMood

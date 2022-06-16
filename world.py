@@ -74,6 +74,8 @@ class World():
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
     YELLOW = (255,233,0) 
+    
+   
 
     def __init__(self, x, y):
         self.MAXX = x
@@ -345,6 +347,14 @@ class World():
             coldCount += 1
         self.setStats(happyCount, lonelyCount, crowdedCount, 
                       hungryCount, deadCount, coldCount)
+
+# world.ifNone
+    def ifNone(self, thing, alternative):
+      if thing == None:
+        result = alternative
+      else:
+        result = thing
+      return result
 
 # world.interimSave
     def interimSave(self):

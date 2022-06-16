@@ -18,6 +18,7 @@
 # TDORSEY 2022-06-03  Day and night
 # TDORSEY 2022-06-15  Ground and Air temperature gauge
 #                     Grocs get cold
+# TDORSEY 2022-06-16  Format temperature and time gauge at top left
 
 import pygame 
 
@@ -38,11 +39,15 @@ class Renderer():
     self.worldColor = self.world.WHITE
     self.screen.fill(self.worldColor)
     self.running = True
-    self.font = pygame.font.Font('/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf', 12)
-    self.text = self.font.render('Temp: ', True, 
-                                 self.world.GREEN, self.worldColor)
-    self.textRect = self.text.get_rect()
-    self.textRect.center = (50, 50)
+    self.font = pygame.font.Font('/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf', 20)
+    self.temps = self.font.render(format('Temp: ', '<20'), True, 
+                                 self.world.GREEN, self.world.BLACK)
+    self.tempsRect = self.temps.get_rect()
+    self.tempsRect.topleft = (5,5)
+    self.times = self.font.render(format('Current Time:', '<20'), True, 
+                                 self.world.GREEN, self.world.BLACK)
+    self.timesRect = self.times.get_rect()
+    self.timesRect.topleft = (5, 25)
     pygame.mixer.init()
     self.eat=pygame.mixer.Sound('eat.ogg')
     self.food=pygame.mixer.Sound('food.ogg')
@@ -168,12 +173,16 @@ class Renderer():
 #render.tick
   def tick(self):
     pygame.display.set_caption(str(self.world.population) + " Grocs")
-    text = self.font.render('Air: ' + 
-               '{:>3}'.format(str(int(self.world.airTemperature*100))) + 
-               ' Ground: ' + 
-               '{:>3}'.format(str(int(self.world.groundTemperature*100))), 
-               True, self.world.GREEN, self.worldColor)
-    self.screen.blit(text, self.textRect)     
+    temps = self.font.render(format('Air: ' + 
+      '{:>3}'.format(str(int(self.world.airTemperature*100))) + 
+      ' Ground: ' + 
+      '{:>3}'.format(str(int(self.world.groundTemperature*100))),'<20'),
+      True, self.world.GREEN, self.world.BLACK)
+    self.screen.blit(temps, self.tempsRect)     
+    times = self.font.render(format('Current Time: ' + 
+               str(self.world.currentGrocTime()),'<20'),
+               True, self.world.GREEN, self.world.BLACK)
+    self.screen.blit(times, self.timesRect)
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()

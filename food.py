@@ -6,6 +6,7 @@
 #     
 #
 #   TDORSEY  2022-06-09  Split from groc.py
+#   TDORSEY  2022-06-16  Support "GrocTime"
 
 
 import time
@@ -53,7 +54,7 @@ class Food():
                    " Count: " + str(len(self.world.foodList)) + 
                    " Light: " + str(self.world.lightLevel) + 
                    " Hungry: " + str(self.world.hungry) + 
-                   " Time: " + str(self.world.currentTick % 10000))
+                   " Time: " + str(self.world.currentGrocTime()))
         return identity 
  
         

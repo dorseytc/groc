@@ -27,6 +27,7 @@
 #   TDORSEY  2022-05-22  Pass the world to the renderer for reference
 #   TDORSEY  2022-06-08  Split from groc.py
 #   TDORSEY  2022-06-15  Air and Ground Temperature
+#   TDORSEY  2022-06-16  Compute "24-hour" GrocTime
 
 
 
@@ -127,6 +128,14 @@ class World():
         newFood = food.Food(self, calories, x, y)
         self.foodList.append(newFood)
         self.render.soundFood()
+
+# world.currentGrocTime
+    def currentGrocTime(self):
+        curr = 5+(24*((self.currentTick % 10000)/10000)) % 24
+        hour = int(curr)
+        minute = int((curr-hour)*60)
+        return (str(hour) + ":" + str(minute).zfill(2))
+        
 
 # world.d6
     def d6(self, n):

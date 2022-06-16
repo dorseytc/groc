@@ -133,7 +133,7 @@ class Groc():
 # groc.act
     def act(self):
       'take action'
-      distToGroc = self.world.findDistance(self, self.nearestGroc)
+      distToGroc = self.distanceTo(self.nearestGroc)
        
       'determine motion'
       if self.mood == self.DEAD:  
@@ -333,6 +333,10 @@ class Groc():
           result = True
         return (result)
 
+# groc.distanceTo
+    def distanceTo(self, object):
+        return (self.world.findDistance(self, object))
+
 # groc.dump
     def dump(self):
         return ("groc.Groc(self, '" + self.mood + "', " + 
@@ -483,10 +487,12 @@ class Groc():
     def observe(self):
         self.nearestGroc = self.findNearestGroc()
         self.nearestFood = self.findNearestFood()
-        self.communityCount = self.countNearbyGrocs(self.getCommunityRadius(), 
-                                                   self.x, self.y)
-        self.personalCount = self.countNearbyGrocs(self.getPersonalRadius(), 
-                                                   self.x, self.y)
+        self.communityCount = self.countNearbyGrocs(
+                                   self.getCommunityRadius(), 
+                                   self.x, self.y)
+        self.personalCount = self.countNearbyGrocs(
+                                   self.getPersonalRadius(), 
+                                   self.x, self.y)
         #other observations eventually
 
 # groc.setMood

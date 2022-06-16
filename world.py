@@ -59,6 +59,7 @@ class World():
     GROCFILE = "grocfile.dat"
     WORLDFILE = "world.dat"
     LOGFILE = "groc.log"
+    DEGREESIGN = u'\N{DEGREE SIGN}'
 
     currentTick = 0    
     currentTime = time.time()
@@ -97,7 +98,7 @@ class World():
         else:
           World.currentTick = 0
         self.lightLevel = self.getLightLevel()
-        self.airTemperature = .4
+        self.airTemperature = .7
         self.groundTemperature = .7
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
         World.startTick = World.currentTick
@@ -131,10 +132,15 @@ class World():
 
 # world.currentGrocTime
     def currentGrocTime(self):
-        curr = 5+(24*((self.currentTick % 10000)/10000)) % 24
+        curr = (5+(24*((self.currentTick % 10000)/10000))) % 24
         hour = int(curr)
         minute = int((curr-hour)*60)
-        return (str(hour) + ":" + str(minute).zfill(2))
+        if hour > 12:
+          hour = hour - 12
+          tag = " pm "
+        else:
+          tag = " am "
+        return (str(hour) + ":" + str(minute).zfill(2) + tag)
         
 
 # world.d6
@@ -456,7 +462,7 @@ class World():
           print("Light:", self.lightLevel, 
                 "Air Temp:", int(self.airTemperature*100), 
                 "Ground Temp:", int(self.groundTemperature*100), 
-                "Time:", self.currentTick % 10000, 
+                "Time:", self.currentGrocTime(),
                 "Date:", self.currentTick)
         self.currentTime = time.time()
         

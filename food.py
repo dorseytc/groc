@@ -60,7 +60,7 @@ class Food():
         
 #food.dump
     def dump(self):
-        return ("Food(self, '" + str(self.calories) + "', '" + 
+        return ("Food(self, " + str(self.calories) + ", " + 
                 str(self.x) + ", " + str(self.y) + ")" + 
                 self.world.NEWLINE)
 

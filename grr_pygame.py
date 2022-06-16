@@ -40,11 +40,11 @@ class Renderer():
     self.screen.fill(self.worldColor)
     self.running = True
     self.font = pygame.font.Font('/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf', 20)
-    self.temps = self.font.render(format('Temp: ', '<20'), True, 
+    self.temps = self.font.render(format('Temp: ', '<25'), True, 
                                  self.world.GREEN, self.world.BLACK)
     self.tempsRect = self.temps.get_rect()
     self.tempsRect.topleft = (5,5)
-    self.times = self.font.render(format('Current Time:', '<20'), True, 
+    self.times = self.font.render(format('Current Time:', '<25'), True, 
                                  self.world.GREEN, self.world.BLACK)
     self.timesRect = self.times.get_rect()
     self.timesRect.topleft = (5, 25)
@@ -81,31 +81,38 @@ class Renderer():
     hunger = theGroc.hungerThreshold - theGroc.fp 
     if theGroc.mood == theGroc.DEAD:
       eyecolor = groccolor
+      eyeshape = "circle"
       groccolor = self.world.BLACK
       intensity = 2
     elif theGroc.mood == theGroc.COLD:
-      eyecolor = self.world.YELLOW
-      intensity = 3
+      eyecolor = self.world.GRAY
+      eyeshape = "square"
+      intensity = 6
     elif theGroc.mood == theGroc.LONELY:
       eyecolor = self.world.WHITE
+      eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
                       max(self.world.MAXX, self.world.MAXY) * 6)
     elif theGroc.mood == theGroc.CROWDED:
       eyecolor = self.world.BLACK
+      eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
                       max(self.world.MAXX, self.world.MAXY) * 6)
     elif theGroc.mood == theGroc.HUNGRY:
       eyecolor = self.world.GRAY
+      eyeshape = "circle"
       intensity = 2 + round(hunger / theGroc.hungerThreshold * 6)
     else:
       eyecolor = groccolor
+      eyeshape = "circle"
       intensity = 2 
     if oldX == newX and oldY == newY:
       isMoving = False
     else:
-      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 10)
+      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 11)
       isMoving = True
-    if False:
+
+    if True:
       'turn off visualRange circle'
       pass
     elif theGroc.touchedTick == None:
@@ -126,8 +133,14 @@ class Renderer():
       pygame.draw.circle(self.screen, self.worldColor,
                          (newX, newY), theGroc.visualRange())
       
-    pygame.draw.circle(self.screen, groccolor, (newX, newY), 9)
-    pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
+    pygame.draw.circle(self.screen, groccolor, (newX, newY), 10)
+    if eyeshape == "circle":
+      pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
+    else:
+      pygame.draw.rect(self.screen, eyecolor, 
+                       pygame.Rect(newX - (intensity//2), 
+                                   newY - (intensity//2), 
+                                   intensity, intensity))
 
 #render.drawStatic
   def drawStatic(self, theGroc, newX, newY):
@@ -173,16 +186,19 @@ class Renderer():
 #render.tick
   def tick(self):
     pygame.display.set_caption(str(self.world.population) + " Grocs")
-    temps = self.font.render(format('Air: ' + 
+    tempstr = ('Air: ' + 
       '{:>3}'.format(str(int(self.world.airTemperature*100))) + 
-      ' Ground: ' + 
-      '{:>3}'.format(str(int(self.world.groundTemperature*100))),'<20'),
-      True, self.world.GREEN, self.world.BLACK)
-    self.screen.blit(temps, self.tempsRect)     
-    times = self.font.render(format('Current Time: ' + 
-               str(self.world.currentGrocTime()),'<20'),
-               True, self.world.GREEN, self.world.BLACK)
-    self.screen.blit(times, self.timesRect)
+      self.world.DEGREESIGN + ' Ground: ' + 
+      '{:>3}'.format(str(int(self.world.groundTemperature*100))) + 
+      self.world.DEGREESIGN)
+    timestr = ('Current Time: ' + str(self.world.currentGrocTime()))
+    gaugeWidth = '<' + str(max(len(tempstr), len(timestr)))
+    self.temps = self.font.render(format(tempstr, gaugeWidth), 
+                   True, self.world.GREEN, self.world.BLACK)
+    self.screen.blit(self.temps, self.tempsRect)     
+    self.times = self.font.render(format(timestr, gaugeWidth), 
+                   True, self.world.GREEN, self.world.BLACK)
+    self.screen.blit(self.times, self.timesRect)
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()

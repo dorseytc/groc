@@ -26,6 +26,7 @@
 #                        class and set of methods
 #   TDORSEY  2022-05-22  Pass the world to the renderer for reference
 #   TDORSEY  2022-06-08  Split from groc.py
+#   TDORSEY  2022-06-15  Air and Ground Temperature
 
 
 
@@ -66,14 +67,13 @@ class World():
     BLACK = (0, 0, 0)
     BLUE = (0, 0, 255)
     GRAY = (159, 159, 159)
+    GREEN = (0, 255, 0)
+    PALEBLUE = (0, 0, 128)
     RED = (128, 0, 0)
     WHITE = (255, 255, 255)
     YELLOW = (255,233,0) 
 
     def __init__(self, x, y):
-        
-        #super(World, self).__init__()
-         
         self.MAXX = x
         self.MAXY = y
         #population counts
@@ -82,6 +82,7 @@ class World():
         self.crowded = 0
         self.hungry = 0
         self.dead = 0
+        self.cold = 0
         self.population = 0
         self.foodList = []
         #technical pointers
@@ -95,7 +96,8 @@ class World():
         else:
           World.currentTick = 0
         self.lightLevel = self.getLightLevel()
-        self.airTemperature = self.getAirTemperature()
+        self.airTemperature = .4
+        self.groundTemperature = .7
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
         World.startTick = World.currentTick
 
@@ -195,7 +197,18 @@ class World():
 
 # world.getAirTemperature
     def getAirTemperature(self):
-        return 70
+        return ((self.airTemperature * .999) + 
+                (self.lightLevel * .0003) + 
+                (self.groundTemperature * .0007)
+               )
+
+# world.getGroundTemperature
+    def getGroundTemperature(self):
+        coreTemp = .60
+        return ((self.groundTemperature * .9999) + 
+                (self.lightLevel * .00005) + 
+                (coreTemp * .00005)
+               )
 
 # world.getGrocs
     def getGrocs(self, numGrocs):
@@ -287,6 +300,7 @@ class World():
         crowdedCount = 0
         hungryCount = 0
         deadCount = 0
+        coldCount = 0
         i = 0
         while i < len(self.grocList):
           if self.grocList[i].fp <= -5:
@@ -312,8 +326,10 @@ class World():
             hungryCount += 1
           elif thisGroc.mood == groc.Groc.DEAD:
             deadCount += 1 
+          elif thisGroc.mood == groc.Groc.COLD:
+            coldCount += 1
         self.setStats(happyCount, lonelyCount, crowdedCount, 
-                      hungryCount, deadCount)
+                      hungryCount, deadCount, coldCount)
 
 # world.interimSave
     def interimSave(self):
@@ -360,13 +376,13 @@ class World():
         self.worldFile.close()
 
 # world.setStats
-    def setStats(self, happy, lonely, crowded, hungry, dead):
+    def setStats(self, happy, lonely, crowded, hungry, dead, cold):
         self.happy = happy 
         self.lonely = lonely
         self.crowded = crowded
         self.hungry = hungry
         self.dead = dead
-        self.population = happy + lonely + crowded + hungry
+        self.population = happy + lonely + crowded + hungry + cold
 
 # world.spawnFood
     def spawnFood(self, calories=None, x=None, y=None):
@@ -416,6 +432,7 @@ class World():
         self.currentTick += 1
         self.lightLevel = self.getLightLevel()
         self.airTemperature = self.getAirTemperature()
+        self.groundTemperature = self.getGroundTemperature()
         self.handleGrocs()
         self.handleFood()
         self.interimSave()
@@ -424,7 +441,14 @@ class World():
           print("Slow tick ", waitSeconds, " seconds")
         nowTime = time.time()
         if nowTime < self.currentTime + self.defaultTick + waitSeconds:
-          time.sleep(self.currentTime + self.defaultTick + waitSeconds - nowTime)
+          time.sleep(self.currentTime + self.defaultTick + 
+                     waitSeconds - nowTime)
+        if self.currentTick % 1000 == 0:
+          print("Light:", self.lightLevel, 
+                "Air Temp:", int(self.airTemperature*100), 
+                "Ground Temp:", int(self.groundTemperature*100), 
+                "Time:", self.currentTick % 10000, 
+                "Date:", self.currentTick)
         self.currentTime = time.time()
         
 

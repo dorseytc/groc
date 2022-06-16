@@ -16,12 +16,15 @@
 # TDORSEY 2022-05-27  Added sound
 # TDORSEY 2022-06-01  Added click identification of food
 # TDORSEY 2022-06-03  Day and night
+# TDORSEY 2022-06-15  Ground and Air temperature gauge
+#                     Grocs get cold
 
 import pygame 
 
 
 class Renderer():
-  pygame.init
+  pygame.init()
+  pygame.font.init()
   pygame.display.set_caption("Grocs")
 
   def __init__(self, thisWorld):
@@ -30,11 +33,16 @@ class Renderer():
 
     print("Renderer is grr_pygame 1.0")
     self.world = thisWorld
-    self.screen = pygame.display.set_mode([self.world.MAXX, 
-                                          self.world.MAXY])
+    self.screen = pygame.display.set_mode([thisWorld.MAXX, 
+                                          thisWorld.MAXY])
     self.worldColor = self.world.WHITE
     self.screen.fill(self.worldColor)
     self.running = True
+    self.font = pygame.font.Font('/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf', 12)
+    self.text = self.font.render('Temp: ', True, 
+                                 self.world.GREEN, self.worldColor)
+    self.textRect = self.text.get_rect()
+    self.textRect.center = (50, 50)
     pygame.mixer.init()
     self.eat=pygame.mixer.Sound('eat.ogg')
     self.food=pygame.mixer.Sound('food.ogg')
@@ -70,6 +78,9 @@ class Renderer():
       eyecolor = groccolor
       groccolor = self.world.BLACK
       intensity = 2
+    elif theGroc.mood == theGroc.COLD:
+      eyecolor = self.world.YELLOW
+      intensity = 3
     elif theGroc.mood == theGroc.LONELY:
       eyecolor = self.world.WHITE
       intensity = 2 + round(distanceFromTarget / 
@@ -89,7 +100,7 @@ class Renderer():
     else:
       pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 10)
       isMoving = True
-    if True:
+    if False:
       'turn off visualRange circle'
       pass
     elif theGroc.touchedTick == None:
@@ -157,6 +168,12 @@ class Renderer():
 #render.tick
   def tick(self):
     pygame.display.set_caption(str(self.world.population) + " Grocs")
+    text = self.font.render('Air: ' + 
+               '{:>3}'.format(str(int(self.world.airTemperature*100))) + 
+               ' Ground: ' + 
+               '{:>3}'.format(str(int(self.world.groundTemperature*100))), 
+               True, self.world.GREEN, self.worldColor)
+    self.screen.blit(text, self.textRect)     
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()

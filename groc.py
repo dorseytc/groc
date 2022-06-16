@@ -60,6 +60,7 @@
 #   TDORSEY  2022-06-08  Huddle for warmth at night
 #   TDORSEY  2022-06-09  Split apart into separate files again
 #   TDORSEY  2022-06-11  Update save file constructor syntax
+#   TDORSEY  2022-06-15  Grocs respond to air temperature
 
 import random
 
@@ -68,6 +69,7 @@ class Groc():
     MALE = "M"
     FEMALE = "F"
     # MOODS
+    COLD = "Cold"
     CROWDED = "Crowded"
     HAPPY = "Happy"
     LONELY = "Lonely"
@@ -171,10 +173,10 @@ class Groc():
 
 
 # groc.chooseLessCrowdedSpace
-    def chooseLessCrowdedSpace(self, radius):
+    def chooseLessCrowdedSpace(self, radius, invert=False):
       quadrantNames = ['NW', 'NE', 'SW', 'SE']
       quadrantInfo = {"NW":(-1,-1), "NE":(1,-1), "SW":(-1,1), "SE":(1,1)}
-      leastPopulation = 100000
+      bestPopulation = 100000
       if self.gender == Groc.MALE:
         direction = -1
       else:
@@ -184,17 +186,27 @@ class Groc():
         population = self.countNearbyGrocs(radius, 
           self.world.bindX(self.x + (xfactor * radius)), 
           self.world.bindY(self.y + (yfactor * radius)))
-        if population < leastPopulation:
-          leastPopulation = population
-          targetQuadrant = quadrantName
+        if invert == False:
+          if population < bestPopulation:
+            bestPopulation = population
+            targetQuadrant = quadrantName
+        else:
+          if population < bestPopulation:
+            bestPopulation = population
+            targetQuadrant = quadrantName
+        
       self.world.logger.debug ("Target quadrant is " + 
           targetQuadrant + " " + 
-          " population " +  str(leastPopulation))
+          " population " +  str(bestPopulation))
       xfactor, yfactor = quadrantInfo[targetQuadrant]
       newX = self.world.bindX(self.x + (xfactor * radius))
       newY = self.world.bindY(self.y + (yfactor * radius))
       self.world.logger.debug("newx, newy " + str(newX) + "," + str(newY))
       return newX, newY
+
+# groc.chooseMoreCrowdedSpace
+    def chooseMoreCrowdedSpace(self, radius):
+      return self.chooseLessCrowdedSpace(radius, True)
  
 # groc.countNearbyGrocs
     def countNearbyGrocs(self, searchRadius, x, y):
@@ -221,6 +233,14 @@ class Groc():
       else:
         distToFood = self.world.findDistance(self, self.nearestFood)
 
+      if self.world.airTemperature > .45:
+        warmEnough = True
+      elif distToGroc < self.getCommunityRadius():
+        warmEnough = True
+      else:
+        warmEnough = False
+        
+      'set mood'
       if self.fp < 0:
         self.setMood(Groc.DEAD)
       elif self.fp < self.hungerThreshold and not self.nearestFood is None:
@@ -229,16 +249,22 @@ class Groc():
       elif self.fp < self.maxfp and distToFood < self.getPersonalRadius():
         'HUNGRY since there is food right here'
         self.setMood(Groc.HUNGRY)
-      elif self.fp < self.hungerThreshold:
-        'HUNGRY even if there is no food since I am not crowded or lonely'
-        self.setMood(Groc.HUNGRY)
       elif distToGroc < self.getPersonalRadius():
         self.setMood(Groc.CROWDED)
       elif distToGroc > self.getCommunityRadius():
-        self.setMood(Groc.LONELY)
+        if warmEnough:
+          self.setMood(Groc.LONELY)
+        else:
+          self.setMood(Groc.COLD)
+      elif self.fp < self.hungerThreshold:
+        'HUNGRY even if there is no food since I am not crowded or lonely'
+        self.setMood(Groc.HUNGRY)
+      elif not warmEnough:
+        self.setMood(Groc.COLD)
       else:
         self.setMood(Groc.HAPPY)
 
+      'set target'
       if self.mood == self.DEAD:
         pass
       elif self.targetX == self.x and self.targetY == self.y:
@@ -265,10 +291,18 @@ class Groc():
         else:  
           self.targetX = self.nearestFood.x
           self.targetY = self.nearestFood.y
-      elif self.mood == Groc.LONELY:
-        #continually retarget nearest groc when lonely
+      elif self.mood in (Groc.LONELY, Groc.COLD):
+        #continually retarget nearest groc when lonely and cold
         if self.nearestGroc == None:
-          self.targetX, self.targetY = None, None
+          if self.mood == Groc.COLD:
+            if None in (self.targetX, self.targetY):
+              if self.nearestFood == None:
+                self.targetX, self.targetY = self.world.randomLocation()
+              else:
+                self.targetX, self.targetY = (self.nearestFood.x, 
+                                              self.nearestFood.y)
+          else:
+            self.targetX, self.targetY = None, None
         else:  
           self.targetX = self.nearestGroc.x
           self.targetY = self.nearestGroc.y
@@ -287,6 +321,7 @@ class Groc():
             self.targetX, self.targetY = self.world.randomLocation()
         else:
           pass
+      
      
        
 

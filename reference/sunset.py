@@ -26,6 +26,7 @@ def main():
   paleblue = (0,0,128)
   black = (0,0,0)
   red = (128,0,0)
+  deepred = (255,0,0)
   white = (255,255,255)
   gray = (159,159,159)
   #colorList = [black, red, blue, white]
@@ -48,7 +49,9 @@ def main():
     print("color", color)
     gauge.fill(color)
     pygame.draw.circle(gauge, red, (300, 300), 7)
+    pygame.draw.circle(gauge, deepred, (30, 30), 7)
     pygame.draw.circle(gauge, blue, (600, 600), 7)
+    pygame.draw.circle(gauge, paleblue, (900, 600), 7)
     text = font.render('Light Level: ' + str(i/100), True, green, blue)
     gauge.blit(text, textRect)
     pygame.display.flip()

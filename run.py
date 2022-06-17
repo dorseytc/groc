@@ -21,6 +21,12 @@
 import sys
 import world
 
+def ifNone(thing, alternative):
+      if thing == None:
+        result = alternative
+      else:
+        result = thing
+      return result
 
 
 def main():   

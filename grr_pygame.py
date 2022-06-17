@@ -75,9 +75,9 @@ class Renderer():
       groccolor = self.world.BLUE
     else:
       groccolor = self.world.RED
-    distanceFromTarget = self.world.findDistanceXY(theGroc.x, 
-                                 theGroc.y, theGroc.targetX, 
-                                 theGroc.targetY) 
+    distanceFromTarget = self.world.ifNone(
+      self.world.findDistanceXY(theGroc.x, theGroc.y, 
+                                theGroc.targetX, theGroc.targetY), 0)
     hunger = theGroc.hungerThreshold - theGroc.fp 
     if theGroc.mood == theGroc.DEAD:
       eyecolor = groccolor
@@ -92,12 +92,12 @@ class Renderer():
       eyecolor = self.world.WHITE
       eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
-                      max(self.world.MAXX, self.world.MAXY) * 6)
+                      self.world.maxDistance * 6)
     elif theGroc.mood == theGroc.CROWDED:
       eyecolor = self.world.BLACK
       eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
-                      max(self.world.MAXX, self.world.MAXY) * 6)
+                      self.world.maxDistance * 6)
     elif theGroc.mood == theGroc.HUNGRY:
       eyecolor = self.world.GRAY
       eyeshape = "circle"
@@ -109,7 +109,7 @@ class Renderer():
     if oldX == newX and oldY == newY:
       isMoving = False
     else:
-      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 11)
+      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 10)
       isMoving = True
 
     if True:
@@ -133,7 +133,7 @@ class Renderer():
       pygame.draw.circle(self.screen, self.worldColor,
                          (newX, newY), theGroc.visualRange())
       
-    pygame.draw.circle(self.screen, groccolor, (newX, newY), 10)
+    pygame.draw.circle(self.screen, groccolor, (newX, newY),9)
     if eyeshape == "circle":
       pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
     else:

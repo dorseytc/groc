@@ -241,9 +241,9 @@ class Groc():
         if self.nearestFood is None:
           if None == self.nearestHungryGroc:
             self.targetX, self.targetY = None, None
-          elif self.distToNearestHungryGroc > self.getPersonalRadius():
-            self.targetX = nearestHungryGroc.targetX
-            self.targetY = nearestHungryGroc.targetY
+          elif self.distToHungryGroc > self.getPersonalRadius():
+            self.targetX = self.nearestHungryGroc.targetX
+            self.targetY = self.nearestHungryGroc.targetY
         elif self.nearestGroc is None:
           'do not venture out for food alone'
           self.targetX, self.targetY = None, None

@@ -173,7 +173,7 @@ class World():
     def findDistance(self, object1, object2):
         'measure the distance between two objects'
         if None in (object1, object2):
-          result = 0
+          result = None
         else:
           x1, y1 = object1.x, object1.y
           x2, y2 = object2.x, object2.y
@@ -184,7 +184,7 @@ class World():
     def findDistanceXY(self, x1, y1, x2, y2):
         'measure the distance between two sets of coordinates'
         if None in (x1, x2, y1, y2):
-          result = 0
+          result = None
         else:
           xDiff = abs(x1 - x2) 
           yDiff = abs(y1 - y2)

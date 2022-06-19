@@ -75,28 +75,39 @@ class Groc():
 
         self.world = world
         self.world.population += 1
-        self.mood = mood
-        self.x = int(x)
-        self.y = int(y)
+        #the world around the groc (from observations)
         self.nearestGroc = None
+        self.distToGroc = None
         self.nearestFood = None
+        self.distToFood = None
+        self.nearestHungryGroc = None
+        self.distToHungryGroc = None
         self.targetX = None
         self.targetY = None
-        self.fp = fp
-        # constants 
-        self.maxfp = 100
-        #self.hungerThreshold = 75
-        self.hungerThreshold = 66 + self.world.d6(3)
-        #self.communityRadius = 22
-        #self.personalRadius = 20
-        self.preferredCommunitySize = 4
+        self.targetComment = None
         self.communityCount = 0
         self.personalCount = 0
+        #personal variables (the result of decisions and actions)
+        self.fp = fp
+        self.mood = mood
+        self.moodComment = "Initial mood"
+        self.x = int(x)
+        self.y = int(y)
+        # constants 
+        self.maxfp = 100
+        self.hungerThreshold = 66 + self.world.d6(3)
         self.metabolism = .01
-        #self.metabolism = (91 + self.world.d6(3))/20000
         self.bite = self.metabolism * 1000
         self.impatience = self.world.d6(1)
         self.id = self.world.population
+        # variables with getters (environment affects these)
+        self.defaultPersonalSpace = 20
+        self.defaultComfortZone = 22
+        self.defaultCommunitySpace = 50
+        self.defaultEarshot = 100
+        self.defaultVisualRange = 2000
+        self.defaultPreferredCommunitySize = 4
+        # generate if missing
         if birthTick is None:
           self.birthTick = self.world.currentTick
         else:
@@ -106,7 +117,6 @@ class Groc():
           self.gender = self.geneticAttributes() 
         else:
           self.gender = gender
-        self.vision = 2000
         self.world.logger.debug ("(init)Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
        
@@ -132,7 +142,7 @@ class Groc():
       'determine eating'
       if self.nearestFood == None:
         pass
-      elif (self.distToFood < self.getPersonalRadius() and 
+      elif (self.distToFood < self.getPersonalSpace() and 
             self.fp < self.maxfp):
         calories = self.nearestFood.bite(self.bite)
         self.fp = self.fp + calories
@@ -148,7 +158,8 @@ class Groc():
           self.fp = self.fp - (self.metabolism/2)
         else:
           self.fp = self.fp - self.metabolism
-        if self.world.ifNone(self.distToGroc, self.world.maxDistance) < self.getPersonalRadius():
+        if (self.world.ifNone(self.distToGroc, self.world.maxDistance) < 
+              self.getPersonalSpace()):
            self.world.render.drawStatic(self, self.x, self.y)
         else:
            self.world.render.maybeDraw(self, self.x, self.y)
@@ -209,79 +220,94 @@ class Groc():
       'set mood'
       maxDistance = self.world.maxDistance
       if self.fp < 0:
-        self.setMood(Groc.DEAD)
+        self.setMood(Groc.DEAD, str(self.fp)+" food points")
+      elif (self.world.airTemperature < .45 
+           and self.communityCount < self.getPreferredCommunitySize()):
+        self.setMood(Groc.COLD, "air temperature " + 
+                     str(self.world.airTemperature) + 
+                     " and community size " + 
+                     str(self.getPreferredCommunitySize()))
       elif (self.fp < self.hungerThreshold and 
             not self.nearestFood is None):
-        'HUNGRY if I can find food'
-        self.setMood(Groc.HUNGRY)
+        self.setMood(Groc.HUNGRY, "I can find food")
       elif (self.fp < self.maxfp and 
-            self.world.ifNone(self.distToFood, maxDistance) < self.getPersonalRadius()):
-        'HUNGRY since there is food right here'
-        self.setMood(Groc.HUNGRY)
-      elif self.world.ifNone(self.distToGroc, maxDistance) < self.getPersonalRadius():
-        self.setMood(Groc.CROWDED)
-      elif self.world.ifNone(self.distToGroc, maxDistance) > self.getCommunityRadius():
-        self.setMood(Groc.LONELY)
+            self.world.ifNone(self.distToFood, maxDistance) < 
+              self.getPersonalSpace()):
+        self.setMood(Groc.HUNGRY, "there is food right here")
+      elif (self.world.ifNone(self.distToGroc, maxDistance) < 
+              self.getPersonalSpace()):
+        self.setMood(Groc.CROWDED, "grocs in my personal space")
+      elif (self.world.ifNone(self.distToGroc, maxDistance) > 
+              self.getComfortZone()):
+        self.setMood(Groc.LONELY, "grocs too far away for my comfort")
       elif self.fp < self.hungerThreshold:
-        'HUNGRY even if there is no food since I am not crowded or lonely'
-        self.setMood(Groc.HUNGRY)
+        self.setMood(Groc.HUNGRY, "can't find food but still hungry") 
       else:
-        self.setMood(Groc.HAPPY)
+        self.setMood(Groc.HAPPY, "feeling groovy")
 
       'set target'
       if self.mood == self.DEAD:
         pass
       elif self.targetX == self.x and self.targetY == self.y:
-        #arrived
-        self.targetX, self.targetY = None, None
+        self.setTarget(None, None, "arrived")
       elif self.mood == Groc.HAPPY:
-        #stay put when you're happy
-        self.targetX, self.targetY = None, None
+        self.setTarget(None, None, "stay put when you're happy")
       elif self.mood == Groc.HUNGRY:
         if self.nearestFood is None:
           if None == self.nearestHungryGroc:
-            self.targetX, self.targetY = None, None
-          elif self.distToHungryGroc > self.getPersonalRadius():
-            self.targetX = self.nearestHungryGroc.targetX
-            self.targetY = self.nearestHungryGroc.targetY
+            self.setTarget(None, None, "nobody knows where food is")
+          elif self.distToHungryGroc > self.getPersonalSpace():
+            self.setTarget(self.nearestHungryGroc.targetX, 
+                           self.nearestHungryGroc.targetY, 
+                           "a friend told me where food is")
         elif self.nearestGroc is None:
-          'do not venture out for food alone'
-          self.targetX, self.targetY = None, None
+          self.setTarget(None, None, "do not venture out for food alone")
         else:  
-          self.targetX = self.nearestFood.x
-          self.targetY = self.nearestFood.y
-      elif self.mood in (Groc.LONELY, Groc.COLD):
-        #continually retarget nearest groc when lonely and cold
+          self.setTarget(self.nearestFood.x, self.nearestFood.y, 
+                         "I detected some food nearby")
+      elif self.mood == Groc.LONELY:
         if self.nearestGroc == None:
-          if self.mood == Groc.COLD:
-            if None in (self.targetX, self.targetY):
-              if self.nearestFood == None:
-                if self.nearestHungryGroc == None:
-                  self.targetX, self.targetY = self.world.randomLocation()
-                else:
-                  self.targetX, self.targetY = (self.nearestHungryGroc.x, 
-                                                self.nearestHungryGroc.y)
-              else:
-                self.targetX, self.targetY = (self.nearestFood.x, 
-                                              self.nearestFood.y)
-          else:
-            self.targetX, self.targetY = None, None
+          self.setTarget(None, None, "I ain't got nobody")
         else:  
-          self.targetX = self.nearestGroc.x
-          self.targetY = self.nearestGroc.y
+          self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
+                         "I detect a friend nearby")
+      elif self.mood == Groc.COLD:
+        if (self.world.ifNone(self.distToGroc, maxDistance) < 
+             self.getPersonalSpace()):
+          self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
+                                          self.nearestGroc.y), 
+                         "Cold and crowded")
+        elif (self.getPersonalSpace() <= 
+                self.world.ifNone(self.distToGroc, maxDistance) <= 
+                self.getComfortZone()):
+          self.setTarget(None, None, "Cold next to a friend")
+        elif not (self.nearestGroc == None):
+          self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
+                         "Cold and headed to nearest friend")
+        elif not (self.nearestFood == None):
+          self.setTarget(self.nearestFood.x, self.nearestFood.y,
+                         "Cold and headed to food")
+        elif self.communityCount < self.getPreferredCommunitySize():
+          self.setTarget(*self.chooseMoreCrowdedSpace( 
+                           self.getCommunitySpace()), 
+                         "Cold and finding a crowd")
+        else:
+          self.setTarget(*self.world.randomLocation(), 
+                         "Cold and lonely in the deep dark night")
       elif self.mood == Groc.CROWDED:
-        #pick a target one time when crowded
         if self.targetX is None and self.targetY is None:
           pct = self.world.percentage()
           if pct <= (100-self.impatience):
-            self.targetX, self.targetY = self.getAwayFrom(
-                                               self.nearestGroc.x, 
-                                               self.nearestGroc.y)
+            self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
+                                            self.nearestGroc.y), 
+                           "Getting away from this other groc")
             if self.targetX == self.x and self.targetY == self.y:
-              self.targetX, self.targetY = self.chooseLessCrowdedSpace(
-                                               self.getCommunityRadius())
+              self.setTarget(*self.chooseLessCrowdedSpace(
+                               self.getCommunitySpace()), 
+                             "Picking a less crowded space")
           else:
-            self.targetX, self.targetY = self.world.randomLocation()
+            self.setTarget(*self.world.randomLocation(), 
+                           "Hiking to get away from the crowd")
         else:
           pass
       
@@ -318,7 +344,7 @@ class Groc():
             if zDist < leastDist:
               leastDist = zDist
               nearestFood = someFood
-          if leastDist > self.visualRange():
+          if leastDist > self.getVisualRange():
             nearestFood = None
           else:
             pass
@@ -353,7 +379,7 @@ class Groc():
               nearestGroc = anotherGroc
           else:
             pass 
-        if leastDist > self.visualRange():
+        if leastDist > self.getVisualRange():
           return None
         else:
           return nearestGroc
@@ -381,16 +407,35 @@ class Groc():
           newY = self.y + diffY
         return newX, newY
 
-# groc.getCommunityRadius
-    def getCommunityRadius(self):
-        #return 22 + (10 * self.world.lightLevel)
-        return 22
+# groc.getComfortZone
+    def getComfortZone(self):
+        return self.defaultComfortZone
 
+# groc.getCommunitySpace
+    def getCommunitySpace(self):
+        return self.defaultCommunitySpace
 
-# groc.getPersonalRadius
-    def getPersonalRadius(self):
-        #return 20 + (10 * self.world.lightLevel)
-        return 20
+# groc.getEarshot
+    def getEarshot(self):
+        return self.defaultEarshot
+
+# groc.getPersonalSpace
+    def getPersonalSpace(self):
+        if self.world.airTemperature < .45: 
+          result = 16
+        elif self.world.airTemperature > .80:
+          result = 22
+        else:
+          result = 20
+        return result
+
+# groc.getPreferredCommunitySize
+    def getPreferredCommunitySize(self):
+        return self.defaultPreferredCommunitySize
+
+# groc.getVisualRange
+    def getVisualRange(self):
+        return max(self.defaultVisualRange * self.world.lightLevel, 50)
 
 # groc.isMoving
     def isMoving(self, theGroc):
@@ -407,18 +452,21 @@ class Groc():
     def identify(self):
         self.world.logger.debug ("Identify " + str(self.id) + 
                       " was born at " + str(self.birthTick))
-        identity = ("Id: " + str(self.id) + 
-                   " Current X,Y: " + str(self.x) + "," + str(self.y) + 
-                   " Target X,Y: " + str(self.targetX) + "," + 
-                                     str(self.targetY) + 
-                   " Mood: " + self.mood + 
-                   " Gender: " + self.gender + 
-                   " Birthtick: " + str(self.birthTick) + 
-                   " Food Points: " + str(self.fp) + 
-                   " Hunger Treshold " + str(self.hungerThreshold) + 
-                   " Nearest Groc " + str(self.nearestGroc) + 
-                   " Nearest Food " + str(self.nearestFood) + 
-                   " Metabolism " + str(self.metabolism))
+        identity = (
+          "Id: " + str(self.id) + 
+          " Current X,Y: " + str(self.x) + "," + str(self.y) + 
+          " Target X,Y: " + str(self.targetX) + "," + str(self.targetY) + 
+          " Mood: " + self.mood + 
+          " Community Count: " + str(self.communityCount) + 
+          #" Gender: " + self.gender + 
+          #" Birthtick: " + str(self.birthTick) + 
+          " Food Points: " + str(self.fp) + 
+          " Hunger Treshold " + str(self.hungerThreshold) + 
+          " Nearest Groc " + str(self.distToGroc) + 
+          " Nearest Food " + str(self.distToFood) + 
+          " Nearest Hungry " + str(self.distToHungryGroc) + 
+          #" Metabolism " + str(self.metabolism) +
+          " " )
         return identity 
  
 
@@ -459,16 +507,16 @@ class Groc():
         self.distToHungryGroc = self.world.findDistance(self, 
                                               self.nearestHungryGroc)
         self.communityCount = self.countNearbyGrocs(
-                                   self.getCommunityRadius(), 
+                                   self.getCommunitySpace(), 
                                    self.x, self.y)
         self.personalCount = self.countNearbyGrocs(
-                                   self.getPersonalRadius(), 
+                                   self.getPersonalSpace(), 
                                    self.x, self.y)
         
         #other observations eventually
 
 # groc.setMood
-    def setMood(self, newMood):
+    def setMood(self, newMood, comment):
         if self.mood == newMood:
           pass
         else:
@@ -478,16 +526,15 @@ class Groc():
           self.mood = newMood
           self.moodSince = self.world.currentTick
           self.world.render.drawStatic(self, self.x, self.y)
+        self.moodComment = comment
 
 # groc.setTarget
-    def setTarget(self, newx, newy):
+    def setTarget(self, newx, newy, comment):
         self.targetX = newx
         self.targetY = newy 
+        self.targetComment = comment
 
 # groc.touch
     def touch(self):
         self.touchedTick = self.world.currentTick
 
-# groc.visualRange
-    def visualRange(self):
-        return max(self.vision * self.world.lightLevel, 50)

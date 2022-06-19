@@ -19,6 +19,7 @@
 # TDORSEY 2022-06-15  Ground and Air temperature gauge
 #                     Grocs get cold
 # TDORSEY 2022-06-16  Format temperature and time gauge at top left
+# TDORSEY 2022-06-18  Toggle groc halo for emphasis
 
 import pygame 
 
@@ -37,6 +38,7 @@ class Renderer():
     self.screen = pygame.display.set_mode([thisWorld.MAXX, 
                                           thisWorld.MAXY])
     self.worldColor = self.world.WHITE
+    self.highlightedGroc = None
     self.screen.fill(self.worldColor)
     self.running = True
     self.font = pygame.font.Font('/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf', 20)
@@ -109,30 +111,13 @@ class Renderer():
     if oldX == newX and oldY == newY:
       isMoving = False
     else:
-      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 10)
+      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 11)
       isMoving = True
 
-    if True:
-      'turn off visualRange circle'
+    if self.highlightedGroc == None:
       pass
-    elif theGroc.touchedTick == None:
-      pass
-    elif self.world.currentTick - theGroc.touchedTick < 50:
-      if isMoving:
-        pygame.draw.circle(self.screen, self.worldColor, 
-                         (oldX, oldY), theGroc.visualRange())
-      pygame.draw.circle(self.screen, self.world.YELLOW, 
-                         (newX, newY), theGroc.visualRange())
-      pygame.draw.circle(self.screen, self.worldColor, 
-                         (newX, newY), theGroc.visualRange() - 1)
-       
-    elif self.world.currentTick - theGroc.touchedTick == 50: 
-      if isMoving:
-        pygame.draw.circle(self.screen, self.worldColor, 
-                         (oldX, oldY), theGroc.visualRange())
-      pygame.draw.circle(self.screen, self.worldColor,
-                         (newX, newY), theGroc.visualRange())
-      
+    elif self.highlightedGroc.id == theGroc.id:
+      pygame.draw.circle(self.screen, self.world.YELLOW, (newX, newY), 10)
     pygame.draw.circle(self.screen, groccolor, (newX, newY),9)
     if eyeshape == "circle":
       pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
@@ -218,10 +203,12 @@ class Renderer():
                                         nearestGroc.x, nearestGroc.y)
         fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
-        if gdist > nearestGroc.getPersonalRadius():
+        if gdist > nearestGroc.getPersonalSpace():
           pass
-        else:
-          nearestGroc.touch()
+        elif nearestGroc == self.highlightedGroc:
+          self.highlightedGroc = None
+        else:   
+          self.highlightedGroc = nearestGroc
           print(nearestGroc.identify())
         if fdist > 30:
           pass

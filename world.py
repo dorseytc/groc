@@ -140,6 +140,8 @@ class World():
         if hour > 12:
           hour = hour - 12
           tag = " pm "
+        elif hour == 12:
+          tag = " pm "
         else:
           tag = " am "
         return (str(hour) + ":" + str(minute).zfill(2) + tag)

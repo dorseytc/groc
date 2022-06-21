@@ -88,6 +88,8 @@ class World():
         self.hungry = 0
         self.dead = 0
         self.cold = 0
+        self.sleeping = 0
+        self.eating = 0
         self.population = 0
         self.foodList = []
         #technical pointers
@@ -322,6 +324,8 @@ class World():
         hungryCount = 0
         deadCount = 0
         coldCount = 0
+        sleepingCount = 0
+        eatingCount = 0
         i = 0
         while i < len(self.grocList):
           if self.grocList[i].fp <= -5:
@@ -349,8 +353,13 @@ class World():
             deadCount += 1 
           elif thisGroc.mood == groc.Groc.COLD:
             coldCount += 1
+          elif thisGroc.mood == groc.Groc.SLEEPING:
+            sleepingCount += 1
+          elif thisGroc.mood == groc.Groc.EATING:
+            eatingCount += 1
         self.setStats(happyCount, lonelyCount, crowdedCount, 
-                      hungryCount, deadCount, coldCount)
+                      hungryCount, deadCount, coldCount, 
+                      sleepingCount, eatingCount)
 
 # world.ifNone
     def ifNone(self, thing, alternative):
@@ -412,13 +421,18 @@ class World():
         self.worldFile.close()
 
 # world.setStats
-    def setStats(self, happy, lonely, crowded, hungry, dead, cold):
+    def setStats(self, happy, lonely, crowded, hungry, 
+                 dead, cold, sleeping, eating):
         self.happy = happy 
         self.lonely = lonely
         self.crowded = crowded
         self.hungry = hungry
+        self.cold = cold
+        self.sleeping = sleeping
+        self.eating = eating
         self.dead = dead
-        self.population = happy + lonely + crowded + hungry + cold
+        self.population = (happy + lonely + crowded + 
+                           hungry + cold + eating + sleeping)
 
 # world.spawnFood
     def spawnFood(self, calories=None, x=None, y=None):

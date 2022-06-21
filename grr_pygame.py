@@ -20,7 +20,8 @@
 #                     Grocs get cold
 # TDORSEY 2022-06-16  Format temperature and time gauge at top left
 # TDORSEY 2022-06-18  Toggle groc halo for emphasis
-# TDORSEY 2022-06-20  Sleep animations
+# TDORSEY 2022-06-20  Sleeping animations
+# TDORSEY 2022-06-21  Eating animations
 
 import pygame 
 
@@ -127,6 +128,10 @@ class Renderer():
       eyecolor = self.world.GRAY
       eyeshape = "circle"
       intensity = 2 + round(hunger / theGroc.hungerThreshold * 6)
+    elif theGroc.mood == theGroc.EATING:
+      eyecolor = self.worldColor
+      eyeshape = "circle"
+      intensity = 2
     elif theGroc.mood == theGroc.SLEEPING:
       eyecolor = self.worldColor
       eyeshape = "circle"
@@ -148,18 +153,22 @@ class Renderer():
         halocolor = self.world.GREEN
       pygame.draw.circle(self.screen, halocolor, (newX, newY), 10)
     pygame.draw.circle(self.screen, groccolor, (newX, newY),9)
-    if eyeshape == "circle":
-      if theGroc.mood == theGroc.SLEEPING:
-        frame = ((theGroc.id + 
-                  self.world.currentTick - theGroc.moodSince) % 100) 
-        intensity = 2 + (abs(50 - frame)/50*5)
-        if theGroc.gender == theGroc.MALE:
-          snore = -7 + intensity/2
-        else:
-          snore = 7 - intensity/2
-        pygame.draw.circle(self.screen, eyecolor,
-                           (newX + snore , newY), intensity)
-      else:
+    if theGroc.mood == theGroc.SLEEPING:
+      frame = ((theGroc.id + 
+                self.world.currentTick - theGroc.moodSince) % 100) 
+      intensity = 3 + (abs(60 - frame)/50*3)
+      mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
+      pygame.draw.circle(self.screen, eyecolor,
+                           (newX + mouthCenter , newY), intensity)
+    elif theGroc.mood == theGroc.EATING:
+      cycle = 10
+      frame = ((theGroc.id + 
+                self.world.currentTick - theGroc.moodSince) % cycle)
+      intensity = 2 + (abs((cycle/2) - frame)/cycle*6)
+      mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
+      pygame.draw.circle(self.screen, eyecolor,
+                           (newX + mouthCenter , newY), intensity)
+    elif eyeshape == "circle":
         pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
     else:
       pygame.draw.rect(self.screen, eyecolor, 

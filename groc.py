@@ -59,6 +59,7 @@ class Groc():
     # MOODS
     COLD = "Cold"
     CROWDED = "Crowded"
+    EATING = "Eating"
     HAPPY = "Happy"
     LONELY = "Lonely"
     HUNGRY = "Hungry"
@@ -89,6 +90,7 @@ class Groc():
         self.personalCount = 0
         #personal variables (the result of decisions and actions)
         self.fp = fp
+        self.sp = 100
         self.mood = mood
         self.moodComment = "Initial mood"
         self.moodSince = self.world.currentTick
@@ -96,6 +98,7 @@ class Groc():
         self.y = int(y)
         # constants 
         self.maxfp = 100
+        self.maxsp = 100
         self.hungerThreshold = 66 + self.world.d6(3)
         self.metabolism = .01
         self.bite = self.metabolism * 1000
@@ -118,6 +121,10 @@ class Groc():
           self.gender = self.geneticAttributes() 
         else:
           self.gender = gender
+        if self.world.percentage() < 50:
+          self.faceTowards = -1
+        else:
+          self.faceTowards = 1
         self.world.logger.debug ("(init)Groc " + str(self.id) + 
                       " X,Y:" + str(self.x) + "," + str(self.y))
        
@@ -153,12 +160,18 @@ class Groc():
       if moving == True:
         self.moveTowardTarget()
         self.fp = self.fp - (2 * self.metabolism)
+        self.sp = self.sp - self.metabolism/2
       else:
         'moving == False'
         if self.world.lightLevel == 0:
           self.fp = self.fp - (self.metabolism/2)
+          if self.mood == self.SLEEPING:
+            pass
+          else:
+            self.sp = self.sp - (self.metabolism/8)
         else:
           self.fp = self.fp - self.metabolism
+          self.sp = self.sp - (self.metabolism/4)
         if (self.world.ifNone(self.distToGroc, self.world.maxDistance) < 
               self.getPersonalSpace()):
            self.world.render.drawGrocStatic(self, self.x, self.y)
@@ -171,7 +184,11 @@ class Groc():
     def chooseLessCrowdedSpace(self, radius, invert=False):
       quadrantNames = ['NW', 'NE', 'SW', 'SE']
       quadrantInfo = {"NW":(-1,-1), "NE":(1,-1), "SW":(-1,1), "SE":(1,1)}
-      bestPopulation = 100000
+      targetQuadrant = None
+      if invert:
+        bestPopulation = 0
+      else:
+        bestPopulation = 100000
       if self.gender == Groc.MALE:
         direction = -1
       else:
@@ -186,7 +203,7 @@ class Groc():
             bestPopulation = population
             targetQuadrant = quadrantName
         else:
-          if population < bestPopulation:
+          if population > bestPopulation:
             bestPopulation = population
             targetQuadrant = quadrantName
         
@@ -231,7 +248,7 @@ class Groc():
       elif (self.fp < self.maxfp and 
             self.world.ifNone(self.distToFood, maxDistance) < 
               self.getPersonalSpace()):
-        self.setMood(Groc.HUNGRY, "There is food right here")
+        self.setMood(Groc.EATING, "There is food right here")
       elif (self.world.ifNone(self.distToGroc, maxDistance) < 
               self.getPersonalSpace()):
         self.setMood(Groc.CROWDED, "Grocs in my space")
@@ -270,6 +287,8 @@ class Groc():
         else:  
           self.setTarget(self.nearestFood.x, self.nearestFood.y, 
                          "I detected some food nearby")
+      elif self.mood == Groc.EATING:
+          self.setTarget(None, None, "Nom nom")
       elif self.mood == Groc.LONELY:
         if self.nearestGroc == None:
           self.setTarget(None, None, "I ain't got nobody")
@@ -474,6 +493,8 @@ class Groc():
           "Food Points: " + str(int(self.fp)) + 
           " Hunger " + str(int(self.hungerThreshold)) + 
           nl + 
+          "Sleep Points: " + str(int(self.sp)) + 
+          nl + 
           "Nearest Groc " + str(self.world.intNone(self.distToGroc)) + 
           nl + 
           "Nearest Food " + str(self.world.intNone(self.distToFood)) + 
@@ -536,6 +557,12 @@ class Groc():
           if newMood == Groc.DEAD:
             self.identify()
             print("Groc died " + str(self.id))
+          elif self.mood == Groc.SLEEPING:
+            sleepTicks = self.world.currentTick - self.moodSince
+            if sleepTicks < 200:
+              pass
+            else:
+              self.sp = min(100, self.sp + (sleepTicks * .025))
           self.mood = newMood
           self.moodSince = self.world.currentTick
           self.world.render.drawGrocStatic(self, self.x, self.y)
@@ -546,6 +573,12 @@ class Groc():
         self.targetX = newx
         self.targetY = newy 
         self.targetComment = comment
+        if newx == None:
+          pass 
+        elif self.x < newx:
+          self.faceTowards = 1
+        else:
+          self.faceTowards = -1
 
 # groc.touch
     def touch(self):

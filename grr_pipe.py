@@ -52,7 +52,7 @@ class Renderer():
   def drawFood(self, theFood):
     pass
 
-  def drawMoving(self, theGroc, oldX, oldY, newX, newY):
+  def drawGroc(self, theGroc, oldX, oldY, newX, newY):
     '''this method gets called once for each groc that moves'''
     fs = self.FIELDSEP
     nl = self.NEWLINE
@@ -62,15 +62,10 @@ class Renderer():
                           theGroc.gender + fs + theGroc.mood + nl)
     self.renderPipe.flush()
 
-  def drawStatic(self, theGroc, newX, newY):
-    '''this gets called each time a groc must be rendered without moving;
-     for example, his mood changes'''
-    self.drawMoving(theGroc, newX, newY, newX, newY)
-
   def maybeDraw(self, theGroc, newX, newY):
     '''this gets called any tick the Groc does not move.  
     May not be necessary to redraw'''
-    self.drawStatic(theGroc, newX, newY)
+    self.drawGroc(theGroc, None, None, newX, newY)
 
   def soundEat(self):
     pass

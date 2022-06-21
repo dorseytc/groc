@@ -28,6 +28,7 @@
 #   TDORSEY  2022-06-08  Split from groc.py
 #   TDORSEY  2022-06-15  Air and Ground Temperature
 #   TDORSEY  2022-06-16  Compute "24-hour" GrocTime
+#   TDORSEY  2022-06-20  Sleep animations
 
 
 
@@ -240,7 +241,8 @@ class World():
             grocsRead += 1
             newGroc = eval(line)
             newGroc.identify()
-            self.render.drawStatic(newGroc, self.bindX(newGroc.x), 
+            self.render.drawGrocStatic(newGroc, 
+                                   self.bindX(newGroc.x), 
                                    self.bindY(newGroc.y))
             builtList.append(newGroc)
             line = savedFile.readline()
@@ -252,7 +254,7 @@ class World():
             newX, newY = self.randomLocation()
             newGroc = groc.Groc(self, groc.Groc.HAPPY, newX, newY)
             newGroc.identify()
-            self.render.drawStatic(newGroc, newX, newY)
+            self.render.drawGrocStatic(newGroc, newX, newY)
             builtList.append(newGroc)
         self.grocList = builtList
 
@@ -364,6 +366,13 @@ class World():
           self.saveGrocs()
           self.saveWorld()
 
+# world.intNone
+    def intNone(self, parm):
+        if parm == None:
+          return None
+        else:
+          return int(parm)
+         
 # world.keepRunning
     def keepRunning(self): 
         result = True

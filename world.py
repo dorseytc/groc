@@ -103,8 +103,8 @@ class World():
         else:
           World.currentTick = 0
         self.lightLevel = self.getLightLevel()
-        self.airTemperature = .7
-        self.groundTemperature = .7
+        self.airTemperature = .0
+        self.groundTemperature = .0
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
         World.startTick = World.currentTick
 
@@ -285,14 +285,7 @@ class World():
 
 # world.getWorldColor
     def getWorldColor(self):
-      def interpolateScalar(v1, v2, scale):
-        return (scale*v2) + (1-scale)*v1
-      def interpolateColor(color1, color2, scale):
-        result = [None,None,None]
-        for i in range(3):
-          result[i] = interpolateScalar(color1[i], color2[i], scale)
-        return tuple(result)
-      return interpolateColor(self.BLACK, self.WHITE, self.lightLevel) 
+      return self.interpolateColor(self.BLACK, self.WHITE, self.lightLevel) 
  
 # world.handleFood
     def handleFood(self):
@@ -374,7 +367,17 @@ class World():
         if self.currentTick % 1000 == 0:
           self.saveGrocs()
           self.saveWorld()
+ 
 
+# world.interpolateColor
+    def interpolateColor(self, color1, color2, scale):
+      def interpolateScalar(v1, v2, scale):
+        return (scale*v2) + (1-scale)*v1
+      result = [None,None,None]
+      for i in range(3):
+        result[i] = interpolateScalar(color1[i], color2[i], scale)
+      return tuple(result)
+ 
 # world.intNone
     def intNone(self, parm):
         if parm == None:

@@ -178,6 +178,24 @@ class Renderer():
     if self.highlightedGroc == theGroc:
       pygame.draw.line(self.screen, halocolor, (newX - 6, newY + 4), 
                        (newX + 6, newY + 4))
+    if None == self.highlightedGroc:
+      pass
+    elif None in (self.highlightedGroc.targetX, 
+                  self.highlightedGroc.targetY):
+      pass
+    else:
+      scalar = (30 - (self.world.currentTick % 30)) 
+      intensity = 20 + scalar
+      print(scalar/30)
+      targetColor = self.world.interpolateColor(
+                               self.world.RED, 
+                               self.worldColor, 
+                               scalar/30)
+      pygame.draw.rect(self.screen, targetColor,
+        pygame.Rect(self.highlightedGroc.targetX - (intensity//2),
+                    self.highlightedGroc.targetY - (intensity//2),
+                    intensity, intensity))
+
 
 #render.drawGrocStatic
   def drawGrocStatic(self, theGroc, newX, newY):

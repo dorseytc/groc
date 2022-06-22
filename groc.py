@@ -198,7 +198,10 @@ class Groc():
         population = self.countNearbyGrocs(radius, 
           self.world.bindX(self.x + (xfactor * radius)), 
           self.world.bindY(self.y + (yfactor * radius)))
-        if invert == False:
+        if targetQuadrant == None:
+           bestPopulation = population
+           targetQuadrant = quadrantName
+        elif invert == False:
           if population < bestPopulation:
             bestPopulation = population
             targetQuadrant = quadrantName
@@ -208,8 +211,8 @@ class Groc():
             targetQuadrant = quadrantName
         
       self.world.logger.debug ("Target quadrant is " + 
-          targetQuadrant + " " + 
-          " population " +  str(bestPopulation))
+          self.world.ifNone(targetQuadrant, "none") + " " + 
+          " population " +  str(self.world.ifNone(bestPopulation, 0)))
       xfactor, yfactor = quadrantInfo[targetQuadrant]
       newX = self.world.bindX(self.x + (xfactor * radius))
       newY = self.world.bindY(self.y + (yfactor * radius))
@@ -239,8 +242,7 @@ class Groc():
       maxDistance = self.world.maxDistance
       if self.fp < 0:
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
-      elif (self.world.airTemperature < .45 
-           and self.communityCount < self.getPreferredCommunitySize()):
+      elif (self.world.airTemperature < .45 ):
         self.setMood(Groc.COLD, "Cold with no shelter")
       elif (self.fp < self.hungerThreshold and 
             not self.nearestFood is None):
@@ -296,25 +298,23 @@ class Groc():
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "I detect a friend nearby")
       elif self.mood == Groc.COLD:
-        if (self.world.ifNone(self.distToGroc, maxDistance) < 
-             self.getPersonalSpace()):
-          self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
+        if self.communityCount < self.getPreferredCommunitySize():
+          self.setTarget(self.mostCrowdedGroc.x, self.mostCrowdedGroc.y, 
+                         "Cold and finding a crowd")
+        elif (self.world.ifNone(self.distToGroc, maxDistance) < 
+             self.getPersonalSpace()): 
+          if self.id > self.nearestGroc.id:
+            self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
                                           self.nearestGroc.y), 
                          "Cold and crowded")
-        elif (self.getPersonalSpace() <= 
-                self.world.ifNone(self.distToGroc, maxDistance) <= 
-                self.getComfortZone()):
-          self.setTarget(None, None, "Cold next to a friend")
+          else:
+            self.setTarget(None, None, "Anchoring the fort")
         elif not (self.nearestGroc == None):
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "Cold and headed to nearest friend")
         elif not (self.nearestFood == None):
           self.setTarget(self.nearestFood.x, self.nearestFood.y,
                          "Cold and headed to food")
-        elif self.communityCount < self.getPreferredCommunitySize():
-          self.setTarget(*self.chooseMoreCrowdedSpace( 
-                           self.getCommunitySpace()), 
-                         "Cold and finding a crowd")
         else:
           self.setTarget(*self.world.randomLocation(), 
                          "Cold and lonely in the deep dark night")
@@ -357,6 +357,29 @@ class Groc():
                 str(self.id) + ", " + str(self.birthTick) + ", '" + 
                 str(self.gender) +  "'," + str(round(self.fp, 3)) + ")" + 
                 self.world.NEWLINE)
+
+# groc.findMostCrowdedGroc
+    def findMostCrowdedGroc(self):
+        biggestGroup = self.communityCount
+        bestGroc = self
+        bestDist = self.world.maxDistance
+        for anotherGroc in self.world.grocList:
+          if (anotherGroc.id == self.id):
+            pass
+          else:
+            thisDist = self.world.findDistance(self, anotherGroc)
+            if anotherGroc.communityCount > biggestGroup: 
+              biggestGroup = anotherGroc.communityCount
+              bestGroc = anotherGroc
+              bestDist = thisDist
+            elif (anotherGroc.communityCount == biggestGroup and
+                  thisDist < bestDist): 
+              biggestGroup = anotherGroc.communityCount
+              bestGroc = anotherGroc
+              bestDist = thisDist
+        if bestGroc == self:
+          bestGroc == None
+        return bestGroc
 
 # groc.findNearestFood
     def findNearestFood(self):
@@ -546,7 +569,7 @@ class Groc():
         self.personalCount = self.countNearbyGrocs(
                                    self.getPersonalSpace(), 
                                    self.x, self.y)
-        
+        self.mostCrowdedGroc = self.findMostCrowdedGroc()         
         #other observations eventually
 
 # groc.setMood

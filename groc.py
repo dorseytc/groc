@@ -263,7 +263,7 @@ class Groc():
         self.setMood(Groc.HAPPY, "Feeling groovy")
   
       if (self.mood == Groc.HAPPY and 
-          (self.world.currentTick - self.moodSince) > 10 and
+          (self.world.currentTick - self.moodSince) > 100 and
           self.world.getLightLevel() == 0):
          self.setMood(Groc.SLEEPING, "Catching some Zs")
 

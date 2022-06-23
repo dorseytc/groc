@@ -1,13 +1,20 @@
 ## Release Notes
 
+### order (v0.11.0) -- completed
+- possible alternate world images as backgrounds
+- world, groc, and food class get their own files 
+- pipe renderer gets feature parity 
+- cold, sleeping and eating moods
+- Air and Ground Temperature
+- groc highlight on-screen groc details
+- groc highlight with target painting for clarity
 
-### light (v0.10.0) -- in progress
+### light (v0.10.0) -- completed
 - food shall spawn in the day
 - grocs shall huddle for warmth at night
 - vision is limited at night
 - starvation shall take longer
 - food shall sustain grocs longer
-- possible alternate world images as backgrounds
 
 ### tick (v0.9.0) -- complete
 

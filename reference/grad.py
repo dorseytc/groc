@@ -1,5 +1,7 @@
+#!/usr/bin/python3
 import pygame
 import groc
+import world
 
 def interpolateScalar(v1, v2, scale):
   return (scale*v2) + (1-scale)*v1
@@ -15,14 +17,15 @@ def interpolateColor(color1, color2, scale):
 def main():
   pygame.init
   gauge = pygame.display.set_mode([1800, 800])
-  #gaugeColor = groc.World.WHITE
-  gaugeColor = groc.World.BLACK
+  #gaugeColor = world.World.WHITE
+  gaugeColor = world.World.BLACK
   blue = (0,0,255)
   black = (0,0,0)
   red = (128,0,0)
   white = (255,255,255)
   gray = (159,159,159)
-  colorList = [blue, black, red, white, gray]
+  #colorList = [blue, black, red, white, gray]
+  colorList = [white, blue, red, white, gray, black]
   
   gauge.fill(gaugeColor)
   

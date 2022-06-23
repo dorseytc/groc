@@ -20,10 +20,12 @@
 # TDORSEY 2022-05-22  Modify to use grr_pipe.py Renderer class
 #                     Rename to pr_pygame to align with new framework
 # TDORSEY 2022-05-24  Support HUNGRY and DEAD
+# TDORSEY 2022-06-13  Compatibility with new class structures
 
 import pygame 
 import os
 import groc
+import world
 import grr_pipe 
 
 def main():
@@ -39,7 +41,7 @@ def main():
   print ("Opened pipe")
   pygame.init
   screen = pygame.display.set_mode([1800, 800])
-  worldcolor = groc.World.WHITE
+  worldcolor = world.World.WHITE
   screen.fill(worldcolor)
   line = ""
   msgcount = 0
@@ -48,8 +50,8 @@ def main():
   while (running):
     if (reading):
       msg = rpipe.read(1)
-      if msg == groc.World.NEWLINE:
-        movemsg = line.split(groc.World.FIELDSEP)
+      if msg == world.World.NEWLINE:
+        movemsg = line.split(world.World.FIELDSEP)
         x = len(movemsg) 
         messageType = movemsg[0] 
         msgcount += 1
@@ -62,18 +64,18 @@ def main():
           gender = movemsg[6]
           mood = movemsg[7]
           if gender == groc.Groc.MALE:
-            groccolor = groc.World.BLUE
+            groccolor = world.World.BLUE
           else:
-            groccolor = groc.World.RED
+            groccolor = world.World.RED
           if mood == groc.Groc.DEAD: 
-            groccolor = groc.World.BLACK
-            eyecolor = groc.World.BLACK
+            groccolor = world.World.BLACK
+            eyecolor = world.World.BLACK
           elif mood == groc.Groc.LONELY:
-            eyecolor = groc.World.WHITE
+            eyecolor = world.World.WHITE
           elif mood == groc.Groc.CROWDED:
-            eyecolor = groc.World.BLACK
+            eyecolor = world.World.BLACK
           elif mood == groc.Groc.HUNGRY:
-            eyecolor = groc.World.GRAY
+            eyecolor = world.World.GRAY
           else:
             # mood == groc.Groc.HAPPY:
             eyecolor = groccolor
@@ -92,8 +94,6 @@ def main():
           lonelyCount =  int(movemsg[3])
           crowdedCount = int(movemsg[4])
           line = ""
-          print(messageType, currentTick, 
-                happyCount, lonelyCount, crowdedCount) 
         else:
           print("unrecognized message type: ", messageType)
       else:

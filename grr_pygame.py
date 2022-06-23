@@ -16,12 +16,19 @@
 # TDORSEY 2022-05-27  Added sound
 # TDORSEY 2022-06-01  Added click identification of food
 # TDORSEY 2022-06-03  Day and night
+# TDORSEY 2022-06-15  Ground and Air temperature gauge
+#                     Grocs get cold
+# TDORSEY 2022-06-16  Format temperature and time gauge at top left
+# TDORSEY 2022-06-18  Toggle groc halo for emphasis
+# TDORSEY 2022-06-20  Sleeping animations
+# TDORSEY 2022-06-21  Eating animations
 
 import pygame 
-import groc
+
 
 class Renderer():
-  pygame.init
+  pygame.init()
+  pygame.font.init()
   pygame.display.set_caption("Grocs")
 
   def __init__(self, thisWorld):
@@ -30,11 +37,26 @@ class Renderer():
 
     print("Renderer is grr_pygame 1.0")
     self.world = thisWorld
-    self.screen = pygame.display.set_mode([self.world.MAXX, 
-                                          self.world.MAXY])
-    self.worldColor = self.world.WHITE
-    self.screen.fill(self.worldColor)
     self.running = True
+    # screen stuff
+    self.screen = pygame.display.set_mode([thisWorld.MAXX, 
+                                          thisWorld.MAXY])
+    self.worldColor = self.world.WHITE
+    self.highlightedGroc = None
+    self.screen.fill(self.worldColor)
+    # font stuff
+    self.fontname = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf'
+    self.largeFont = pygame.font.Font(self.fontname, 20)
+    self.temps = self.largeFont.render(format('Temp: ', '<25'), True, 
+                                 self.world.GREEN, self.world.BLACK)
+    self.tempsRect = self.temps.get_rect()
+    self.tempsRect.topleft = (5,5)
+    self.times = self.largeFont.render(format('Current Time:', '<25'), 
+                                 True, self.world.GREEN, self.world.BLACK)
+    self.timesRect = self.times.get_rect()
+    self.timesRect.topleft = (5, 25)
+    self.smallFont = pygame.font.Font(self.fontname, 14)
+    # sound stuff
     pygame.mixer.init()
     self.eat=pygame.mixer.Sound('eat.ogg')
     self.food=pygame.mixer.Sound('food.ogg')
@@ -55,47 +77,128 @@ class Renderer():
                                                      theFood.y - size, 
                                                      size*2, size*2))
      
-#render.drawMoving 
-  def drawMoving(self, theGroc, oldX, oldY, newX, newY):
-    assert not None in (oldX, oldY, newX, newY), 'Cannot move to None coordinates'
-    if theGroc.gender == groc.Groc.MALE:
-      groccolor = groc.World.BLUE
+#render.drawGauge
+  def drawGauge(self):
+    'time and temperature gauge'
+    tempstr = ('Air: ' + 
+      '{:>3}'.format(str(int(self.world.airTemperature*100))) + 
+      self.world.DEGREESIGN + ' Ground: ' + 
+      '{:>3}'.format(str(int(self.world.groundTemperature*100))) + 
+      self.world.DEGREESIGN)
+    timestr = ('Current Time: ' + str(self.world.currentGrocTime()))
+    gaugeWidth = '<' + str(max(len(tempstr), len(timestr)))
+    self.temps = self.largeFont.render(format(tempstr, gaugeWidth), 
+                   True, self.world.GREEN, self.world.BLACK)
+    self.screen.blit(self.temps, self.tempsRect)     
+    self.times = self.largeFont.render(format(timestr, gaugeWidth), 
+                   True, self.world.GREEN, self.world.BLACK)
+    self.screen.blit(self.times, self.timesRect)
+
+#render.drawGrocMoving
+  def drawGrocMoving(self, theGroc, oldX, oldY, newX, newY):
+    assert not None in (oldX, oldY, newX, newY), 'Cannot move to x,y None'
+    if theGroc.gender == theGroc.MALE:
+      groccolor = self.world.BLUE
     else:
-      groccolor = groc.World.RED
-    distanceFromTarget = theGroc.world.findDistanceXY(theGroc.x, 
-                                 theGroc.y, theGroc.targetX, 
-                                 theGroc.targetY) 
+      groccolor = self.world.RED
+    distanceFromTarget = self.world.ifNone(
+      self.world.findDistanceXY(theGroc.x, theGroc.y, 
+                                theGroc.targetX, theGroc.targetY), 0)
     hunger = theGroc.hungerThreshold - theGroc.fp 
-    if theGroc.mood == groc.Groc.DEAD:
+    if theGroc.mood == theGroc.DEAD:
       eyecolor = groccolor
-      groccolor = groc.World.BLACK
+      eyeshape = "circle"
+      groccolor = self.world.BLACK
       intensity = 2
-    elif theGroc.mood == groc.Groc.LONELY:
-      eyecolor = groc.World.WHITE
+    elif theGroc.mood == theGroc.COLD:
+      eyecolor = self.world.GRAY
+      eyeshape = "square"
+      intensity = 6
+    elif theGroc.mood == theGroc.LONELY:
+      eyecolor = self.world.WHITE
+      eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
-                      max(self.world.MAXX, self.world.MAXY) * 6)
-    elif theGroc.mood == groc.Groc.CROWDED:
-      eyecolor = groc.World.BLACK
+                      self.world.maxDistance * 6)
+    elif theGroc.mood == theGroc.CROWDED:
+      eyecolor = self.world.BLACK
+      eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
-                      max(self.world.MAXX, self.world.MAXY) * 6)
-    elif theGroc.mood == groc.Groc.HUNGRY:
-      eyecolor = groc.World.GRAY
+                      self.world.maxDistance * 6)
+    elif theGroc.mood == theGroc.HUNGRY:
+      eyecolor = self.world.GRAY
+      eyeshape = "circle"
       intensity = 2 + round(hunger / theGroc.hungerThreshold * 6)
+    elif theGroc.mood == theGroc.EATING:
+      eyecolor = self.worldColor
+      eyeshape = "circle"
+      intensity = 2
+    elif theGroc.mood == theGroc.SLEEPING:
+      eyecolor = self.worldColor
+      eyeshape = "circle"
+      intensity = 2
     else:
       eyecolor = groccolor
+      eyeshape = "circle"
       intensity = 2 
     if oldX == newX and oldY == newY:
-      'has not moved'
+      isMoving = False
+    else:
+      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 11)
+      isMoving = True
+
+    if self.highlightedGroc == theGroc:
+      if self.world.lightLevel < .5: 
+        halocolor = self.world.YELLOW
+      else:
+        halocolor = self.world.GREEN
+      pygame.draw.circle(self.screen, halocolor, (newX, newY), 10)
+    pygame.draw.circle(self.screen, groccolor, (newX, newY),9)
+    if theGroc.mood == theGroc.SLEEPING:
+      frame = ((theGroc.id + 
+                self.world.currentTick - theGroc.moodSince) % 100) 
+      intensity = 3 + (abs(60 - frame)/50*3)
+      mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
+      pygame.draw.circle(self.screen, eyecolor,
+                           (newX + mouthCenter , newY), intensity)
+    elif theGroc.mood == theGroc.EATING:
+      cycle = 10
+      frame = ((theGroc.id + 
+                self.world.currentTick - theGroc.moodSince) % cycle)
+      intensity = 2 + (abs((cycle/2) - frame)/cycle*6)
+      mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
+      pygame.draw.circle(self.screen, eyecolor,
+                           (newX + mouthCenter , newY), intensity)
+    elif eyeshape == "circle":
+        pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
+    else:
+      pygame.draw.rect(self.screen, eyecolor, 
+                       pygame.Rect(newX - (intensity//2), 
+                                   newY - (intensity//2), 
+                                   intensity, intensity))
+    if self.highlightedGroc == theGroc:
+      pygame.draw.line(self.screen, halocolor, (newX - 6, newY + 4), 
+                       (newX + 6, newY + 4))
+    if None == self.highlightedGroc:
+      pass
+    elif None in (self.highlightedGroc.targetX, 
+                  self.highlightedGroc.targetY):
       pass
     else:
-      pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 10)
-    pygame.draw.circle(self.screen, groccolor, (newX, newY), 9)
-    pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
+      intensity = (20 - (self.world.currentTick % 20)) 
+      targetColor = self.world.interpolateColor(
+                               self.world.RED, 
+                               self.worldColor, 
+                               intensity/20)
+      pygame.draw.rect(self.screen, targetColor,
+        pygame.Rect(self.highlightedGroc.targetX - (intensity),
+                    self.highlightedGroc.targetY - (intensity),
+                    2*intensity, 2*intensity))
 
-#render.drawStatic
-  def drawStatic(self, theGroc, newX, newY):
-    assert not None in (newX, newY), 'Cannot render coordinates of None'
-    self.drawMoving(theGroc, newX, newY, newX, newY)
+
+#render.drawGrocStatic
+  def drawGrocStatic(self, theGroc, newX, newY):
+    assert not None in (newX, newY), 'Cannot render x,y of None'
+    self.drawGrocMoving(theGroc, newX, newY, newX, newY)
 
 #render.close
   def close(self):
@@ -104,14 +207,38 @@ class Renderer():
       self.tick()
     self.quit()
 
+#render.highlightGroc
+  def highlightGroc(self, theGroc):
+    if theGroc == None:
+      pass 
+    else:
+      self.highlightedGroc = theGroc
+      grocDetails = theGroc.identify().split('\n')
+      length = max(len(max(grocDetails, key=len)),35)
+      height = 14
+      if theGroc.x < 300 and theGroc.y < ((height * len(grocDetails)) + 47):
+        top = 5
+        left = self.world.MAXX - 250
+      else:
+        top = 47
+        left = 5
+      for i in range(len(grocDetails)):
+        line = self.smallFont.render(
+                                  grocDetails[i].ljust(length), True, 
+                                  self.world.GREEN, 
+                                  self.world.BLACK)
+        lineRect = line.get_rect() 
+        lineRect.topleft = (left, top + (height*i))
+        self.screen.blit(line, lineRect)     
+
 #render.maybeDraw
   def maybeDraw(self, theGroc, newX, newY):
     if 0 < self.world.lightLevel < 1:
-      self.drawStatic(theGroc, newX, newY)
+      self.drawGrocStatic(theGroc, newX, newY)
     else:
       pass
       'theoretically not needed when light levels are steady'
-      self.drawStatic(theGroc, newX, newY)
+      self.drawGrocStatic(theGroc, newX, newY)
       
 #render.quit
   def quit(self):
@@ -136,11 +263,13 @@ class Renderer():
 #render.tick
   def tick(self):
     pygame.display.set_caption(str(self.world.population) + " Grocs")
+    self.drawGauge() 
+    self.highlightGroc(self.highlightedGroc)     
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()
     if oldColor == self.worldColor:
-      pass
+      self.screen.fill(self.worldColor)
     else:
       self.screen.fill(self.worldColor)
     for event in pygame.event.get():
@@ -155,12 +284,18 @@ class Renderer():
                                         nearestGroc.x, nearestGroc.y)
         fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
-        if gdist > nearestGroc.getPersonalRadius():
-          pass
-        else:
+        if gdist > nearestGroc.getPersonalSpace():
+          self.highlightedGroc = None
+        elif nearestGroc == self.highlightedGroc:
+          self.highlightedGroc = None
+        else:   
+          self.highlightedGroc = nearestGroc
           print(nearestGroc.identify())
         if fdist > 30:
           pass
         else:
           print(nearestFood.identify())
  
+
+
+    

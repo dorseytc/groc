@@ -184,17 +184,15 @@ class Renderer():
                   self.highlightedGroc.targetY):
       pass
     else:
-      scalar = (30 - (self.world.currentTick % 30)) 
-      intensity = 20 + scalar
-      print(scalar/30)
+      intensity = (20 - (self.world.currentTick % 20)) 
       targetColor = self.world.interpolateColor(
                                self.world.RED, 
                                self.worldColor, 
-                               scalar/30)
+                               intensity/20)
       pygame.draw.rect(self.screen, targetColor,
-        pygame.Rect(self.highlightedGroc.targetX - (intensity//2),
-                    self.highlightedGroc.targetY - (intensity//2),
-                    intensity, intensity))
+        pygame.Rect(self.highlightedGroc.targetX - (intensity),
+                    self.highlightedGroc.targetY - (intensity),
+                    2*intensity, 2*intensity))
 
 
 #render.drawGrocStatic

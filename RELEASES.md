@@ -1,11 +1,13 @@
 ## Release Notes
 
-### order (v0.11.0) -- in progress
+### order (v0.11.0) -- completed
 - possible alternate world images as backgrounds
 - world, groc, and food class get their own files 
-- pipe renderer gets feature parity with integrated renderer
-- immutable world with decorator methods?
-- property file as alternative to command line arguments
+- pipe renderer gets feature parity 
+- cold, sleeping and eating moods
+- Air and Ground Temperature
+- groc highlight on-screen groc details
+- groc highlight with target painting for clarity
 
 ### light (v0.10.0) -- completed
 - food shall spawn in the day

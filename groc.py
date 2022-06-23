@@ -242,7 +242,8 @@ class Groc():
       maxDistance = self.world.maxDistance
       if self.fp < 0:
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
-      elif (self.world.airTemperature < .45 ):
+      elif (self.world.airTemperature < .45 and
+            self.communityCount < self.getPreferredCommunitySize()):
         self.setMood(Groc.COLD, "Cold with no shelter")
       elif (self.fp < self.hungerThreshold and 
             not self.nearestFood is None):
@@ -298,26 +299,31 @@ class Groc():
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "I detect a friend nearby")
       elif self.mood == Groc.COLD:
-        if self.communityCount < self.getPreferredCommunitySize():
-          self.setTarget(self.mostCrowdedGroc.x, self.mostCrowdedGroc.y, 
+        if self.communityCount < self.mostCrowdedGroc.communityCount:
+          """
+          if self.communityCount < self.getPreferredCommunitySize():
+          self.setTarget(*self.chooseMoreCrowdedSpace( 
+                           self.getCommunitySpace()), 
                          "Cold and finding a crowd")
+          """
+          self.setTarget(self.mostCrowdedGroc.x, 
+                         self.mostCrowdedGroc.y, 
+                         "Find the center of attention")
         elif (self.world.ifNone(self.distToGroc, maxDistance) < 
-             self.getPersonalSpace()): 
-          if self.id > self.nearestGroc.id:
-            self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
+             self.getPersonalSpace()):
+          self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
                                           self.nearestGroc.y), 
                          "Cold and crowded")
-          else:
-            self.setTarget(None, None, "Anchoring the fort")
+        elif (self.getPersonalSpace() <= 
+                self.world.ifNone(self.distToGroc, maxDistance) <= 
+                self.getComfortZone()):
+          self.setTarget(None, None, "Cold next to a friend")
         elif not (self.nearestGroc == None):
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "Cold and headed to nearest friend")
         elif not (self.nearestFood == None):
           self.setTarget(self.nearestFood.x, self.nearestFood.y,
                          "Cold and headed to food")
-        else:
-          self.setTarget(*self.world.randomLocation(), 
-                         "Cold and lonely in the deep dark night")
       elif self.mood == Groc.CROWDED:
         if self.targetX is None and self.targetY is None:
           pct = self.world.percentage()

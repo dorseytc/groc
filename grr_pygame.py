@@ -189,6 +189,10 @@ class Renderer():
                                self.world.RED, 
                                self.worldColor, 
                                intensity/20)
+      pygame.draw.rect(self.screen, self.world.YELLOW, 
+        pygame.Rect(self.highlightedGroc.targetX - (intensity+1),
+                    self.highlightedGroc.targetY - (intensity+1),
+                    2*(1+intensity), 2*(1*intensity)))
       pygame.draw.rect(self.screen, targetColor,
         pygame.Rect(self.highlightedGroc.targetX - (intensity),
                     self.highlightedGroc.targetY - (intensity),

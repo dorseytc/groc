@@ -103,8 +103,8 @@ class World():
         else:
           World.currentTick = 0
         self.lightLevel = self.getLightLevel()
-        self.airTemperature = .0
-        self.groundTemperature = .0
+        self.airTemperature = .7
+        self.groundTemperature = .7
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
         World.startTick = World.currentTick
 

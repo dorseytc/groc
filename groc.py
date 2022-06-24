@@ -59,6 +59,7 @@ class Groc():
     # MOODS
     COLD = "Cold"
     CROWDED = "Crowded"
+    DANCING = "Dancing"
     EATING = "Eating"
     HAPPY = "Happy"
     LONELY = "Lonely"
@@ -243,7 +244,8 @@ class Groc():
       if self.fp < 0:
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
       elif (self.world.airTemperature < .45 and
-            self.communityCount < self.getPreferredCommunitySize()):
+            self.communityCount < self.getPreferredCommunitySize()
+            and False):
         self.setMood(Groc.COLD, "Cold with no shelter")
       elif (self.fp < self.hungerThreshold and 
             not self.nearestFood is None):
@@ -299,36 +301,26 @@ class Groc():
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "I detect a friend nearby")
       elif self.mood == Groc.COLD:
-        if self.communityCount < self.mostCrowdedGroc.communityCount:
-          """
-          if self.communityCount < self.getPreferredCommunitySize():
-          self.setTarget(*self.chooseMoreCrowdedSpace( 
-                           self.getCommunitySpace()), 
-                         "Cold and finding a crowd")
-          """
-          self.setTarget(self.mostCrowdedGroc.x, 
-                         self.mostCrowdedGroc.y, 
-                         "Find the center of attention")
+        if not (self.nearestFood == None):
+          self.setTarget(self.nearestFood.x, self.nearestFood.y,
+                         "Cold and headed to food")
         elif (self.world.ifNone(self.distToGroc, maxDistance) < 
              self.getPersonalSpace()):
-          self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
+          self.setTarget(*self.moveAwayFrom(self.nearestGroc.x, 
                                           self.nearestGroc.y), 
                          "Cold and crowded")
+        elif not (self.nearestGroc == None):
+          self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
+                         "Cold and headed to nearest friend")
         elif (self.getPersonalSpace() <= 
                 self.world.ifNone(self.distToGroc, maxDistance) <= 
                 self.getComfortZone()):
           self.setTarget(None, None, "Cold next to a friend")
-        elif not (self.nearestGroc == None):
-          self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
-                         "Cold and headed to nearest friend")
-        elif not (self.nearestFood == None):
-          self.setTarget(self.nearestFood.x, self.nearestFood.y,
-                         "Cold and headed to food")
       elif self.mood == Groc.CROWDED:
         if self.targetX is None and self.targetY is None:
           pct = self.world.percentage()
           if pct <= (100-self.impatience):
-            self.setTarget(*self.getAwayFrom(self.nearestGroc.x, 
+            self.setTarget(*self.moveAwayFrom(self.nearestGroc.x, 
                                             self.nearestGroc.y), 
                            "Getting away from this other groc")
             if self.targetX == self.x and self.targetY == self.y:
@@ -340,6 +332,11 @@ class Groc():
                            "Hiking to get away from the crowd")
         else:
           pass
+      """
+      elif self.mood == Groc.DANCING:
+        self.setTarget(*self.orbitTarget(self.nearestFood, 100), 
+                         "Dancing around the food")
+      """
       
      
        
@@ -448,18 +445,6 @@ class Groc():
         # additional attributes added later
         return gender
 
-# groc.getAwayFrom
-    def getAwayFrom(self, x, y):
-        if None in (x,y):
-          newX = self.x 
-          newY = self.y
-        else:
-          diffX = self.x - x
-          diffY = self.y - y
-          newX = self.x + diffX
-          newY = self.y + diffY
-        return newX, newY
-
 # groc.getComfortZone
     def getComfortZone(self):
         return self.defaultComfortZone
@@ -532,6 +517,17 @@ class Groc():
           nl )
         return identity 
  
+# groc.moveAwayFrom
+    def moveAwayFrom(self, x, y):
+        if None in (x,y):
+          newX = self.x 
+          newY = self.y
+        else:
+          diffX = self.x - x
+          diffY = self.y - y
+          newX = self.x + diffX
+          newY = self.y + diffY
+        return newX, newY
 
 # groc.moveTowardTarget
     def moveTowardTarget(self, speed=1):
@@ -578,6 +574,72 @@ class Groc():
         self.mostCrowdedGroc = self.findMostCrowdedGroc()         
         #other observations eventually
 
+# groc.orbitTarget
+    def orbitTarget(self, anchor, radius, clockwise=True):
+      zdist = self.world.findDistance(self, anchor) 
+      xdiff = (self.x - anchor.x)
+      ydiff = (self.y - anchor.y) 
+      if zdist < radius: 
+        targetX = self.x
+        targetY = (((radius ** 2) - ((self.x - anchor.x) ** 2) ** .5) 
+                     + anchor.y)
+      elif zdist > radius:
+        targetX, targetY = (anchor.x, anchor.y) 
+      elif zdist == radius:
+        if xdiff < 0 and ydiff < 0:
+          'upper left - NW'
+          if abs(xdiff) > abs(ydiff):
+            'NNW'
+            targetY = self.y - 5 
+            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
+                     + anchor.x)
+          else:
+            'WNW'
+            targetX = self.x + 5
+            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
+                     + anchor.y)
+        elif xdiff > 0 and ydiff < 0:
+          'upper right - NE' 
+          if abs(xdiff) > abs(ydiff):
+            'ENE'
+            targetY = self.y + 5
+            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
+                     + anchor.x)
+          else:
+            'NNE'
+            targetX = self.x + 5
+            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
+                     + anchor.y)
+        elif xdiff > 0 and ydiff > 0:
+          'lower right - SE'
+          if abs(xdiff) > abs(ydiff):
+            'ESE'
+            targetY = self.y + 5
+            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
+                     + anchor.x)
+          else:
+            'SSE'
+            targetX = self.x - 5
+            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
+                     + anchor.y)
+        elif xdiff < 0 and ydiff > 0:
+          'lower left - SW'
+          if abs(xdiff) > abs(ydiff):
+            'SSW'
+            targetY = self.y - 5
+            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
+                     + anchor.x)
+          else:
+            'ESE'
+            targetX = self.x - 5
+            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
+                     + anchor.y)
+      return (targetX, targetY)
+   
+
+          
+    
+    
 # groc.setMood
     def setMood(self, newMood, comment):
         if self.mood == newMood:

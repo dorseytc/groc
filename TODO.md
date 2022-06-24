@@ -10,19 +10,21 @@
 [x] - motivation should include companionship - LONELY done (shakers)
 [x] - motivation should include space - CROWDED done (shakers)
 [x] - motivation should include food - HUNGRY done (hunger, tick)
-[x] - motivation - "nearest Groc" should be told to the Groc by the World - done (world)
-[x] - need for companionship vs need for space should be randomized - not started
+[x] - motivation - "nearest Groc" told to Groc by World - done (world)
+[ ] - need for companionship/space should be randomized - not started
 
 ### food
 [x] - Food appears randomly
-[x] - Food - HUNGRY might override CROWDED - HUNGRY grocs might ignoring CROWDED conditions - once sated, grocs might flee crowds seeking HAPPY condition - done (tick)
+[x] - Food - HUNGRY might override CROWDED - 
+[x] - Food - HUNGRY grocs might ignoring CROWDED conditions 
+[x] - Food - once sated, grocs might flee crowds - done (tick)
 [x] - Food restores food points - done (tick)
 [x] - Food - hunger should be based on food points - done (hunger, tick)
 [x] - Food - Genetic factors affect metabolism - done (tick)
 [x] - Food - Genetic factors affect eating - done (tick)
 [x] - Food - Random food value (calories) - done (tick)
 [x] - Food - starvation should be more rare - done (light)
-[x] - Food - metabolism and hunger should be adjusted to support day/night cycle - done (light)
+[x] - Food - metabolism/hunger support day/night cycle - done (light)
 
 ### predators
 [ ] - predators could be expressed as "species"
@@ -47,9 +49,23 @@
 ### light
 [x] - light - food might spawn during the day - done (light)
 [x] - light - grocs might have limited vision at night - done (light)
-[x] - light - grocs would need to have enough stamina to withstand a nightly fast - done (light)
+[x] - light - grocs have enough stamina for a nightly fast - done (light)
 
 ### render
 [x] - pygame and debug scripts - done (world)
 [x] - leverage World constants - done (world)
 [x] - encapsulate pipe complexity - done (movers)
+[ ] - 
+
+### cold
+[x] - Specific behaviors for cold
+[x] - Light affects ground and air temperature
+
+### spotlight
+[x] - Click on groc to highlight, see stats (order)
+[x] - Highlighted groc's target is displayed (order)
+
+### rituals
+[ ] - Sunset ritual to gather food and provide warmth
+[ ] - Funeral ritual to bury the dead
+

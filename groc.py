@@ -87,6 +87,11 @@ class Groc():
         self.targetX = None
         self.targetY = None
         self.targetComment = None
+        self.orbitAnchor = None
+        self.orbitalIndex = None
+        self.orbitalPoints = None
+        self.orbitalLeader = None
+        self.orbiterNumber = None
         self.communityCount = 0
         self.personalCount = 0
         #personal variables (the result of decisions and actions)
@@ -235,13 +240,35 @@ class Groc():
           if zdist <= searchRadius:
             count += 1
       return count     
+
+# groc.countGrocsInOrbit
+    def countGrocsInOrbit(self, anchor):
+      count = 0
+      for anotherGroc in self.world.grocList: 
+        if anotherGroc.orbitAnchor == None:
+          pass
+        elif anotherGroc.id == self.id:
+          pass
+        elif (anotherGroc.orbitAnchor.x == anchor.x and
+            anotherGroc.orbitAnchor.y == anchor.y ):
+          count += 1
+      return count
        
 # groc.decide
     def decide(self):
       'decide what to do'
       'set mood'
       maxDistance = self.world.maxDistance
-      if self.fp < 0:
+      if self.mood == Groc.DANCING:
+        nearestFood = self.findNearestFood()
+        if nearestFood == None:
+          pass
+        elif self.orbitAnchor == None:
+          self.doOrbit(nearestFood, 100)
+        else:
+          self.doOrbit(self.orbitAnchor, 100)
+        self.fp = 100
+      elif self.fp < 0:
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
       elif (self.world.airTemperature < .45 and
             self.communityCount < self.getPreferredCommunitySize()
@@ -273,8 +300,10 @@ class Groc():
          self.setMood(Groc.SLEEPING, "Catching some Zs")
 
       'set target'
-      if self.mood == self.DEAD:
+      if self.mood == Groc.DEAD:
         pass
+      elif self.mood == Groc.DANCING:
+        pass 
       elif self.targetX == self.x and self.targetY == self.y:
         self.setTarget(None, None, "Arrived")
       elif self.mood == Groc.HAPPY:
@@ -434,6 +463,23 @@ class Groc():
         else:
           return nearestGroc
     
+# groc.findOrbitalLeader
+    def findOrbitalLeader(self, anchor):
+      leader = None
+      for anotherGroc in self.world.grocList:
+        if (anotherGroc.id == self.id):
+          pass
+        elif (anotherGroc.orbitAnchor == anchor):
+          print("same orbit", anchor) 
+          print("anotherGroc.id", anotherGroc.id, 
+                "anotherGroc.orbiterNumber", anotherGroc.orbiterNumber, 
+                "self.orbiterNumber", self.orbiterNumber, 
+                "self.orbiterNumber - 1", (self.orbiterNumber - 1))
+          if (anotherGroc.orbiterNumber == self.orbiterNumber - 1):
+            print("ahead of me")
+            leader = anotherGroc
+            break
+      return leader
  
 # groc.geneticAttributes
     def geneticAttributes(self):
@@ -514,7 +560,26 @@ class Groc():
           "Nearest Food " + str(self.world.intNone(self.distToFood)) + 
           nl + 
           "Community Size: " + str(self.communityCount) +
-          nl )
+          nl) 
+        if not None == self.orbitAnchor:
+          identity = (identity + 
+            "Orbiting: " + str(self.orbitAnchor) + 
+            nl + 
+            "orbiterNumber: " + str(self.orbiterNumber) + 
+            nl +  
+            "Leader: " + str(self.orbitalLeader) + 
+            nl + 
+            "OrbitalIndex: " + str(self.orbitalIndex) + 
+            nl )
+        if not None == self.orbitalLeader:
+          identity = (identity + 
+            "leader.orbiterNumber " + 
+            str(self.orbitalLeader.orbiterNumber) +
+            nl + 
+            "leader.orbitalIndex " + 
+            str(self.orbitalLeader.orbitalIndex) + 
+            nl )
+            
         return identity 
  
 # groc.moveAwayFrom
@@ -574,68 +639,63 @@ class Groc():
         self.mostCrowdedGroc = self.findMostCrowdedGroc()         
         #other observations eventually
 
-# groc.orbitTarget
-    def orbitTarget(self, anchor, radius, clockwise=True):
-      zdist = self.world.findDistance(self, anchor) 
-      xdiff = (self.x - anchor.x)
-      ydiff = (self.y - anchor.y) 
-      if zdist < radius: 
-        targetX = self.x
-        targetY = (((radius ** 2) - ((self.x - anchor.x) ** 2) ** .5) 
-                     + anchor.y)
-      elif zdist > radius:
-        targetX, targetY = (anchor.x, anchor.y) 
-      elif zdist == radius:
-        if xdiff < 0 and ydiff < 0:
-          'upper left - NW'
-          if abs(xdiff) > abs(ydiff):
-            'NNW'
-            targetY = self.y - 5 
-            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
-                     + anchor.x)
-          else:
-            'WNW'
-            targetX = self.x + 5
-            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
-                     + anchor.y)
-        elif xdiff > 0 and ydiff < 0:
-          'upper right - NE' 
-          if abs(xdiff) > abs(ydiff):
-            'ENE'
-            targetY = self.y + 5
-            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
-                     + anchor.x)
-          else:
-            'NNE'
-            targetX = self.x + 5
-            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
-                     + anchor.y)
-        elif xdiff > 0 and ydiff > 0:
-          'lower right - SE'
-          if abs(xdiff) > abs(ydiff):
-            'ESE'
-            targetY = self.y + 5
-            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
-                     + anchor.x)
-          else:
-            'SSE'
-            targetX = self.x - 5
-            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
-                     + anchor.y)
-        elif xdiff < 0 and ydiff > 0:
-          'lower left - SW'
-          if abs(xdiff) > abs(ydiff):
-            'SSW'
-            targetY = self.y - 5
-            targetX = (((radius ** 2) - ((targetY - anchor.y) ** 2) ** .5) 
-                     + anchor.x)
-          else:
-            'ESE'
-            targetX = self.x - 5
-            targetY = (((radius ** 2) - ((targetX - anchor.x) ** 2) ** .5) 
-                     + anchor.y)
-      return (targetX, targetY)
-   
+# groc.doOrbit
+    def doOrbit(self, anchor, radius, points=100):
+      assert None not in (anchor, radius, points), "invalid parms"
+      def getHeadway():
+        countOfOrbiters = self.countGrocsInOrbit(anchor) + 1
+        return round(points/countOfOrbiters)
+      def getNthStation(currentStation, n):
+        return (currentStation + n) % points
+      def hasHeadway(headway):
+        if self.orbitalLeader == None:
+          result = True
+          comment = "elif self.orbitalLeader.orbitalIndex < headway: result = True"
+        elif (getNthStation(self.orbitalIndex, headway) == 
+              self.orbitalLeader.orbitalIndex):
+          result = True
+        elif (getNthStation(self.orbitalIndex, headway+1) == 
+              self.orbitalLeader.orbitalIndex):
+          result = True
+        else:
+          result = False
+        return result
+      if not (self.orbitAnchor == anchor):
+        self.orbiterNumber = self.countGrocsInOrbit(anchor) 
+        self.orbitAnchor = anchor
+        if self.orbiterNumber > 0:
+          self.orbitalLeader = self.findOrbitalLeader(anchor)
+        else:
+          self.orbitalLeader = None
+        self.orbitalIndex = 0
+        self.orbitalPoints = self.world.pointsOnACircle(radius, points)
+      newX, newY = self.orbitalPoints[self.orbitalIndex]
+      headway = getHeadway()
+      self.setTarget((round(newX) + anchor.x), 
+                     (round(newY) + anchor.y),
+                     "Orbital index "  + str(self.orbitalIndex) + 
+                     "Headway " + str(headway))
+      if self.x == self.targetX and self.y == self.targetY:
+        if not hasHeadway(headway):
+          if self.world.render.highlightedGroc == None:
+            pass
+          elif self.world.render.highlightedGroc.id == self.id:
+            print(str(self.id), "holding for headway", headway, 
+                "my index=", self.orbitalIndex, 
+                "leader's index=", 
+                self.orbitalLeader.orbitalIndex)
+        else:
+          self.orbitalIndex = getNthStation(self.orbitalIndex, 1)
+          newX, newY = self.orbitalPoints[self.orbitalIndex]
+          self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y,
+                     "Orbital index "  + str(self.orbitalIndex))
+      self.moveTowardTarget()
+        
+        
+        
+         
+
+      
 
           
     

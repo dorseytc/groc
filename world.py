@@ -33,9 +33,11 @@
 
 
 import logging
+import math
 import os
 import random
 import time
+
 import groc
 import food
 import grr_pygame as render
@@ -305,8 +307,11 @@ class World():
              len(self.foodList) < .1 * self.population):
               self.spawnFood()
         if len(self.foodList) == 0:
-          for i in range(max(2,int(.05 * self.population))):
-            self.createFood()
+          if True:
+            self.createFood(self.MAXX/2, self.MAXY/2, 500)
+          else: 
+            for i in range(max(2,int(.05 * self.population))):
+              self.createFood()
 
 # world.handleGrocs
     def handleGrocs(self):
@@ -319,6 +324,7 @@ class World():
         coldCount = 0
         sleepingCount = 0
         eatingCount = 0
+        dancingCount = 0
         i = 0
         while i < len(self.grocList):
           if self.grocList[i].fp <= -5:
@@ -350,9 +356,11 @@ class World():
             sleepingCount += 1
           elif thisGroc.mood == groc.Groc.EATING:
             eatingCount += 1
+          elif thisGroc.mood == groc.Groc.DANCING:
+            dancingCount += 1
         self.setStats(happyCount, lonelyCount, crowdedCount, 
                       hungryCount, deadCount, coldCount, 
-                      sleepingCount, eatingCount)
+                      sleepingCount, eatingCount, dancingCount)
 
 # world.ifNone
     def ifNone(self, thing, alternative):
@@ -401,6 +409,12 @@ class World():
           result = False
         return result
 
+# world.pointsOnACircle
+    def pointsOnACircle(self, r, n=100): 
+      pi = math.pi
+      return [(math.cos(2*pi/n*x)*r, math.sin(2*pi/n*x)*r) for x in range(0,n+1)] 
+
+
 # world.randomLocation
     def randomLocation(self):
         newX = random.randint(1, self.MAXX)  
@@ -425,7 +439,7 @@ class World():
 
 # world.setStats
     def setStats(self, happy, lonely, crowded, hungry, 
-                 dead, cold, sleeping, eating):
+                 dead, cold, sleeping, eating, dancing):
         self.happy = happy 
         self.lonely = lonely
         self.crowded = crowded
@@ -434,7 +448,8 @@ class World():
         self.sleeping = sleeping
         self.eating = eating
         self.dead = dead
-        self.population = (happy + lonely + crowded + 
+        self.dancing = dancing
+        self.population = (happy + lonely + crowded + dancing + 
                            hungry + cold + eating + sleeping)
 
 # world.spawnFood

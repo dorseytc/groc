@@ -1,11 +1,8 @@
-import food
-import groc
 import pygame
 import world
 import sys
 import time
-def pointsInCircumference(r, n=100):
-  return [(math.cos(2*pi/n*x)*r,math.sin(2*pi/n*x)*r) for x in range(0,n+1)] 
+
 def solveForX(radius, ax, ay, sy):
   sx = ((((radius ** 2) - ((sy - ay) ** 2)) ** .5) + ax)
   print("sfx", sx)
@@ -140,69 +137,38 @@ def orbitTarget2(self, anchor, radius, clockwise=True):
     targetX = self.x
     targetY = self.y
   return (targetX, targetY)
+
 def main():
   theWorld = world.World(1920,930)
   theWorld.start(sys.argv)
-  theGroc = []
   gaugeText = []
   gauge = []
   gaugeRect = []
   i = 0
-  worldcolor = theWorld.BLACK
+  worldcolor = theWorld.WHITE
   eyecolor = theWorld.BLACK
   theWorld.render.screen.fill(worldcolor)
   pygame.display.set_caption("Animation Test")
-  theGroc.append(groc.Groc(theWorld, groc.Groc.DANCING,
-                           300, 300, 300, 300, 'M', 100))
-  theFood = food.Food(theWorld, 500, 400, 300) 
+  theWorld.getGrocs(2)
+  theWorld.spawnFood(500, 400, 300) 
+  theFood = theWorld.foodList[0]
   fontname = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf'
   largeFont = pygame.font.Font(fontname, 20)
-  gaugeText.append("Hello Gauge")
-  gauge.append(largeFont.render(gaugeText[0], True, 
-            theWorld.GREEN, theWorld.BLACK))
-  gaugeRect.append(gauge[0].get_rect())
-  gaugeRect[0].topleft = (5, 25)
-  gaugeText.append("Hello Gauge")
-  gauge.append(largeFont.render(gaugeText[1], True, 
-            theWorld.GREEN, theWorld.BLACK))
-  gaugeRect.append(gauge[1].get_rect())
-  gaugeRect[1].topleft = (5, 45)
-  """
-  theGroc.append(groc.Groc(theWorld, groc.Groc.DANCING, 
-                           400, 300, 300, 300, 'F', 100))
-  theGroc.append(groc.Groc(theWorld, groc.Groc.DANCING, 
-                           300, 400, 400, 300, 'M', 100))
-  theGroc.append(groc.Groc(theWorld, groc.Groc.DANCING, 
-                           400, 400, 400, 300, 'F', 100))
-  theGroc.append(groc.Groc(theWorld, groc.Groc.HUNGRY,
-                           300, 500, 400, 300, 'M', 100))
-  theGroc.append(groc.Groc(theWorld, groc.Groc.HUNGRY,
-                           400, 500, 400, 300, 'F', 100))
-  """
   running = True 
   while running:
     pygame.display.flip()
     theWorld.render.screen.fill(worldcolor)
-    for j in range(len(theGroc)):
-      yo = theGroc[j]
+    for j in range(len(theWorld.grocList)):
+      yo = theWorld.grocList[j]
+      direction, finer = pickCompass(yo, theFood)
+      gaugeText = "Heading " + direction + " (" + finer + ")" +  str(yo.x) + "," + str(yo.y) + " Target " + str(yo.targetX) + "," + str(yo.targetY) + " Orbital Index: " + str(yo.orbitalIndex) + " #" + str(yo.orbiterNumber) + " Anchor " + str(theFood) + " Leader " + str(yo.orbitalLeader)
+      gauge = largeFont.render(gaugeText, True, theWorld.GREEN, theWorld.BLACK)
+      gaugeRect = gauge.get_rect()
+      gaugeRect.topleft = (5, 5 + (20*j))
+      theWorld.render.screen.blit(gauge, gaugeRect)     
       theWorld.render.drawGrocStatic(yo, yo.x, yo.y)
       theWorld.render.drawFood(theFood)
-      direction, finer = pickCompass(yo, theFood)
-      yo.targetX, yo.targetY = orbitTarget(yo, theFood, 100)
-      stepping = True
-      while stepping:
-        print("stepping ", yo.x, yo.y, " target ", yo.targetX, yo.targetY)
-        yo.moveTowardTarget(3)
-        if yo.x == yo.targetX and yo.y == yo.targetY:
-          stepping = False
-      gaugeText[0] = "Heading " + direction + " (" + finer + ")"
-      gauge[0] = largeFont.render(gaugeText[0],
-                   True, theWorld.GREEN, theWorld.BLACK)
-      theWorld.render.screen.blit(gauge[0], gaugeRect[0])     
-      gaugeText[1] = str(yo.x) + "," + str(yo.y) + " Target " + str(yo.targetX) + "," + str(yo.targetY)
-      gauge[1] = largeFont.render(gaugeText[1],
-                   True, theWorld.GREEN, theWorld.BLACK)
-      theWorld.render.screen.blit(gauge[1], gaugeRect[1])     
+      yo.doOrbit(theFood, 100)
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           running = False

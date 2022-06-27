@@ -519,7 +519,7 @@ class Groc():
 
 # groc.getVisualRange
     def getVisualRange(self):
-        return max(self.defaultVisualRange * self.world.lightLevel, 50)
+        return max(self.defaultVisualRange * self.world.lightLevel, 105)
 
 # groc.isMoving
     def isMoving(self, theGroc):

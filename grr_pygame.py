@@ -44,6 +44,7 @@ class Renderer():
     self.worldColor = self.world.WHITE
     self.highlightedGroc = None
     self.screen.fill(self.worldColor)
+    self.screenshot = True
     # font stuff
     self.fontname = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf'
     self.largeFont = pygame.font.Font(self.fontname, 20)
@@ -62,6 +63,10 @@ class Renderer():
     self.food=pygame.mixer.Sound('food.ogg')
     self.lastSoundTick = self.world.currentTick
 
+#render.drawDeath
+  def drawDeath(self, theDead): 
+    self.screenshot = True
+ 
 #render.drawFood
   def drawFood(self, theFood): 
     if theFood.calories <= 0:
@@ -243,6 +248,16 @@ class Renderer():
       pass
       'theoretically not needed when light levels are steady'
       self.drawGrocStatic(theGroc, newX, newY)
+
+#render.maybeScreenshot
+  def maybeScreenshot(self):
+    if self.screenshot:
+      pygame.image.save(self.screen, 
+                      "./images/dead_" + 
+                      str(self.world.currentTick) + 
+                      ".png")
+      self.screenshot = False
+
       
 #render.quit
   def quit(self):
@@ -272,6 +287,7 @@ class Renderer():
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()
+    self.maybeScreenshot()
     if oldColor == self.worldColor:
       self.screen.fill(self.worldColor)
     else:

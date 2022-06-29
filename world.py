@@ -105,6 +105,7 @@ class World():
         else:
           World.currentTick = 0
         self.lightLevel = self.getLightLevel()
+        self.previousLightLevel = self.lightLevel + .01
         self.airTemperature = .7
         self.groundTemperature = .7
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
@@ -307,11 +308,10 @@ class World():
              len(self.foodList) < .1 * self.population):
               self.spawnFood()
         if len(self.foodList) == 0:
-          if True:
-            self.createFood(self.MAXX/2, self.MAXY/2, 500)
-          else: 
-            for i in range(max(2,int(.05 * self.population))):
+          for i in range(max(2,int(.05 * self.population))):
               self.createFood()
+        if self.lightLevel == 0 and self.previousLightLevel > 0:
+          self.createFood(1000, self.MAXX/2, self.MAXY/2)
 
 # world.handleGrocs
     def handleGrocs(self):
@@ -498,6 +498,7 @@ class World():
 # world.tick
     def tick(self, waitSeconds=0):
         self.currentTick += 1
+        self.previousLightLevel = self.lightLevel
         self.lightLevel = self.getLightLevel()
         self.airTemperature = self.getAirTemperature()
         self.groundTemperature = self.getGroundTemperature()

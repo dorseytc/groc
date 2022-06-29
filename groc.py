@@ -49,6 +49,7 @@
 #   TDORSEY  2022-06-09  Split apart into separate files again
 #   TDORSEY  2022-06-11  Update save file constructor syntax
 #   TDORSEY  2022-06-15  Grocs respond to air temperature
+#   TDORSEY  2022-06-27  Grocs can dance
 
 import random
 
@@ -106,6 +107,7 @@ class Groc():
         self.maxfp = 100
         self.maxsp = 100
         self.hungerThreshold = 66 + self.world.d6(3)
+        self.sleepThreshold = 30
         self.metabolism = .01
         self.bite = self.metabolism * 1000
         self.impatience = self.world.d6(1)
@@ -150,6 +152,8 @@ class Groc():
         moving = False
       elif None in (self.targetX, self.targetY):
         moving = False
+      elif self.x == self.targetX and self.y == self.targetY:
+        moving = False
       else:
         moving = True
 
@@ -163,15 +167,20 @@ class Groc():
 
 
       'move, or sit still; expend energy accordingly'
-      if moving == True:
+      if self.fp < 0: 
+        pass
+      elif moving == True:
         self.moveTowardTarget()
-        self.fp = self.fp - (2 * self.metabolism)
+        if self.mood == Groc.DANCING:
+          self.fp = self.fp - self.metabolism
+        else:
+          self.fp = self.fp - (2 * self.metabolism)
         self.sp = self.sp - self.metabolism/2
       else:
         'moving == False'
         if self.world.lightLevel == 0:
           self.fp = self.fp - (self.metabolism/2)
-          if self.mood == self.SLEEPING:
+          if self.mood == Groc.SLEEPING:
             pass
           else:
             self.sp = self.sp - (self.metabolism/8)
@@ -259,20 +268,16 @@ class Groc():
       'decide what to do'
       'set mood'
       maxDistance = self.world.maxDistance
-      if self.mood == Groc.DANCING:
-        nearestFood = self.findNearestFood()
-        if nearestFood == None:
-          pass
-        elif self.orbitAnchor == None:
-          self.doOrbit(nearestFood, 100)
-        else:
-          self.doOrbit(self.orbitAnchor, 100)
-        self.fp = 100
-      elif self.fp < 0:
+      if self.fp < 0:
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
+      elif (self.world.lightLevel < 1 
+            and not self.world.ifNone(self.orbitAnchor, self.nearestFood) 
+                    == None
+            and self.fp >= self.hungerThreshold 
+            and self.sp >= self.sleepThreshold):
+        self.setMood(Groc.DANCING, "Time to dance")
       elif (self.world.airTemperature < .45 and
-            self.communityCount < self.getPreferredCommunitySize()
-            and False):
+            self.communityCount < self.getPreferredCommunitySize()):
         self.setMood(Groc.COLD, "Cold with no shelter")
       elif (self.fp < self.hungerThreshold and 
             not self.nearestFood is None):
@@ -303,7 +308,13 @@ class Groc():
       if self.mood == Groc.DEAD:
         pass
       elif self.mood == Groc.DANCING:
-        pass 
+        if self.orbitAnchor == None:
+          if self.nearestFood == None:
+            pass
+          else:
+            self.doOrbit(self.nearestFood, 100) 
+        else:
+          self.doOrbit(self.orbitAnchor, 100)
       elif self.targetX == self.x and self.targetY == self.y:
         self.setTarget(None, None, "Arrived")
       elif self.mood == Groc.HAPPY:
@@ -361,11 +372,6 @@ class Groc():
                            "Hiking to get away from the crowd")
         else:
           pass
-      """
-      elif self.mood == Groc.DANCING:
-        self.setTarget(*self.orbitTarget(self.nearestFood, 100), 
-                         "Dancing around the food")
-      """
       
      
        
@@ -385,9 +391,10 @@ class Groc():
 # groc.dump
     def dump(self):
         return ("groc.Groc(self, '" + self.mood + "', " + 
-                str(self.x) + ", " + str(self.y) + ", " + 
+                "self.bindX(" + str(self.x) + "), " + 
+                "self.bindY(" + str(self.y) + "), " + 
                 str(self.id) + ", " + str(self.birthTick) + ", '" + 
-                str(self.gender) +  "'," + str(round(self.fp, 3)) + ")" + 
+                self.gender +  "'," + str(round(self.fp, 3)) + ")" + 
                 self.world.NEWLINE)
 
 # groc.findMostCrowdedGroc
@@ -470,13 +477,7 @@ class Groc():
         if (anotherGroc.id == self.id):
           pass
         elif (anotherGroc.orbitAnchor == anchor):
-          print("same orbit", anchor) 
-          print("anotherGroc.id", anotherGroc.id, 
-                "anotherGroc.orbiterNumber", anotherGroc.orbiterNumber, 
-                "self.orbiterNumber", self.orbiterNumber, 
-                "self.orbiterNumber - 1", (self.orbiterNumber - 1))
           if (anotherGroc.orbiterNumber == self.orbiterNumber - 1):
-            print("ahead of me")
             leader = anotherGroc
             break
       return leader
@@ -650,7 +651,6 @@ class Groc():
       def hasHeadway(headway):
         if self.orbitalLeader == None:
           result = True
-          comment = "elif self.orbitalLeader.orbitalIndex < headway: result = True"
         elif (getNthStation(self.orbitalIndex, headway) == 
               self.orbitalLeader.orbitalIndex):
           result = True
@@ -663,12 +663,12 @@ class Groc():
       if not (self.orbitAnchor == anchor):
         self.orbiterNumber = self.countGrocsInOrbit(anchor) 
         self.orbitAnchor = anchor
-        if self.orbiterNumber > 0:
-          self.orbitalLeader = self.findOrbitalLeader(anchor)
-        else:
-          self.orbitalLeader = None
         self.orbitalIndex = 0
         self.orbitalPoints = self.world.pointsOnACircle(radius, points)
+      if self.orbiterNumber > 0:
+        self.orbitalLeader = self.findOrbitalLeader(anchor)
+      else:
+        self.orbitalLeader = None
       newX, newY = self.orbitalPoints[self.orbitalIndex]
       headway = getHeadway()
       self.setTarget((round(newX) + anchor.x), 
@@ -677,29 +677,33 @@ class Groc():
                      "Headway " + str(headway))
       if self.x == self.targetX and self.y == self.targetY:
         if not hasHeadway(headway):
-          if self.world.render.highlightedGroc == None:
-            pass
-          elif self.world.render.highlightedGroc.id == self.id:
-            print(str(self.id), "holding for headway", headway, 
-                "my index=", self.orbitalIndex, 
-                "leader's index=", 
-                self.orbitalLeader.orbitalIndex)
+          pass
         else:
           self.orbitalIndex = getNthStation(self.orbitalIndex, 1)
           newX, newY = self.orbitalPoints[self.orbitalIndex]
           self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y,
                      "Orbital index "  + str(self.orbitalIndex))
-      self.moveTowardTarget()
+      #self.moveTowardTarget()
         
-        
-        
-         
+# groc.exitOrbit
+    def exitOrbit(self):
+      self.orbiterNumber = None
+      self.orbitAnchor = None
+      self.orbitalIndex = None
+      self.orbitalPoints = None
+      self.orbitalLeader = None
 
-      
-
+# groc.isInSameOrbit
+    def isInSameOrbit(self, other):
+      if other == None:
+        result = False
+      elif self.orbitAnchor == other.orbitAnchor:
+        result = True
+      else:
+        result = False
+      return result
           
-    
-    
+             
 # groc.setMood
     def setMood(self, newMood, comment):
         if self.mood == newMood:
@@ -708,6 +712,9 @@ class Groc():
           if newMood == Groc.DEAD:
             self.identify()
             print("Groc died " + str(self.id))
+            self.world.render.drawDeath(self)
+          elif self.mood == Groc.DANCING:
+            self.exitOrbit()
           elif self.mood == Groc.SLEEPING:
             sleepTicks = self.world.currentTick - self.moodSince
             if sleepTicks < 200:

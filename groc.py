@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 #
 #   groc.py
 #
@@ -309,10 +310,8 @@ class Groc():
         pass
       elif self.mood == Groc.DANCING:
         if self.orbitAnchor == None:
-          if self.nearestFood == None:
-            pass
-          else:
-            self.doOrbit(self.nearestFood, 100) 
+          self.doOrbit(self.nearestFood, 100)
+          #self.doOrbit(self.findNearestFood(self.findBiggestFood(2)), 100)
         else:
           self.doOrbit(self.orbitAnchor, 100)
       elif self.targetX == self.x and self.targetY == self.y:
@@ -397,6 +396,12 @@ class Groc():
                 self.gender +  "'," + str(round(self.fp, 3)) + ")" + 
                 self.world.NEWLINE)
 
+# groc.findBiggestFood
+    def findBiggestFood(self, n=1):
+      self.world.foodList.sort(key=lambda x: x.calories, reverse=True)
+      return self.world.foodList[:n]
+      
+      
 # groc.findMostCrowdedGroc
     def findMostCrowdedGroc(self):
         biggestGroup = self.communityCount
@@ -421,11 +426,13 @@ class Groc():
         return bestGroc
 
 # groc.findNearestFood
-    def findNearestFood(self):
+    def findNearestFood(self, foodList=None):
+        if None == foodList:
+          foodList = self.world.foodList
         if self.gender == self.FEMALE:
           leastDist = self.world.maxDistance
           nearestFood = None
-          for someFood in self.world.foodList:
+          for someFood in foodList:
             zDist = self.world.findDistance(self, someFood)
             if zDist < leastDist:
               leastDist = zDist
@@ -437,7 +444,7 @@ class Groc():
         else:
           strongestOdor = 0
           nearestFood = None
-          for someFood in self.world.foodList:
+          for someFood in foodList:
             zDist = self.world.findDistance(self, someFood)
             if zDist == 0:
               odor = 100
@@ -449,7 +456,12 @@ class Groc():
         return nearestFood
 
 # groc.findNearestGroc
-    def findNearestGroc(self, mood=None, mustHaveTarget=False):
+    def findNearestGroc(self, 
+                        mood=None, 
+                        mustHaveTarget=False, 
+                        grocList=None):
+        if grocList == None:
+          grocList = self.world.grocList
         leastDist = self.world.maxDistance
         nearestGroc = None
         for anotherGroc in self.world.grocList:

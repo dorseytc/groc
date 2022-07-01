@@ -192,6 +192,10 @@ class Groc():
         else:
            self.world.render.maybeDraw(self, self.x, self.y)
 
+# groc.canSmell
+    def canSmell(self, other):
+      return True
+
 # groc.canSee
     def canSee(self, other):
       if other == None:
@@ -201,7 +205,7 @@ class Groc():
         result = True
       else:
         result = False
-      return Result
+      return result
 
 # groc.chooseLessCrowdedSpace
     def chooseLessCrowdedSpace(self, radius, invert=False):
@@ -442,10 +446,10 @@ class Groc():
         return bestGroc
 
 # groc.findNearestFood
-    def findNearestFood(self, foodList=None):
-        if None == foodList:
-          foodList = self.world.foodList
+    def findNearestFood(self):
+        foodList = self.world.foodList
         if self.gender == self.FEMALE:
+        #if self.gender in (Groc.FEMALE, Groc.MALE):
           leastDist = self.world.maxDistance
           nearestFood = None
           for someFood in foodList:
@@ -453,7 +457,7 @@ class Groc():
             if zDist < leastDist:
               leastDist = zDist
               nearestFood = someFood
-          if leastDist > self.getVisualRange():
+          if self.canSee(nearestFood): 
             nearestFood = None
           else:
             pass
@@ -465,11 +469,11 @@ class Groc():
             if zDist == 0:
               odor = 100
             else:
-              odor = max(0,(100-self.fp)) + someFood.calories / (2*zDist)
+              odor = max(0,(100-self.fp)) * someFood.calories / (2*zDist)
             if odor > strongestOdor:
               strongestOdor = odor
               nearestFood = someFood
-          if strongestOdor > self.getOlfactoryLimit():  
+          if self.canSmell(nearestFood):
             nearestFood = None 
           else:
             pass

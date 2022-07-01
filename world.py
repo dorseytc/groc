@@ -141,7 +141,7 @@ class World():
 
 # world.currentGrocTime
     def currentGrocTime(self):
-        curr = (5+(24*((self.currentTick % 10000)/10000))) % 24
+        curr = (6+(24*((self.currentTick % 10000)/10000))) % 24
         hour = int(curr)
         minute = int((curr-hour)*60)
         if hour > 12:

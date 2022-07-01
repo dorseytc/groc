@@ -5,6 +5,7 @@
 - better survival of dark and cold
 - food gathering
 - fire?  
+- global settings.py file for behavior configuration
 
 ### order (v0.11.0) -- completed
 - world, groc, and food class get their own files 

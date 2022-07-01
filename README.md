@@ -2,28 +2,39 @@
 
 ## to run, try something like 
 
-python3 groc.py 
+python3 run.py
+./run.py
 
 ### FYI
 
 - The full syntax of groc.py includes optional positional parameters
 - One of these lines will work best for you
-  - python3 groc.py number-of-grocs number-of-iterations filename 
-  - ./groc.py number-of-grocs number-of-iterations filename 
+  - python3 run.py number-of-grocs number-of-iterations mode log-level 
+  - ./run.py number-of-grocs number-of-iterations mode log-level 
+
+- mode 
+  - is either "LIFE" or "MOTION"
+  - groc will keep running as long as there is "<mode>"
+  - default is LIFE
+
+- log-level
+  - 00 = NOTSET
+  - 10 = DEBUG
+  - 20 = INFO
+  - 30 = WARNING
+  - 40 = ERROR
+  - 50 = CRITICAL
 
 ### Sample Syntax
 - ./groc.py 100 0 
   - 100 grocs 
   - 0 means unlimited iterations
-  - filename is omitted which means it uses the default grocfile.dat
-- ./groc.py 10 10 testfile.dat
+- ./groc.py 10 10 
   - 10 grocs
   - limit to 10 iterations
-  - use testfile.dat instead of grocfile.dat
 - ./groc.py 
   - omit groc count, use default of 2
   - omit iteration limit, use default of 1000
-  - omit filename, use default of grocfile.dat
 
 
 ### Renderer grr\_pipe
@@ -35,12 +46,16 @@ python3 groc.py
 ### Supporting Files
 
 The files present in this project are:
-- grocfile.dat - saves the grocs when the world isn't running
 - groc.py - the core classes World, Groc
-- .world.dat - stores the number of iterations since the world began
+- grocfile.dat - saves the grocs when the world isn't running
+- food.py - the food class
+- run.py - main loop to invoke the world
+- settings.py - user-configurable settings
+- world.dat - stores the number of iterations since the world began
+- world.py - the world class, plus any helper functions
 
 #### the Renderers
-- grr\_pyg.py 
+- grr\_pygame.py 
   - the groc renderer using pygame
   - direct write requires no pipe reader
 - grr\_pipe.py 

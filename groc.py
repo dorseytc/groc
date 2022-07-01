@@ -447,36 +447,34 @@ class Groc():
 
 # groc.findNearestFood
     def findNearestFood(self):
-        foodList = self.world.foodList
         if self.gender == self.FEMALE:
-        #if self.gender in (Groc.FEMALE, Groc.MALE):
           leastDist = self.world.maxDistance
           nearestFood = None
-          for someFood in foodList:
+          for someFood in self.world.foodList:
             zDist = self.world.findDistance(self, someFood)
             if zDist < leastDist:
               leastDist = zDist
               nearestFood = someFood
           if self.canSee(nearestFood): 
-            nearestFood = None
-          else:
             pass
+          else:
+            nearestFood = None
         else:
           strongestOdor = 0
           nearestFood = None
-          for someFood in foodList:
+          for someFood in self.world.foodList:
             zDist = self.world.findDistance(self, someFood)
             if zDist == 0:
               odor = 100
             else:
-              odor = max(0,(100-self.fp)) * someFood.calories / (2*zDist)
+              odor = (max(0,(100-self.fp)) * someFood.calories) / (2*zDist)
             if odor > strongestOdor:
               strongestOdor = odor
               nearestFood = someFood
           if self.canSmell(nearestFood):
-            nearestFood = None 
-          else:
             pass
+          else:
+            nearestFood = None 
         return nearestFood
 
 # groc.findNearestGroc

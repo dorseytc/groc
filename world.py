@@ -42,6 +42,7 @@ import groc
 import food
 import grr_pygame as render
 #import grr_pipe as render
+import settings
 #
 #
 #
@@ -265,7 +266,8 @@ class World():
 
 # world.getLightLevel
     def getLightLevel(self):
-        relevantTick = self.currentTick % 10000
+      relevantTick = self.currentTick % 10000
+      if settings.fixedLightLevel == None:
         if 0 <= relevantTick < 1000:
           result = relevantTick/1000
         elif 1000 <= relevantTick < 5000:
@@ -274,7 +276,9 @@ class World():
           result = (6000-relevantTick)/1000
         elif 6000 <= relevantTick < 10000:
           result = 0 
-        return result
+      else:
+        result = settings.fixedLightLevel 
+      return result
 
 # world.getLogger
     def getLogger(self, debugLevel):    
@@ -393,6 +397,14 @@ class World():
         else:
           return int(parm)
          
+# world.isEnabled
+    def isEnabled(self, state):
+      if state in settings.enabledStates:
+        result = True  
+      else:
+        result = False
+      return result
+
 # world.keepRunning
     def keepRunning(self): 
         result = True

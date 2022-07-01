@@ -333,6 +333,7 @@ class World():
         while i < len(self.grocList):
           if self.grocList[i].fp <= -5:
             deadGroc = self.grocList.pop(i)
+            deadGroc.identify()
             self.createFood(500, deadGroc.x, deadGroc.y)
           else:
             i += 1

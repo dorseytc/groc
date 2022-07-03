@@ -51,6 +51,7 @@
 #   TDORSEY  2022-06-11  Update save file constructor syntax
 #   TDORSEY  2022-06-15  Grocs respond to air temperature
 #   TDORSEY  2022-06-27  Grocs can dance
+#   TDORSEY  2022-07-03  Better cold behavior
 
 import random
 
@@ -384,7 +385,7 @@ class Groc():
           self.setTarget(self.nearestFood.x, self.nearestFood.y,
                          "Cold and headed to food")
         elif not (self.rumoredFood == None):
-          self.setTarget(self.nearestFood.x, self.nearestFood.y,
+          self.setTarget(self.rumoredFood.x, self.rumoredFood.y,
                          "I heard there was food nearby")
         elif (self.world.ifNone(
                 self.world.findDistance(self, self.nearestGroc), 

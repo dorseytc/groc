@@ -29,6 +29,8 @@
 #   TDORSEY  2022-06-15  Air and Ground Temperature
 #   TDORSEY  2022-06-16  Compute "24-hour" GrocTime
 #   TDORSEY  2022-06-20  Sleep animations
+#   TDORSEY  2022-07-03  Graceful exits and world saves
+#                        World file format change
 
 
 
@@ -65,9 +67,6 @@ class World():
     LOGFILE = "groc.log"
     DEGREESIGN = u'\N{DEGREE SIGN}'
 
-    currentTick = 0    
-    currentTime = time.time()
-    defaultTick = .1
 
     # COLORS
     BLACK = (0, 0, 0)
@@ -96,21 +95,36 @@ class World():
         self.population = 0
         self.foodList = []
         #technical pointers
+        self.currentTick = 0    
+        self.currentTime = time.time()
+        self.defaultTick = .1
         self.logger = None
         self.render = render.Renderer(self)
         self.mute = K_MUTE
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
-          World.currentTick = int(line)
+          while line:
+            print(line)
+            exec(line)          
+            line = self.worldFile.readline()
         else:
-          World.currentTick = 0
+          self.currentTick = 0
+          self.airTemperature = .7
+          self.groundTemperature = .7
         self.lightLevel = self.getLightLevel()
         self.previousLightLevel = self.lightLevel + .01
-        self.airTemperature = .7
-        self.groundTemperature = .7
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
-        World.startTick = World.currentTick
+        self.startTick = self.currentTick
+
+
+# world.__str__
+    def __str__(self, x):
+      return self.dump()
+ 
+# world.__repr__
+    def __repr__(self, x):
+      return self.dump()
 
 # world.bindX
     def bindX(self, x):
@@ -153,52 +167,58 @@ class World():
           tag = " am "
         return (str(hour) + ":" + str(minute).zfill(2) + tag)
         
+# world.dump
+    def dump(self):
+      nl = self.NEWLINE
+      return ("self.currentTick = " + str(self.currentTick) + nl + 
+              "self.airTemperature = " + str(self.airTemperature) + nl + 
+              "self.groundTemperature = " + str(self.airTemperature) + nl)
 
 # world.d6
     def d6(self, n):
-        result = 0
-        for i in range(n):
-          result = result + random.randint(1,6)
-        return result
+      result = 0
+      for i in range(n):
+        result = result + random.randint(1,6)
+      return result
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
-        'measure elapsed ticks subtracting sinceTicks from current value'
-        return abs(self.currentTick - sinceTick)
+      'measure elapsed ticks subtracting sinceTicks from current value'
+      return abs(self.currentTick - sinceTick)
         
 # world.end
     def end(self):
-        self.saveGrocs()
-        self.saveWorld()
-        self.endTimeSeconds = time.time()
-        self.endTick = self.currentTick
-        print("Elapsed seconds: " + 
-              str(int(self.endTimeSeconds - self.startTimeSeconds)))
-        print("Elapsed ticks: " + 
-              str(self.endTick - self.startTick))
-        self.render.close()  
+      self.saveGrocs()
+      self.saveWorld()
+      self.endTimeSeconds = time.time()
+      self.endTick = self.currentTick
+      print("Elapsed seconds: " + 
+            str(int(self.endTimeSeconds - self.startTimeSeconds)))
+      print("Elapsed ticks: " + 
+            str(self.endTick - self.startTick))
+      self.render.close()  
 
 # world.findDistance
     def findDistance(self, object1, object2):
-        'measure the distance between two objects'
-        if None in (object1, object2):
-          result = None
-        else:
-          x1, y1 = object1.x, object1.y
-          x2, y2 = object2.x, object2.y
-          result = self.findDistanceXY(x1, y1, x2, y2)
-        return result
+      'measure the distance between two objects'
+      if None in (object1, object2):
+        result = None
+      else:
+        x1, y1 = object1.x, object1.y
+        x2, y2 = object2.x, object2.y
+        result = self.findDistanceXY(x1, y1, x2, y2)
+      return result
         
 # world.findDistanceXY
     def findDistanceXY(self, x1, y1, x2, y2):
-        'measure the distance between two sets of coordinates'
-        if None in (x1, x2, y1, y2):
-          result = None
-        else:
-          xDiff = abs(x1 - x2) 
-          yDiff = abs(y1 - y2)
-          result = (((xDiff ** 2) + (yDiff ** 2)) ** .5)
-        return result
+      'measure the distance between two sets of coordinates'
+      if None in (x1, x2, y1, y2):
+        result = None
+      else:
+        xDiff = abs(x1 - x2) 
+        yDiff = abs(y1 - y2)
+        result = (((xDiff ** 2) + (yDiff ** 2)) ** .5)
+      return result
 
 # world.findFoodNearXY
     def findFoodNearXY(self, x, y):
@@ -420,6 +440,8 @@ class World():
           print("Iteration limit " + str(self.iterationLimit) + 
                 " exceeded")
           result = False
+        elif not self.render.running:
+          result = False
         return result
 
 # world.pointsOnACircle
@@ -447,7 +469,7 @@ class World():
 # world.saveWorld
     def saveWorld(self):
         self.worldFile = open(World.WORLDFILE, "w")
-        self.worldFile.write(str(self.currentTick) + self.NEWLINE)
+        self.worldFile.write(self.dump())
         self.worldFile.close()
 
 # world.setStats

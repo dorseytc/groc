@@ -211,7 +211,7 @@ class Renderer():
 
 #render.close
   def close(self):
-    print("Awaiting user input to close")
+    print("Ready to close")
     while (self.running):
       self.tick()
     self.quit()
@@ -261,6 +261,7 @@ class Renderer():
       
 #render.quit
   def quit(self):
+    
     pygame.quit()
 
 #render.soundEat
@@ -296,6 +297,7 @@ class Renderer():
       if event.type == pygame.QUIT:
         self.quit()
         self.running = False
+        print("User clicked 'QUIT'")
       if event.type == pygame.MOUSEBUTTONDOWN:
         x, y = event.pos
         nearestGroc = self.world.findGrocNearXY(x, y) 

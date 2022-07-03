@@ -46,9 +46,11 @@ python3 run.py
 ### Supporting Files
 
 The files present in this project are:
+- eat.ogg - the sound of food being eaten
 - groc.py - the core classes World, Groc
 - grocfile.dat - saves the grocs when the world isn't running
 - food.py - the food class
+- food.ogg - the sound of food being placed
 - run.py - main loop to invoke the world
 - settings.py - user-configurable settings
 - world.dat - stores the number of iterations since the world began

@@ -1,6 +1,6 @@
 # Happy is never disabled
 enabledStates = ('Happy'
-#'Cold'
+, 'Cold'
 , 'Crowded'
 #, 'Dancing'
 , 'Eating'

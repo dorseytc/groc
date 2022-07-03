@@ -383,6 +383,9 @@ class Groc():
         if not (self.nearestFood == None):
           self.setTarget(self.nearestFood.x, self.nearestFood.y,
                          "Cold and headed to food")
+        elif not (self.rumoredFood == None):
+          self.setTarget(self.nearestFood.x, self.nearestFood.y,
+                         "I heard there was food nearby")
         elif (self.world.ifNone(
                 self.world.findDistance(self, self.nearestGroc), 
                 maxDistance) < self.getPersonalSpace()):
@@ -393,8 +396,8 @@ class Groc():
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "Cold and headed to nearest friend")
         elif (self.getPersonalSpace() <= self.world.ifNone(
-                self.world.findDistance(self.nearestGroc, maxDistance)) <= 
-                self.getComfortZone()):
+                self.world.findDistance(self, self.nearestGroc), 
+                maxDistance) <= self.getComfortZone()):
           self.setTarget(None, None, "Cold next to a friend")
       elif self.mood == Groc.CROWDED:
         if self.targetX is None and self.targetY is None:

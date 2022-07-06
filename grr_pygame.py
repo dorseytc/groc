@@ -42,7 +42,7 @@ class Renderer():
     self.screen = pygame.display.set_mode([thisWorld.MAXX, 
                                           thisWorld.MAXY])
     self.worldColor = self.world.WHITE
-    self.highlightedGroc = None
+    self.highlightedObject = None
     self.screen.fill(self.worldColor)
     self.screenshot = True
     # font stuff
@@ -151,7 +151,7 @@ class Renderer():
       pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 11)
       isMoving = True
 
-    if self.highlightedGroc == theGroc:
+    if self.highlightedObject == theGroc:
       if self.world.lightLevel < .5: 
         halocolor = self.world.YELLOW
       else:
@@ -180,13 +180,15 @@ class Renderer():
                        pygame.Rect(newX - (intensity//2), 
                                    newY - (intensity//2), 
                                    intensity, intensity))
-    if self.highlightedGroc == theGroc:
+    if self.highlightedObject == theGroc:
       pygame.draw.line(self.screen, halocolor, (newX - 6, newY + 4), 
                        (newX + 6, newY + 4))
-    if None == self.highlightedGroc:
+    if None == self.highlightedObject:
       pass
-    elif None in (self.highlightedGroc.targetX, 
-                  self.highlightedGroc.targetY):
+    elif not hasattr(self.highlightedObject, 'targetX'):
+      pass
+    elif None in (self.highlightedObject.targetX, 
+                  self.highlightedObject.targetY):
       pass
     else:
       intensity = (20 - (self.world.currentTick % 20)) 
@@ -195,12 +197,12 @@ class Renderer():
                                self.worldColor, 
                                intensity/20)
       pygame.draw.rect(self.screen, self.world.YELLOW, 
-        pygame.Rect(self.highlightedGroc.targetX - (intensity+1),
-                    self.highlightedGroc.targetY - (intensity+1),
+        pygame.Rect(self.highlightedObject.targetX - (intensity+1),
+                    self.highlightedObject.targetY - (intensity+1),
                     2*(1+intensity), 2*(1*intensity)))
       pygame.draw.rect(self.screen, targetColor,
-        pygame.Rect(self.highlightedGroc.targetX - (intensity),
-                    self.highlightedGroc.targetY - (intensity),
+        pygame.Rect(self.highlightedObject.targetX - (intensity),
+                    self.highlightedObject.targetY - (intensity),
                     2*intensity, 2*intensity))
 
 
@@ -216,24 +218,25 @@ class Renderer():
       self.tick()
     self.quit()
 
-#render.highlightGroc
-  def highlightGroc(self, theGroc):
-    if theGroc == None:
+#render.highlightObject
+  def highlightObject(self, theObject):
+    if theObject == None:
       pass 
     else:
-      self.highlightedGroc = theGroc
-      grocDetails = theGroc.identify().split('\n')
-      length = max(len(max(grocDetails, key=len)),35)
+      self.highlightedObject = theObject
+      objectDetails = theObject.identify().split('\n')
+      length = max(len(max(objectDetails, key=len)),35)
       height = 14
-      if theGroc.x < 300 and theGroc.y < ((height * len(grocDetails)) + 47):
-        top = 5
-        left = self.world.MAXX - 250
-      else:
-        top = 47
-        left = 5
-      for i in range(len(grocDetails)):
+      top = 47
+      left = 5
+      if hasattr(theObject, 'x'):
+        if (theObject.x < 300 and 
+            theObject.y < ((height * len(objectDetails)) + 47)):
+          top = 5
+          left = self.world.MAXX - 250
+      for i in range(len(objectDetails)):
         line = self.smallFont.render(
-                                  grocDetails[i].ljust(length), True, 
+                                  objectDetails[i].ljust(length), True, 
                                   self.world.GREEN, 
                                   self.world.BLACK)
         lineRect = line.get_rect() 
@@ -284,7 +287,7 @@ class Renderer():
   def tick(self):
     pygame.display.set_caption(str(self.world.population) + " Grocs")
     self.drawGauge() 
-    self.highlightGroc(self.highlightedGroc)     
+    self.highlightObject(self.highlightedObject)     
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()
@@ -306,13 +309,20 @@ class Renderer():
                                         nearestGroc.x, nearestGroc.y)
         fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
-        if gdist > nearestGroc.getPersonalSpace():
-          self.highlightedGroc = None
-        elif nearestGroc == self.highlightedGroc:
-          self.highlightedGroc = None
-        else:   
-          self.highlightedGroc = nearestGroc
+        if (self.highlightedObject is None and
+          x < 60 and
+          y < 60):
+          self.highlightedObject = self.world
+        elif nearestGroc == self.highlightedObject:
+          self.highlightedObject = None
+        elif gdist <= nearestGroc.getPersonalSpace():
+          self.highlightedObject = nearestGroc
           print(nearestGroc.identify())
+        elif fdist <= 30:
+          self.highlightedObject = nearestFood
+          print(nearestFood.identify())
+        else:
+          self.highlightedObject = None
         if fdist > 30:
           pass
         else:

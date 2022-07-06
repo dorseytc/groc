@@ -387,6 +387,25 @@ class World():
                       hungryCount, deadCount, coldCount, 
                       sleepingCount, eatingCount, dancingCount)
 
+# world.identify
+    def identify(self):
+      nl = self.NEWLINE      
+      identity = (
+        "Current Tick: " + str(self.currentTick) + nl + 
+        " Light Level: " + str(self.getLightLevel()) + nl +
+        " Total Grocs: " + str(self.population) + nl +
+        "        Cold: " + str(self.cold) + nl + 
+        "     Crowded: " + str(self.crowded) + nl + 
+        "     Dancing: " + str(self.dancing) + nl +
+        "        Dead: " + str(self.dead) + nl + 
+        "      Eating: " + str(self.eating) + nl + 
+        "       Happy: " + str(self.happy) + nl + 
+        "      Hungry: " + str(self.hungry) + nl + 
+        "      Lonely: " + str(self.lonely) + nl + 
+        "    Sleeping: " + str(self.sleeping) + nl + nl + 
+        )
+      return identity
+
 # world.ifNone
     def ifNone(self, thing, alternative):
       if thing == None:
@@ -444,10 +463,15 @@ class World():
           result = False
         return result
 
+# world.percentage
+    def percentage(self):
+        return(random.randint(1,100))
+
 # world.pointsOnACircle
     def pointsOnACircle(self, r, n=100): 
       pi = math.pi
-      return [(math.cos(2*pi/n*x)*r, math.sin(2*pi/n*x)*r) for x in range(0,n+1)] 
+      return [(math.cos(2*pi/n*x)*r, 
+               math.sin(2*pi/n*x)*r) for x in range(0,n+1)] 
 
 
 # world.randomLocation
@@ -511,7 +535,8 @@ class World():
         p_loopMode = argv[3]
       else:
         p_loopMode = "LIFE"
-      assert p_loopMode in ("LIFE", "MOTION"), "Mode must be 'LIFE' or 'MOTION'"
+      assert p_loopMode in ("LIFE", 
+        "MOTION"), "Mode must be 'LIFE' or 'MOTION'"
       if numArgs > 2:
         p_iterationLimit = int(argv[2])
       else:
@@ -558,6 +583,3 @@ class World():
 
         
         
-# world.percentage
-    def percentage(self):
-        return(random.randint(1,100))

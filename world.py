@@ -402,8 +402,8 @@ class World():
         "       Happy: " + str(self.happy) + nl + 
         "      Hungry: " + str(self.hungry) + nl + 
         "      Lonely: " + str(self.lonely) + nl + 
-        "    Sleeping: " + str(self.sleeping) + nl + nl + 
-        )
+        "    Sleeping: " + str(self.sleeping) + nl + 
+        " ")
       return identity
 
 # world.ifNone

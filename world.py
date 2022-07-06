@@ -170,7 +170,6 @@ class World():
 # world.dump
     def dump(self):
       nl = self.NEWLINE
-      print("dump")
       return ("self.currentTick = " + str(self.currentTick) + nl + 
               "self.airTemperature = " + str(self.airTemperature) + nl + 
               "self.groundTemperature = " + str(self.airTemperature) + nl)

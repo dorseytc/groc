@@ -55,7 +55,6 @@
 [x] - pygame and debug scripts - done (world)
 [x] - leverage World constants - done (world)
 [x] - encapsulate pipe complexity - done (movers)
-[ ] - 
 
 ### cold
 [x] - Specific behaviors for cold
@@ -66,6 +65,11 @@
 [x] - Highlighted groc's target is displayed (order)
 
 ### rituals
+[ ] - Sunset food drop for nightly ritual
 [ ] - Sunset ritual to gather food and provide warmth
 [ ] - Funeral ritual to bury the dead
+
+### interactive
+[ ] - user can drag food
+[ ] - user can place food?
 

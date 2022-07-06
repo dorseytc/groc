@@ -1,6 +1,7 @@
 ## Release Notes
 
 ### dance (v0.12.0) -- in progress
+- groc, food, world on-screen inspection gauge
 - sundown ritual
 - better survival of dark and cold
 - food gathering

@@ -22,6 +22,7 @@
 # TDORSEY 2022-06-18  Toggle groc halo for emphasis
 # TDORSEY 2022-06-20  Sleeping animations
 # TDORSEY 2022-06-21  Eating animations
+# TDORSEY 2022-07-06  Drag food and grocs
 
 import pygame 
 
@@ -43,6 +44,9 @@ class Renderer():
                                           thisWorld.MAXY])
     self.worldColor = self.world.WHITE
     self.highlightedObject = None
+    self.dragging = False
+    self.dragOffsetX = 0
+    self.dragOffsetY = 0
     self.screen.fill(self.worldColor)
     self.screenshot = True
     # font stuff
@@ -301,33 +305,44 @@ class Renderer():
         self.quit()
         self.running = False
         print("User clicked 'QUIT'")
-      if event.type == pygame.MOUSEBUTTONDOWN:
+      elif event.type == pygame.MOUSEBUTTONDOWN:
         x, y = event.pos
-        nearestGroc = self.world.findGrocNearXY(x, y) 
-        nearestFood = self.world.findFoodNearXY(x, y)
-        gdist = self.world.findDistanceXY(x, y, 
+        if event.button == 1:
+          nearestGroc = self.world.findGrocNearXY(x, y) 
+          nearestFood = self.world.findFoodNearXY(x, y)
+          gdist = self.world.findDistanceXY(x, y, 
                                         nearestGroc.x, nearestGroc.y)
-        fdist = self.world.findDistanceXY(x, y, 
+          fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
-        if (self.highlightedObject is None and
-          x < 60 and
-          y < 60):
-          self.highlightedObject = self.world
-        elif nearestGroc == self.highlightedObject:
-          self.highlightedObject = None
-        elif gdist <= nearestGroc.getPersonalSpace():
-          self.highlightedObject = nearestGroc
-          print(nearestGroc.identify())
-        elif fdist <= 30:
-          self.highlightedObject = nearestFood
-          print(nearestFood.identify())
-        else:
-          self.highlightedObject = None
-        if fdist > 30:
+          if (self.highlightedObject is None and
+            x < 60 and
+            y < 60):
+            self.highlightedObject = self.world
+          elif nearestGroc == self.highlightedObject:
+            self.highlightedObject = None
+          elif gdist < fdist and gdist <= nearestGroc.getPersonalSpace():
+            self.highlightedObject = nearestGroc
+          elif fdist <= 30:
+            self.highlightedObject = nearestFood
+          else:
+            self.highlightedObject = None
+          if not self.highlightedObject is None:
+            if hasattr(self.highlightedObject, 'x'):
+              self.dragging = True
+              self.dragOffsetX = x - self.highlightedObject.x
+              self.dragOffsetY = y - self.highlightedObject.y
+      elif event.type == pygame.MOUSEBUTTONUP:
+        x, y = event.pos
+        if event.button == 1:
+          self.dragging = False
+      elif event.type == pygame.MOUSEMOTION:
+        if self.highlightedObject == None:
           pass
         else:
-          print(nearestFood.identify())
- 
+          x, y = event.pos
+          if self.dragging:
+            self.highlightedObject.x = x + self.dragOffsetX
+            self.highlightedObject.y = y + self.dragOffsetY
 
 
     

@@ -25,7 +25,6 @@ class Food():
         self.x = x
         self.y = y
         self.color = (255, 0, 0)
-        print(self.identify(), time.ctime())
          
          
 # food.__str__

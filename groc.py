@@ -52,6 +52,7 @@
 #   TDORSEY  2022-06-15  Grocs respond to air temperature
 #   TDORSEY  2022-06-27  Grocs can dance
 #   TDORSEY  2022-07-03  Better cold behavior
+#   TDORSEY  2022-07-07  Hunger and loneliness create urgency
 
 import random
 
@@ -86,6 +87,7 @@ class Groc():
         self.nearestHungryGroc = None
         self.targetX = None
         self.targetY = None
+        self.urgency = 1
         self.targetComment = None
         self.orbitAnchor = None
         self.orbitalIndex = None
@@ -168,7 +170,7 @@ class Groc():
 
       'move, or sit still; expend energy accordingly'
       if moving == True:
-        self.moveTowardTarget()
+        self.moveTowardTarget(self.urgency)
         if self.mood == Groc.DANCING:
           self.fp = self.fp - self.metabolism
         else:
@@ -199,6 +201,8 @@ class Groc():
       nearestFood = None
       for otherGroc in nearbyGrocs:
         if otherGroc.nearestFood is None:
+          pass
+        elif otherGroc.mood in (Groc.SLEEPING, Groc.DEAD):
           pass
         else: 
           thisDist = self.world.findDistance(self, otherGroc.nearestFood) 
@@ -298,6 +302,7 @@ class Groc():
       'decide what to do'
       'set mood'
       maxDistance = self.world.maxDistance
+      self.urgency = 1
       if (self.world.isEnabled(Groc.DEAD) 
           and self.fp < 0):
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
@@ -367,11 +372,17 @@ class Groc():
             self.setTarget(self.rumoredFood.x, 
                            self.rumoredFood.y,
                            "A friend told me where food is")
+            if (self.fp < (self.hungerThreshold/2) and
+              self.countFoodCompetitors(self.rumoredFood) > 0): 
+                self.urgency = 2
         elif self.nearestGroc is None:
           self.setTarget(None, None, "Do not venture out for food alone")
         else:  
           self.setTarget(self.nearestFood.x, self.nearestFood.y, 
                          "I detected some food nearby")
+          if (self.fp < (self.hungerThreshold/2) and
+            self.countFoodCompetitors(self.nearestFood) > 0): 
+              self.urgency = 2
       elif self.mood == Groc.EATING:
           self.setTarget(None, None, "Nom nom")
       elif self.mood == Groc.LONELY:
@@ -380,6 +391,8 @@ class Groc():
         else:  
           self.setTarget(self.nearestGroc.x, self.nearestGroc.y, 
                          "I detect a friend nearby")
+          if (self.world.currentTick - self.moodSince) > 100: 
+            self.urgency = 2
       elif self.mood == Groc.COLD:
         if not (self.nearestFood == None):
           self.setTarget(self.nearestFood.x, self.nearestFood.y,
@@ -446,6 +459,23 @@ class Groc():
       self.world.foodList.sort(key=lambda x: x.calories, reverse=True)
       return self.world.foodList[:n]
       
+# groc.countFoodCompetitors
+    def countFoodCompetitors(self, theFood):
+        leastDist = self.world.maxDistance
+        competitorCount = 0
+        for anotherGroc in self.world.grocList:
+          if (anotherGroc.id == self.id):
+            pass
+          elif not (anotherGroc.nearestFood == theFood):
+            pass
+          elif (self.world.findDistance(self, anotherGroc) > 
+                self.getVisualRange()):
+            pass
+          elif (self.world.findDistance(theFood, anotherGroc) < 
+                self.world.findDistance(self, theFood)):
+            competitorCount += 1
+        return competitorCount
+    
       
 # groc.findMostCrowdedGroc
     def findMostCrowdedGroc(self):
@@ -619,10 +649,12 @@ class Groc():
           "Location " + str(self.x) + "," + str(self.y) + 
           nl + 
           "Target " + str(self.targetX) + "," + str(self.targetY) + 
+          " Urgency " + str(self.urgency) + 
           nl + 
           self.world.ifNone(self.targetComment, "") + 
           nl + 
-          "Mood: " + self.mood +  
+          "Mood: " + self.mood + 
+          " Duration: " + str(self.world.currentTick - self.moodSince) +
           nl + 
           self.world.ifNone(self.moodComment, "") + 
           nl + 
@@ -785,7 +817,8 @@ class Groc():
         else:
           if newMood == Groc.DEAD:
             self.identify()
-            print("Groc died " + str(self.id))
+            print("Groc died (" + str(self.id) + 
+              ") " + str(self.world.currentGrocTime()))
             self.world.render.drawDeath(self)
           elif self.mood == Groc.DANCING:
             self.exitOrbit()

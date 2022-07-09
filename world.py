@@ -336,6 +336,9 @@ class World():
               self.createFood()
         if self.lightLevel == 0 and self.previousLightLevel > 0:
           self.createFood(1000, self.MAXX/2, self.MAXY/2)
+        elif self.lightLevel < 1 and self.previousLightLevel == 1:
+          self.createFood(1000, self.MAXX/2, self.MAXY/2)
+          
 
 # world.handleGrocs
     def handleGrocs(self):
@@ -470,8 +473,9 @@ class World():
 # world.pointsOnACircle
     def pointsOnACircle(self, r, n=100): 
       pi = math.pi
-      return [(math.cos(2*pi/n*x)*r, 
+      zeroCircle = [(math.cos(2*pi/n*x)*r, 
                math.sin(2*pi/n*x)*r) for x in range(0,n+1)] 
+      return zeroCircle
 
 
 # world.randomLocation

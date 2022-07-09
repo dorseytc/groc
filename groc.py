@@ -307,11 +307,11 @@ class Groc():
           and self.fp < 0):
         self.setMood(Groc.DEAD, str(self.fp)+" food points")
       elif (self.world.isEnabled(Groc.DANCING) 
-            and self.world.lightLevel < 1 
             and not self.world.ifNone(self.orbitAnchor, self.nearestFood) 
                     == None
             and self.fp >= self.hungerThreshold 
-            and self.sp >= self.sleepThreshold):
+            and self.sp >= self.sleepThreshold
+            and self.world.lightLevel < 1): 
         self.setMood(Groc.DANCING, "Time to dance")
       elif (self.world.isEnabled(Groc.COLD) and 
             self.world.airTemperature < .45 and
@@ -357,9 +357,11 @@ class Groc():
         pass
       elif self.mood == Groc.DANCING:
         if self.orbitAnchor == None: 
-          self.doOrbit(self.nearestFood, 100)
+          #self.doOrbit(self.nearestFood, 100)
+          self.doDance(self.nearestFood, 100)
         else:
-          self.doOrbit(self.orbitAnchor, 100)
+          #self.doOrbit(self.orbitAnchor, 100)
+          self.doDance(self.orbitAnchor, 100)
       elif self.targetX == self.x and self.targetY == self.y:
         self.setTarget(None, None, "Arrived")
       elif self.mood == Groc.HAPPY:
@@ -675,8 +677,6 @@ class Groc():
           identity = (identity + 
             "Orbiting: " + str(self.orbitAnchor) + 
             nl + 
-            "orbiterNumber: " + str(self.orbiterNumber) + 
-            nl +  
             "OrbitalIndex: " + str(self.orbitalIndex) + 
             nl )
         if not None == self.orbitalLeader:
@@ -746,6 +746,57 @@ class Groc():
         self.mostCrowdedGroc = self.findMostCrowdedGroc()         
         #other observations eventually
 
+# groc.findNearestOrbitalIndex
+    def findNearestOrbitalIndex(self):
+      assert None not in (self.orbitAnchor, 
+        self.orbitalPoints), "invalid parms"
+      closestDist = self.world.maxDistance
+      for i in range(len(self.orbitalPoints)):
+        pos = self.orbitalPoints[i]
+        zdist = self.world.findDistanceXY(self.x, self.y, 
+                  pos[0] + self.orbitAnchor.x, 
+                  pos[1] + self.orbitAnchor.y)
+        if zdist < closestDist:
+          closestDist = zdist
+          closestIndex = i 
+      return closestIndex
+
+
+
+# groc.doDance
+    def doDance(self, anchor, radius, points=100):
+      assert None not in (anchor, radius, points), "invalid parms"
+      def getNthStation(currentStation, n):
+        return (currentStation + n) % points
+      if not (self.orbitAnchor == anchor):
+        self.orbitAnchor = anchor
+        self.orbitalPoints = self.world.pointsOnACircle(radius, points)
+        self.orbitalIndex = self.findNearestOrbitalIndex()
+        newX, newY = self.orbitalPoints[self.orbitalIndex]
+        self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y, 
+                     "Orbital index "  + str(self.orbitalIndex))
+      if self.x == self.targetX and self.y == self.targetY:
+        aheadIndex = getNthStation(self.orbitalIndex, round(points/4))
+        aheadCount = self.countNearbyGrocs(
+          self.world.findDistanceXY(self.x, self.y, 
+            *self.orbitalPoints[aheadIndex]), 
+          *self.orbitalPoints[aheadIndex])
+        behindIndex = getNthStation(self.orbitalIndex, -1*round(points/4))
+        behindCount = self.countNearbyGrocs(
+          self.world.findDistanceXY(self.x, self.y, 
+            *self.orbitalPoints[behindIndex]), 
+          *self.orbitalPoints[behindIndex])
+        print("Ahead ", aheadCount, "Behind", behindCount, "AI", aheadIndex, "BI", behindIndex)
+        if behindCount > aheadCount:
+          self.urgency = 2
+        else:
+          self.urgency = 1
+        self.orbitalIndex = getNthStation(self.orbitalIndex, 1)
+        newX, newY = self.orbitalPoints[self.orbitalIndex]
+        self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y,
+                     "Orbital index "  + str(self.orbitalIndex))
+      #self.moveTowardTarget()
+        
 # groc.doOrbit
     def doOrbit(self, anchor, radius, points=100):
       assert None not in (anchor, radius, points), "invalid parms"

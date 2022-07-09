@@ -2,7 +2,7 @@
 enabledStates = ('Happy'
 , 'Cold'
 , 'Crowded'
-#, 'Dancing'
+, 'Dancing'
 , 'Eating'
 , 'Lonely'
 , 'Hungry'

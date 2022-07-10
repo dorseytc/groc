@@ -53,6 +53,7 @@
 #   TDORSEY  2022-06-27  Grocs can dance
 #   TDORSEY  2022-07-03  Better cold behavior
 #   TDORSEY  2022-07-07  Hunger and loneliness create urgency
+#   TDORSEY  2022-07-10  More grockish dancing
 
 import random
 
@@ -357,10 +358,8 @@ class Groc():
         pass
       elif self.mood == Groc.DANCING:
         if self.orbitAnchor == None: 
-          #self.doOrbit(self.nearestFood, 100)
           self.doDance(self.nearestFood, 100)
         else:
-          #self.doOrbit(self.orbitAnchor, 100)
           self.doDance(self.orbitAnchor, 100)
       elif self.targetX == self.x and self.targetY == self.y:
         self.setTarget(None, None, "Arrived")
@@ -573,18 +572,6 @@ class Groc():
         else:
           return nearestGroc
     
-# groc.findOrbitalLeader
-    def findOrbitalLeader(self, anchor):
-      leader = None
-      for anotherGroc in self.world.grocList:
-        if (anotherGroc.id == self.id):
-          pass
-        elif (anotherGroc.orbitAnchor == anchor):
-          if (anotherGroc.orbiterNumber == self.orbiterNumber - 1):
-            leader = anotherGroc
-            break
-      return leader
- 
 # groc.geneticAttributes
     def geneticAttributes(self):
         seed = random.randint(1, self.world.MAXX) 
@@ -776,69 +763,26 @@ class Groc():
         self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y, 
                      "Orbital index "  + str(self.orbitalIndex))
       if self.x == self.targetX and self.y == self.targetY:
-        aheadIndex = getNthStation(self.orbitalIndex, round(points/4))
-        aheadCount = self.countNearbyGrocs(
-          self.world.findDistanceXY(self.x, self.y, 
-            *self.orbitalPoints[aheadIndex]), 
-          *self.orbitalPoints[aheadIndex])
-        behindIndex = getNthStation(self.orbitalIndex, -1*round(points/4))
-        behindCount = self.countNearbyGrocs(
-          self.world.findDistanceXY(self.x, self.y, 
-            *self.orbitalPoints[behindIndex]), 
-          *self.orbitalPoints[behindIndex])
-        print("Ahead ", aheadCount, "Behind", behindCount, "AI", aheadIndex, "BI", behindIndex)
-        if behindCount > aheadCount:
-          self.urgency = 2
-        else:
+        aheadIndex = getNthStation(self.orbitalIndex, 9)
+        behindIndex = getNthStation(self.orbitalIndex, -9)
+        if self.nearestGroc == None:
           self.urgency = 1
+        else:
+          distAhead = self.world.findDistanceXY(self.nearestGroc.x, 
+                        self.nearestGroc.y, 
+                        self.orbitalPoints[aheadIndex][0] + anchor.x, 
+                        self.orbitalPoints[aheadIndex][1] + anchor.y) 
+          distBehind = self.world.findDistanceXY(self.nearestGroc.x, 
+                        self.nearestGroc.y, 
+                        self.orbitalPoints[behindIndex][0] + anchor.x, 
+                        self.orbitalPoints[behindIndex][1] + anchor.y) 
+          if distAhead < distBehind:
+            self.urgency = 1
+          else:
+            self.urgency = 2
         self.orbitalIndex = getNthStation(self.orbitalIndex, 1)
         newX, newY = self.orbitalPoints[self.orbitalIndex]
         self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y,
-                     "Orbital index "  + str(self.orbitalIndex))
-      #self.moveTowardTarget()
-        
-# groc.doOrbit
-    def doOrbit(self, anchor, radius, points=100):
-      assert None not in (anchor, radius, points), "invalid parms"
-      def getHeadway():
-        countOfOrbiters = self.countGrocsInOrbit(anchor) + 1
-        return round(points/countOfOrbiters)
-      def getNthStation(currentStation, n):
-        return (currentStation + n) % points
-      def hasHeadway(headway):
-        if self.orbitalLeader == None:
-          result = True
-        elif (getNthStation(self.orbitalIndex, headway) == 
-              self.orbitalLeader.orbitalIndex):
-          result = True
-        elif (getNthStation(self.orbitalIndex, headway+1) == 
-              self.orbitalLeader.orbitalIndex):
-          result = True
-        else:
-          result = False
-        return result
-      if not (self.orbitAnchor == anchor):
-        self.orbiterNumber = self.countGrocsInOrbit(anchor) 
-        self.orbitAnchor = anchor
-        self.orbitalIndex = 0
-        self.orbitalPoints = self.world.pointsOnACircle(radius, points)
-      if self.orbiterNumber > 0:
-        self.orbitalLeader = self.findOrbitalLeader(anchor)
-      else:
-        self.orbitalLeader = None
-      newX, newY = self.orbitalPoints[self.orbitalIndex]
-      headway = getHeadway()
-      self.setTarget((round(newX) + anchor.x), 
-                     (round(newY) + anchor.y),
-                     "Orbital index "  + str(self.orbitalIndex) + 
-                     " Headway " + str(headway))
-      if self.x == self.targetX and self.y == self.targetY:
-        if not hasHeadway(headway):
-          pass
-        else:
-          self.orbitalIndex = getNthStation(self.orbitalIndex, 1)
-          newX, newY = self.orbitalPoints[self.orbitalIndex]
-          self.setTarget(round(newX) + anchor.x, round(newY) + anchor.y,
                      "Orbital index "  + str(self.orbitalIndex))
       #self.moveTowardTarget()
         

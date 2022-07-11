@@ -22,6 +22,7 @@
 # TDORSEY 2022-06-18  Toggle groc halo for emphasis
 # TDORSEY 2022-06-20  Sleeping animations
 # TDORSEY 2022-06-21  Eating animations
+# TDORSEY 2022-07-06  Drag food and grocs
 
 import pygame 
 
@@ -42,8 +43,12 @@ class Renderer():
     self.screen = pygame.display.set_mode([thisWorld.MAXX, 
                                           thisWorld.MAXY])
     self.worldColor = self.world.WHITE
-    self.highlightedGroc = None
+    self.highlightedObject = None
+    self.dragging = False
+    self.dragOffsetX = 0
+    self.dragOffsetY = 0
     self.screen.fill(self.worldColor)
+    self.screenshot = True
     # font stuff
     self.fontname = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf'
     self.largeFont = pygame.font.Font(self.fontname, 20)
@@ -62,6 +67,10 @@ class Renderer():
     self.food=pygame.mixer.Sound('food.ogg')
     self.lastSoundTick = self.world.currentTick
 
+#render.drawDeath
+  def drawDeath(self, theDead): 
+    self.screenshot = True
+ 
 #render.drawFood
   def drawFood(self, theFood): 
     if theFood.calories <= 0:
@@ -146,7 +155,7 @@ class Renderer():
       pygame.draw.circle(self.screen, self.worldColor, (oldX, oldY), 11)
       isMoving = True
 
-    if self.highlightedGroc == theGroc:
+    if self.highlightedObject == theGroc:
       if self.world.lightLevel < .5: 
         halocolor = self.world.YELLOW
       else:
@@ -175,13 +184,15 @@ class Renderer():
                        pygame.Rect(newX - (intensity//2), 
                                    newY - (intensity//2), 
                                    intensity, intensity))
-    if self.highlightedGroc == theGroc:
+    if self.highlightedObject == theGroc:
       pygame.draw.line(self.screen, halocolor, (newX - 6, newY + 4), 
                        (newX + 6, newY + 4))
-    if None == self.highlightedGroc:
+    if None == self.highlightedObject:
       pass
-    elif None in (self.highlightedGroc.targetX, 
-                  self.highlightedGroc.targetY):
+    elif not hasattr(self.highlightedObject, 'targetX'):
+      pass
+    elif None in (self.highlightedObject.targetX, 
+                  self.highlightedObject.targetY):
       pass
     else:
       intensity = (20 - (self.world.currentTick % 20)) 
@@ -189,9 +200,13 @@ class Renderer():
                                self.world.RED, 
                                self.worldColor, 
                                intensity/20)
+      pygame.draw.rect(self.screen, self.world.YELLOW, 
+        pygame.Rect(self.highlightedObject.targetX - (intensity+1),
+                    self.highlightedObject.targetY - (intensity+1),
+                    2*(1+intensity), 2*(1*intensity)))
       pygame.draw.rect(self.screen, targetColor,
-        pygame.Rect(self.highlightedGroc.targetX - (intensity),
-                    self.highlightedGroc.targetY - (intensity),
+        pygame.Rect(self.highlightedObject.targetX - (intensity),
+                    self.highlightedObject.targetY - (intensity),
                     2*intensity, 2*intensity))
 
 
@@ -202,29 +217,30 @@ class Renderer():
 
 #render.close
   def close(self):
-    print("Awaiting user input to close")
+    print("Ready to close")
     while (self.running):
       self.tick()
     self.quit()
 
-#render.highlightGroc
-  def highlightGroc(self, theGroc):
-    if theGroc == None:
+#render.highlightObject
+  def highlightObject(self, theObject):
+    if theObject == None:
       pass 
     else:
-      self.highlightedGroc = theGroc
-      grocDetails = theGroc.identify().split('\n')
-      length = max(len(max(grocDetails, key=len)),35)
+      self.highlightedObject = theObject
+      objectDetails = theObject.identify().split('\n')
+      length = max(len(max(objectDetails, key=len)),35)
       height = 14
-      if theGroc.x < 300 and theGroc.y < ((height * len(grocDetails)) + 47):
-        top = 5
-        left = self.world.MAXX - 250
-      else:
-        top = 47
-        left = 5
-      for i in range(len(grocDetails)):
+      top = 47
+      left = 5
+      if hasattr(theObject, 'x'):
+        if (theObject.x < 300 and 
+            theObject.y < ((height * len(objectDetails)) + 47)):
+          top = 5
+          left = self.world.MAXX - 250
+      for i in range(len(objectDetails)):
         line = self.smallFont.render(
-                                  grocDetails[i].ljust(length), True, 
+                                  objectDetails[i].ljust(length), True, 
                                   self.world.GREEN, 
                                   self.world.BLACK)
         lineRect = line.get_rect() 
@@ -239,9 +255,20 @@ class Renderer():
       pass
       'theoretically not needed when light levels are steady'
       self.drawGrocStatic(theGroc, newX, newY)
+
+#render.maybeScreenshot
+  def maybeScreenshot(self):
+    if self.screenshot:
+      pygame.image.save(self.screen, 
+                      "./images/dead_" + 
+                      str(self.world.currentTick) + 
+                      ".png")
+      self.screenshot = False
+
       
 #render.quit
   def quit(self):
+    
     pygame.quit()
 
 #render.soundEat
@@ -264,10 +291,11 @@ class Renderer():
   def tick(self):
     pygame.display.set_caption(str(self.world.population) + " Grocs")
     self.drawGauge() 
-    self.highlightGroc(self.highlightedGroc)     
+    self.highlightObject(self.highlightedObject)     
     pygame.display.flip()
     oldColor = self.worldColor
     self.worldColor = self.world.getWorldColor()
+    self.maybeScreenshot()
     if oldColor == self.worldColor:
       self.screen.fill(self.worldColor)
     else:
@@ -276,26 +304,45 @@ class Renderer():
       if event.type == pygame.QUIT:
         self.quit()
         self.running = False
-      if event.type == pygame.MOUSEBUTTONDOWN:
+        print("User clicked 'QUIT'")
+      elif event.type == pygame.MOUSEBUTTONDOWN:
         x, y = event.pos
-        nearestGroc = self.world.findGrocNearXY(x, y) 
-        nearestFood = self.world.findFoodNearXY(x, y)
-        gdist = self.world.findDistanceXY(x, y, 
+        if event.button == 1:
+          nearestGroc = self.world.findGrocNearXY(x, y) 
+          nearestFood = self.world.findFoodNearXY(x, y)
+          gdist = self.world.findDistanceXY(x, y, 
                                         nearestGroc.x, nearestGroc.y)
-        fdist = self.world.findDistanceXY(x, y, 
+          fdist = self.world.findDistanceXY(x, y, 
                                         nearestFood.x, nearestFood.y)
-        if gdist > nearestGroc.getPersonalSpace():
-          self.highlightedGroc = None
-        elif nearestGroc == self.highlightedGroc:
-          self.highlightedGroc = None
-        else:   
-          self.highlightedGroc = nearestGroc
-          print(nearestGroc.identify())
-        if fdist > 30:
+          if (self.highlightedObject is None and
+            x < 60 and
+            y < 60):
+            self.highlightedObject = self.world
+          elif nearestGroc == self.highlightedObject:
+            self.highlightedObject = None
+          elif gdist < fdist and gdist <= nearestGroc.getPersonalSpace():
+            self.highlightedObject = nearestGroc
+          elif fdist <= 30:
+            self.highlightedObject = nearestFood
+          else:
+            self.highlightedObject = None
+          if not self.highlightedObject is None:
+            if hasattr(self.highlightedObject, 'x'):
+              self.dragging = True
+              self.dragOffsetX = x - self.highlightedObject.x
+              self.dragOffsetY = y - self.highlightedObject.y
+      elif event.type == pygame.MOUSEBUTTONUP:
+        x, y = event.pos
+        if event.button == 1:
+          self.dragging = False
+      elif event.type == pygame.MOUSEMOTION:
+        if self.highlightedObject == None:
           pass
         else:
-          print(nearestFood.identify())
- 
+          x, y = event.pos
+          if self.dragging:
+            self.highlightedObject.x = x + self.dragOffsetX
+            self.highlightedObject.y = y + self.dragOffsetY
 
 
     

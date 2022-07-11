@@ -29,17 +29,22 @@
 #   TDORSEY  2022-06-15  Air and Ground Temperature
 #   TDORSEY  2022-06-16  Compute "24-hour" GrocTime
 #   TDORSEY  2022-06-20  Sleep animations
+#   TDORSEY  2022-07-03  Graceful exits and world saves
+#                        World file format change
 
 
 
 import logging
+import math
 import os
 import random
 import time
+
 import groc
 import food
 import grr_pygame as render
 #import grr_pipe as render
+import settings
 #
 #
 #
@@ -62,9 +67,6 @@ class World():
     LOGFILE = "groc.log"
     DEGREESIGN = u'\N{DEGREE SIGN}'
 
-    currentTick = 0    
-    currentTime = time.time()
-    defaultTick = .1
 
     # COLORS
     BLACK = (0, 0, 0)
@@ -93,20 +95,36 @@ class World():
         self.population = 0
         self.foodList = []
         #technical pointers
+        self.currentTick = 0    
+        self.currentTime = time.time()
+        self.defaultTick = .1
         self.logger = None
         self.render = render.Renderer(self)
         self.mute = K_MUTE
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
-          World.currentTick = int(line)
+          while line:
+            print(line)
+            exec(line)          
+            line = self.worldFile.readline()
         else:
-          World.currentTick = 0
+          self.currentTick = 0
+          self.airTemperature = .7
+          self.groundTemperature = .7
         self.lightLevel = self.getLightLevel()
-        self.airTemperature = .0
-        self.groundTemperature = .0
+        self.previousLightLevel = self.lightLevel + .01
         self.maxDistance = self.findDistanceXY(0, 0, x, y)
-        World.startTick = World.currentTick
+        self.startTick = self.currentTick
+
+
+# world.__str__
+    def __str__(self, x):
+      return self.dump()
+ 
+# world.__repr__
+    def __repr__(self, x):
+      return self.dump()
 
 # world.bindX
     def bindX(self, x):
@@ -137,7 +155,7 @@ class World():
 
 # world.currentGrocTime
     def currentGrocTime(self):
-        curr = (5+(24*((self.currentTick % 10000)/10000))) % 24
+        curr = (6+(24*((self.currentTick % 10000)/10000))) % 24
         hour = int(curr)
         minute = int((curr-hour)*60)
         if hour > 12:
@@ -149,52 +167,58 @@ class World():
           tag = " am "
         return (str(hour) + ":" + str(minute).zfill(2) + tag)
         
+# world.dump
+    def dump(self):
+      nl = self.NEWLINE
+      return ("self.currentTick = " + str(self.currentTick) + nl + 
+              "self.airTemperature = " + str(self.airTemperature) + nl + 
+              "self.groundTemperature = " + str(self.airTemperature) + nl)
 
 # world.d6
     def d6(self, n):
-        result = 0
-        for i in range(n):
-          result = result + random.randint(1,6)
-        return result
+      result = 0
+      for i in range(n):
+        result = result + random.randint(1,6)
+      return result
 
 # world.elapsedTicks
     def elapsedTicks(self, sinceTick):
-        'measure elapsed ticks subtracting sinceTicks from current value'
-        return abs(self.currentTick - sinceTick)
+      'measure elapsed ticks subtracting sinceTicks from current value'
+      return abs(self.currentTick - sinceTick)
         
 # world.end
     def end(self):
-        self.saveGrocs()
-        self.saveWorld()
-        self.endTimeSeconds = time.time()
-        self.endTick = self.currentTick
-        print("Elapsed seconds: " + 
-              str(int(self.endTimeSeconds - self.startTimeSeconds)))
-        print("Elapsed ticks: " + 
-              str(self.endTick - self.startTick))
-        self.render.close()  
+      self.saveGrocs()
+      self.saveWorld()
+      self.endTimeSeconds = time.time()
+      self.endTick = self.currentTick
+      print("Elapsed seconds: " + 
+            str(int(self.endTimeSeconds - self.startTimeSeconds)))
+      print("Elapsed ticks: " + 
+            str(self.endTick - self.startTick))
+      self.render.close()  
 
 # world.findDistance
     def findDistance(self, object1, object2):
-        'measure the distance between two objects'
-        if None in (object1, object2):
-          result = None
-        else:
-          x1, y1 = object1.x, object1.y
-          x2, y2 = object2.x, object2.y
-          result = self.findDistanceXY(x1, y1, x2, y2)
-        return result
+      'measure the distance between two objects'
+      if None in (object1, object2):
+        result = None
+      else:
+        x1, y1 = object1.x, object1.y
+        x2, y2 = object2.x, object2.y
+        result = self.findDistanceXY(x1, y1, x2, y2)
+      return result
         
 # world.findDistanceXY
     def findDistanceXY(self, x1, y1, x2, y2):
-        'measure the distance between two sets of coordinates'
-        if None in (x1, x2, y1, y2):
-          result = None
-        else:
-          xDiff = abs(x1 - x2) 
-          yDiff = abs(y1 - y2)
-          result = (((xDiff ** 2) + (yDiff ** 2)) ** .5)
-        return result
+      'measure the distance between two sets of coordinates'
+      if None in (x1, x2, y1, y2):
+        result = None
+      else:
+        xDiff = abs(x1 - x2) 
+        yDiff = abs(y1 - y2)
+        result = (((xDiff ** 2) + (yDiff ** 2)) ** .5)
+      return result
 
 # world.findFoodNearXY
     def findFoodNearXY(self, x, y):
@@ -262,7 +286,8 @@ class World():
 
 # world.getLightLevel
     def getLightLevel(self):
-        relevantTick = self.currentTick % 10000
+      relevantTick = self.currentTick % 10000
+      if settings.fixedLightLevel == None:
         if 0 <= relevantTick < 1000:
           result = relevantTick/1000
         elif 1000 <= relevantTick < 5000:
@@ -271,7 +296,9 @@ class World():
           result = (6000-relevantTick)/1000
         elif 6000 <= relevantTick < 10000:
           result = 0 
-        return result
+      else:
+        result = settings.fixedLightLevel 
+      return result
 
 # world.getLogger
     def getLogger(self, debugLevel):    
@@ -306,7 +333,12 @@ class World():
               self.spawnFood()
         if len(self.foodList) == 0:
           for i in range(max(2,int(.05 * self.population))):
-            self.createFood()
+              self.createFood()
+        if self.lightLevel == 0 and self.previousLightLevel > 0:
+          self.createFood(1000, self.MAXX/2, self.MAXY/2)
+        elif self.lightLevel < 1 and self.previousLightLevel == 1:
+          self.createFood(1000, self.MAXX/2, self.MAXY/2)
+          
 
 # world.handleGrocs
     def handleGrocs(self):
@@ -319,10 +351,12 @@ class World():
         coldCount = 0
         sleepingCount = 0
         eatingCount = 0
+        dancingCount = 0
         i = 0
         while i < len(self.grocList):
           if self.grocList[i].fp <= -5:
             deadGroc = self.grocList.pop(i)
+            deadGroc.identify()
             self.createFood(500, deadGroc.x, deadGroc.y)
           else:
             i += 1
@@ -350,9 +384,30 @@ class World():
             sleepingCount += 1
           elif thisGroc.mood == groc.Groc.EATING:
             eatingCount += 1
+          elif thisGroc.mood == groc.Groc.DANCING:
+            dancingCount += 1
         self.setStats(happyCount, lonelyCount, crowdedCount, 
                       hungryCount, deadCount, coldCount, 
-                      sleepingCount, eatingCount)
+                      sleepingCount, eatingCount, dancingCount)
+
+# world.identify
+    def identify(self):
+      nl = self.NEWLINE      
+      identity = (
+        "Current Tick: " + str(self.currentTick) + nl + 
+        " Light Level: " + str(self.getLightLevel()) + nl +
+        " Total Grocs: " + str(self.population) + nl +
+        "        Cold: " + str(self.cold) + nl + 
+        "     Crowded: " + str(self.crowded) + nl + 
+        "     Dancing: " + str(self.dancing) + nl +
+        "        Dead: " + str(self.dead) + nl + 
+        "      Eating: " + str(self.eating) + nl + 
+        "       Happy: " + str(self.happy) + nl + 
+        "      Hungry: " + str(self.hungry) + nl + 
+        "      Lonely: " + str(self.lonely) + nl + 
+        "    Sleeping: " + str(self.sleeping) + nl + 
+        " ")
+      return identity
 
 # world.ifNone
     def ifNone(self, thing, alternative):
@@ -385,6 +440,14 @@ class World():
         else:
           return int(parm)
          
+# world.isEnabled
+    def isEnabled(self, state):
+      if state in settings.enabledStates:
+        result = True  
+      else:
+        result = False
+      return result
+
 # world.keepRunning
     def keepRunning(self): 
         result = True
@@ -399,7 +462,21 @@ class World():
           print("Iteration limit " + str(self.iterationLimit) + 
                 " exceeded")
           result = False
+        elif not self.render.running:
+          result = False
         return result
+
+# world.percentage
+    def percentage(self):
+        return(random.randint(1,100))
+
+# world.pointsOnACircle
+    def pointsOnACircle(self, r, n=100): 
+      pi = math.pi
+      zeroCircle = [(math.cos(2*pi/n*x)*r, 
+               math.sin(2*pi/n*x)*r) for x in range(0,n+1)] 
+      return zeroCircle
+
 
 # world.randomLocation
     def randomLocation(self):
@@ -420,12 +497,12 @@ class World():
 # world.saveWorld
     def saveWorld(self):
         self.worldFile = open(World.WORLDFILE, "w")
-        self.worldFile.write(str(self.currentTick) + self.NEWLINE)
+        self.worldFile.write(self.dump())
         self.worldFile.close()
 
 # world.setStats
     def setStats(self, happy, lonely, crowded, hungry, 
-                 dead, cold, sleeping, eating):
+                 dead, cold, sleeping, eating, dancing):
         self.happy = happy 
         self.lonely = lonely
         self.crowded = crowded
@@ -434,7 +511,8 @@ class World():
         self.sleeping = sleeping
         self.eating = eating
         self.dead = dead
-        self.population = (happy + lonely + crowded + 
+        self.dancing = dancing
+        self.population = (happy + lonely + crowded + dancing + 
                            hungry + cold + eating + sleeping)
 
 # world.spawnFood
@@ -461,7 +539,8 @@ class World():
         p_loopMode = argv[3]
       else:
         p_loopMode = "LIFE"
-      assert p_loopMode in ("LIFE", "MOTION"), "Mode must be 'LIFE' or 'MOTION'"
+      assert p_loopMode in ("LIFE", 
+        "MOTION"), "Mode must be 'LIFE' or 'MOTION'"
       if numArgs > 2:
         p_iterationLimit = int(argv[2])
       else:
@@ -483,6 +562,7 @@ class World():
 # world.tick
     def tick(self, waitSeconds=0):
         self.currentTick += 1
+        self.previousLightLevel = self.lightLevel
         self.lightLevel = self.getLightLevel()
         self.airTemperature = self.getAirTemperature()
         self.groundTemperature = self.getGroundTemperature()
@@ -507,6 +587,3 @@ class World():
 
         
         
-# world.percentage
-    def percentage(self):
-        return(random.randint(1,100))

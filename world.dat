@@ -1,1 +1,3 @@
-3344000
+self.currentTick = 11325652
+self.airTemperature = 0.6604274972083503
+self.groundTemperature = 0.6604274972083503

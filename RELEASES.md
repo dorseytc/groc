@@ -1,7 +1,14 @@
 ## Release Notes
 
+### dance (v0.12.0) -- in progress
+- groc, food, world on-screen inspection gauge
+- sundown ritual
+- better survival of dark and cold
+- food gathering
+- fire?  
+- global settings.py file for behavior configuration
+
 ### order (v0.11.0) -- completed
-- possible alternate world images as backgrounds
 - world, groc, and food class get their own files 
 - pipe renderer gets feature parity 
 - cold, sleeping and eating moods

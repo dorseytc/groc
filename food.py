@@ -25,7 +25,6 @@ class Food():
         self.x = x
         self.y = y
         self.color = (255, 0, 0)
-        print(self.identify(), time.ctime())
          
          
 # food.__str__
@@ -48,13 +47,14 @@ class Food():
         return biteCalories
  
     def identify(self):
-        identity = ("Calories: " + str(self.calories) + 
-                   " X,Y: " + str(self.x) + "," + str(self.y) + 
-                   " Value: " + str(self.value) + 
-                   " Count: " + str(len(self.world.foodList)) + 
-                   " Light: " + str(self.world.lightLevel) + 
-                   " Hungry: " + str(self.world.hungry) + 
-                   " Time: " + str(self.world.currentGrocTime()))
+        nl = self.world.NEWLINE
+        identity = ("Calories: " + str(self.calories) + nl +
+                   "X,Y: " + str(self.x) + "," + str(self.y) + nl + 
+                   "Value: " + str(self.value) + nl + 
+                   "Count: " + str(len(self.world.foodList)) + nl + 
+                   "Hungry: " + str(self.world.hungry) + nl + 
+                   "Light Level: " + str(self.world.lightLevel) + nl +
+                   "Time: " + str(self.world.currentGrocTime()) + nl)
         return identity 
  
         

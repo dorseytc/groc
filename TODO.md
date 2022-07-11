@@ -4,7 +4,7 @@
 [x] - movement should be part of the Groc class - done (brown)
 [x] - movement should be based on motivation - done (movers)
 [x] - movement - approach direction could be randomized - done (movers)
-[ ] - movement - variable speed could be introduced - started (movers)
+[x] - movement - variable speed could be introduced - done (dance)
 
 ### motivation
 [x] - motivation should include companionship - LONELY done (shakers)
@@ -25,6 +25,7 @@
 [x] - Food - Random food value (calories) - done (tick)
 [x] - Food - starvation should be more rare - done (light)
 [x] - Food - metabolism/hunger support day/night cycle - done (light)
+[ ] - Food - grocs can carry food
 
 ### predators
 [ ] - predators could be expressed as "species"
@@ -65,11 +66,11 @@
 [x] - Highlighted groc's target is displayed (order)
 
 ### rituals
-[ ] - Sunset food drop for nightly ritual
-[ ] - Sunset ritual to gather food and provide warmth
+[x] - Sunset food drop for nightly ritual
+[x] - Sunset ritual to gather food and provide warmth
 [ ] - Funeral ritual to bury the dead
 
 ### interactive
-[ ] - user can drag food
-[ ] - user can place food?
+[x] - user can drag food - done (dance)
+[ ] - user can place food
 

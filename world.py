@@ -31,6 +31,7 @@
 #   TDORSEY  2022-06-20  Sleep animations
 #   TDORSEY  2022-07-03  Graceful exits and world saves
 #                        World file format change
+#   TDORSEY  2022-07-03  Is there food?
 
 
 
@@ -241,6 +242,17 @@ class World():
         'supply coordinates, find nearest Groc'
         return self.findItemNearXY(self.grocList, x, y)
 
+# world.foodIsGone
+    def foodIsGone(self, x, y):
+      assert not None in (x, y), "invalid parms"
+      exists = True
+      for food in self.foodList:
+        if (food.x == x and food.y == y and 
+            food.calories > 0):
+          exists = False
+          break
+      return exists
+          
 # world.getAirTemperature
     def getAirTemperature(self):
         return ((self.airTemperature * .999) + 
@@ -440,6 +452,7 @@ class World():
         else:
           return int(parm)
          
+      
 # world.isEnabled
     def isEnabled(self, state):
       if state in settings.enabledStates:

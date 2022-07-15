@@ -137,6 +137,10 @@ class Renderer():
       eyecolor = self.world.GRAY
       eyeshape = "circle"
       intensity = 2 + round(hunger / theGroc.hungerThreshold * 6)
+    elif theGroc.mood == theGroc.DANCING:
+      eyecolor = self.worldColor
+      eyeshape = "circle"
+      intensity = 2
     elif theGroc.mood == theGroc.EATING:
       eyecolor = self.worldColor
       eyeshape = "circle"
@@ -177,6 +181,32 @@ class Renderer():
       mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
       pygame.draw.circle(self.screen, eyecolor,
                            (newX + mouthCenter , newY), intensity)
+    elif theGroc.mood == theGroc.DANCING:
+      cycle = 8
+      if theGroc.orbitalAnchor == None:
+        x, y = 0,0
+      else:
+        x = theGroc.orbitalAnchor.x
+        y = theGroc.orbitalAnchor.y
+      frame = ((self.world.currentTick + x + y) % cycle)
+      if frame < cycle/2:
+        polarity = 1
+      else:
+        polarity = -1
+      intensity = 4
+      pygame.draw.circle(self.screen, groccolor, 
+                         (newX, newY), 9)
+      pygame.draw.circle(self.screen, eyecolor, 
+                         (newX, newY), intensity)
+      pygame.draw.line(self.screen, self.worldColor, 
+                         (newX - 7, newY + (3*polarity)), 
+                         (newX + 7, newY - (3*polarity)))
+      pygame.draw.line(self.screen, self.worldColor, 
+                         (newX - 6, newY + (5*polarity)), 
+                         (newX + 6, newY - (5*polarity)))
+      pygame.draw.line(self.screen, self.worldColor, 
+                         (newX - 5, newY + (7*polarity)), 
+                         (newX + 5, newY - (7*polarity)))
     elif eyeshape == "circle":
         pygame.draw.circle(self.screen, eyecolor, (newX, newY), intensity)
     else:
@@ -184,31 +214,44 @@ class Renderer():
                        pygame.Rect(newX - (intensity//2), 
                                    newY - (intensity//2), 
                                    intensity, intensity))
+    # highlighted object
     if self.highlightedObject == theGroc:
       pygame.draw.line(self.screen, halocolor, (newX - 6, newY + 4), 
                        (newX + 6, newY + 4))
     if None == self.highlightedObject:
       pass
-    elif not hasattr(self.highlightedObject, 'targetX'):
-      pass
-    elif None in (self.highlightedObject.targetX, 
-                  self.highlightedObject.targetY):
-      pass
     else:
+      if hasattr(self.highlightedObject, 'targetX'):
+        self.doHighlight(self.highlightedObject, True)
+      if hasattr(self.highlightedObject, 'orbitalAnchor'):
+        self.doHighlight(self.highlightedObject.orbitalAnchor)
+ 
+#render.doHighlight
+  def doHighlight(self, theObject, useTarget=True):
       intensity = (20 - (self.world.currentTick % 20)) 
       targetColor = self.world.interpolateColor(
                                self.world.RED, 
                                self.worldColor, 
                                intensity/20)
-      pygame.draw.rect(self.screen, self.world.YELLOW, 
-        pygame.Rect(self.highlightedObject.targetX - (intensity+1),
-                    self.highlightedObject.targetY - (intensity+1),
+      if theObject is None:
+        x, y = None, None
+      elif useTarget and hasattr(theObject, 'targetX'):
+        x = theObject.targetX
+        y = theObject.targetY
+      elif not useTarget and hasattr(theObject, 'x'):
+        x = theObject.x
+        y = theObject.y
+      else:
+        x, y = None, None
+      if not None in (x, y):
+        pygame.draw.rect(self.screen, self.world.YELLOW, 
+          pygame.Rect(x - (intensity+1),
+                    y - (intensity+1),
                     2*(1+intensity), 2*(1*intensity)))
-      pygame.draw.rect(self.screen, targetColor,
-        pygame.Rect(self.highlightedObject.targetX - (intensity),
-                    self.highlightedObject.targetY - (intensity),
+        pygame.draw.rect(self.screen, targetColor,
+          pygame.Rect(x - (intensity),
+                    y - (intensity),
                     2*intensity, 2*intensity))
-
 
 #render.drawGrocStatic
   def drawGrocStatic(self, theGroc, newX, newY):

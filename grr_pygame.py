@@ -31,6 +31,8 @@ class Renderer():
   pygame.init()
   pygame.font.init()
   pygame.display.set_caption("Grocs")
+  CIRCLE = 'Circle'
+  SQUARE = 'Square'
 
   def __init__(self, thisWorld):
 
@@ -85,6 +87,12 @@ class Renderer():
     pygame.draw.rect(self.screen, color, pygame.Rect(theFood.x - size,
                                                      theFood.y - size, 
                                                      size*2, size*2))
+    if self.highlightedObject == None:
+      pass
+    elif not hasattr(self.highlightedObject, 'orbitalAnchor'):
+      pass
+    elif self.highlightedObject.orbitalAnchor == theFood:
+      self.drawHighlight(theFood, self.CIRCLE, False)
      
 #render.drawGauge
   def drawGauge(self):
@@ -222,12 +230,10 @@ class Renderer():
       pass
     else:
       if hasattr(self.highlightedObject, 'targetX'):
-        self.doHighlight(self.highlightedObject, True)
-      if hasattr(self.highlightedObject, 'orbitalAnchor'):
-        self.doHighlight(self.highlightedObject.orbitalAnchor)
+        self.drawHighlight(self.highlightedObject, self.SQUARE, True)
  
-#render.doHighlight
-  def doHighlight(self, theObject, useTarget=True):
+#render.drawHighlight
+  def drawHighlight(self, theObject, shape, useTarget=True):
       intensity = (20 - (self.world.currentTick % 20)) 
       targetColor = self.world.interpolateColor(
                                self.world.RED, 
@@ -244,14 +250,21 @@ class Renderer():
       else:
         x, y = None, None
       if not None in (x, y):
-        pygame.draw.rect(self.screen, self.world.YELLOW, 
-          pygame.Rect(x - (intensity+1),
+        if shape == self.SQUARE:
+          pygame.draw.rect(self.screen, self.world.YELLOW, 
+            pygame.Rect(x - (intensity+1),
                     y - (intensity+1),
                     2*(1+intensity), 2*(1*intensity)))
-        pygame.draw.rect(self.screen, targetColor,
-          pygame.Rect(x - (intensity),
+          pygame.draw.rect(self.screen, targetColor,
+            pygame.Rect(x - (intensity),
                     y - (intensity),
                     2*intensity, 2*intensity))
+        elif shape == self.CIRCLE:
+          pygame.draw.circle(self.screen, self.world.YELLOW, 
+                   (x, y), intensity + 1)
+          pygame.draw.circle(self.screen, targetColor, 
+                   (x, y), intensity)
+    
 
 #render.drawGrocStatic
   def drawGrocStatic(self, theGroc, newX, newY):

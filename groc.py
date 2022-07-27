@@ -818,7 +818,7 @@ class Groc():
             self.exitOrbit()
           elif self.mood == Groc.SLEEPING:
             sleepTicks = self.world.currentTick - self.moodSince
-            self.sp = self.sp + ((sleepTicks ** 2)/1000)
+            self.sp = min(100000, self.sp + ((sleepTicks ** 2)/1000))
           self.mood = newMood
           self.moodSince = self.world.currentTick
           self.world.render.drawGrocStatic(self, self.x, self.y)

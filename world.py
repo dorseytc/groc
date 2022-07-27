@@ -32,6 +32,7 @@
 #   TDORSEY  2022-07-03  Graceful exits and world saves
 #                        World file format change
 #   TDORSEY  2022-07-03  Is there food?
+#   TDORSEY  2022-07-27  Improved identify output
 
 
 
@@ -407,7 +408,11 @@ class World():
       nl = self.NEWLINE      
       identity = (
         "Current Tick: " + str(self.currentTick) + nl + 
-        " Light Level: " + str(self.getLightLevel()) + nl +
+        " Light Level: " + str(round(self.getLightLevel()*100)) + "%" + nl +
+        "         Air: " + str(round(self.airTemperature*100)) + 
+                           self.DEGREESIGN + nl +
+        "      Ground: " + str(round(self.groundTemperature*100)) + 
+                           self.DEGREESIGN + nl +
         " Total Grocs: " + str(self.population) + nl +
         "        Cold: " + str(self.cold) + nl + 
         "     Crowded: " + str(self.crowded) + nl + 

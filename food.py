@@ -55,11 +55,11 @@ class Food():
 #food.identify
     def identify(self):
       nl = self.world.NEWLINE
-      identity = ("Calories: " + str(self.calories) + nl +
-                 "X,Y: " + str(self.x) + "," + str(self.y) + nl + 
-                 "Value: " + str(self.value) + nl + 
-                 "Count: " + str(len(self.world.foodList)) + nl + 
-                 "Hungry: " + str(self.world.hungry) + nl + 
-                 "Light Level: " + str(self.world.lightLevel) + nl +
-                 "Time: " + str(self.world.currentGrocTime()) + nl)
+      identity = ("   Calories: " + str(self.calories) + nl +
+                  "        X,Y: " + str(self.x) + "," + str(self.y) + nl + 
+                  "      Value: " + str(self.value) + nl + 
+                  "      Count: " + str(len(self.world.foodList)) + nl + 
+                  "     Hungry: " + str(self.world.hungry) + nl + 
+                  "Light Level: " + 
+                      str(round(self.world.lightLevel*100))+ "%" + nl)
       return identity 

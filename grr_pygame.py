@@ -23,6 +23,7 @@
 # TDORSEY 2022-06-20  Sleeping animations
 # TDORSEY 2022-06-21  Eating animations
 # TDORSEY 2022-07-06  Drag food and grocs
+# TDORSEY 2022-07-27  Improved time and temp
 
 import pygame 
 
@@ -97,12 +98,10 @@ class Renderer():
 #render.drawGauge
   def drawGauge(self):
     'time and temperature gauge'
-    tempstr = ('Air: ' + 
+    tempstr = ('Temp:' + 
       '{:>3}'.format(str(int(self.world.airTemperature*100))) + 
-      self.world.DEGREESIGN + ' Ground: ' + 
-      '{:>3}'.format(str(int(self.world.groundTemperature*100))) + 
-      self.world.DEGREESIGN)
-    timestr = ('Current Time: ' + str(self.world.currentGrocTime()))
+      self.world.DEGREESIGN) 
+    timestr = ('Time: ' + str(self.world.currentGrocTime()))
     gaugeWidth = '<' + str(max(len(tempstr), len(timestr)))
     self.temps = self.largeFont.render(format(tempstr, gaugeWidth), 
                    True, self.world.GREEN, self.world.BLACK)

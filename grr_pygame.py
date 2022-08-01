@@ -113,7 +113,7 @@ class Renderer():
 #render.drawGrocMoving
   def drawGrocMoving(self, theGroc, oldX, oldY, newX, newY):
     assert not None in (oldX, oldY, newX, newY), 'Cannot move to x,y None'
-    if theGroc.gender == theGroc.MALE:
+    if theGroc.gender == theGroc.Gender.MALE:
       groccolor = self.world.BLUE
     else:
       groccolor = self.world.RED
@@ -121,38 +121,38 @@ class Renderer():
       self.world.findDistanceXY(theGroc.x, theGroc.y, 
                                 theGroc.targetX, theGroc.targetY), 0)
     hunger = theGroc.hungerThreshold - theGroc.fp 
-    if theGroc.mood == theGroc.DEAD:
+    if theGroc.mood == theGroc.Mood.DEAD:
       eyecolor = groccolor
       eyeshape = "circle"
       groccolor = self.world.BLACK
       intensity = 2
-    elif theGroc.mood == theGroc.COLD:
+    elif theGroc.mood == theGroc.Mood.COLD:
       eyecolor = self.world.GRAY
       eyeshape = "square"
       intensity = 6
-    elif theGroc.mood == theGroc.LONELY:
+    elif theGroc.mood == theGroc.Mood.LONELY:
       eyecolor = self.world.WHITE
       eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
                       self.world.maxDistance * 6)
-    elif theGroc.mood == theGroc.CROWDED:
+    elif theGroc.mood == theGroc.Mood.CROWDED:
       eyecolor = self.world.BLACK
       eyeshape = "circle"
       intensity = 2 + round(distanceFromTarget / 
                       self.world.maxDistance * 6)
-    elif theGroc.mood == theGroc.HUNGRY:
+    elif theGroc.mood == theGroc.Mood.HUNGRY:
       eyecolor = self.world.GRAY
       eyeshape = "circle"
       intensity = 2 + round(hunger / theGroc.hungerThreshold * 6)
-    elif theGroc.mood == theGroc.DANCING:
+    elif theGroc.mood == theGroc.Mood.DANCING:
       eyecolor = self.worldColor
       eyeshape = "circle"
       intensity = 2
-    elif theGroc.mood == theGroc.EATING:
+    elif theGroc.mood == theGroc.Mood.EATING:
       eyecolor = self.worldColor
       eyeshape = "circle"
       intensity = 2
-    elif theGroc.mood == theGroc.SLEEPING:
+    elif theGroc.mood == theGroc.Mood.SLEEPING:
       eyecolor = self.worldColor
       eyeshape = "circle"
       intensity = 2
@@ -173,14 +173,14 @@ class Renderer():
         halocolor = self.world.GREEN
       pygame.draw.circle(self.screen, halocolor, (newX, newY), 10)
     pygame.draw.circle(self.screen, groccolor, (newX, newY),9)
-    if theGroc.mood == theGroc.SLEEPING:
+    if theGroc.mood == theGroc.Mood.SLEEPING:
       frame = ((theGroc.id + 
                 self.world.currentTick - theGroc.moodSince) % 100) 
       intensity = 3 + (abs(60 - frame)/50*3)
       mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
       pygame.draw.circle(self.screen, eyecolor,
                            (newX + mouthCenter , newY), intensity)
-    elif theGroc.mood == theGroc.EATING:
+    elif theGroc.mood == theGroc.Mood.EATING:
       cycle = 10
       frame = ((theGroc.id + 
                 self.world.currentTick - theGroc.moodSince) % cycle)
@@ -188,7 +188,7 @@ class Renderer():
       mouthCenter = (9 - (intensity/2)) * theGroc.faceTowards
       pygame.draw.circle(self.screen, eyecolor,
                            (newX + mouthCenter , newY), intensity)
-    elif theGroc.mood == theGroc.DANCING:
+    elif theGroc.mood == theGroc.Mood.DANCING:
       cycle = 8
       if theGroc.orbitalAnchor == None:
         x, y = 0,0

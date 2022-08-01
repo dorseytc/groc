@@ -44,8 +44,6 @@ import time
 
 import groc
 import food
-import grr_pygame as render
-#import grr_pipe as render
 import settings
 #
 #
@@ -82,27 +80,27 @@ class World():
     
    
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, graphics=True):
+        #renderer
         self.MAXX = x
         self.MAXY = y
         #population counts
-        self.happy = 0
-        self.lonely = 0
-        self.crowded = 0
-        self.hungry = 0
-        self.dead = 0
-        self.cold = 0
-        self.sleeping = 0
-        self.eating = 0
-        self.population = 0
+        self.moodCounts = dict()
         self.foodList = []
+        self.population = 0
         #technical pointers
         self.currentTick = 0    
         self.currentTime = time.time()
         self.defaultTick = .1
         self.logger = None
-        self.render = render.Renderer(self)
         self.mute = K_MUTE
+        #renderer
+        if graphics:
+          import grr_pygame as render
+        else:
+          import grr_text as render
+        self.render = render.Renderer(self)
+ 
         if os.path.exists(self.WORLDFILE):
           self.worldFile = open(self.WORLDFILE, "r")
           line = self.worldFile.readline()
@@ -291,7 +289,7 @@ class World():
         if grocsRead < numGrocs:
           for count in range(0, (numGrocs - grocsRead)):
             newX, newY = self.randomLocation()
-            newGroc = groc.Groc(self, groc.Groc.HAPPY, newX, newY)
+            newGroc = groc.Groc(self, groc.Groc.Mood.HAPPY, newX, newY)
             newGroc.identify()
             self.render.drawGrocStatic(newGroc, newX, newY)
             builtList.append(newGroc)
@@ -355,16 +353,6 @@ class World():
 
 # world.handleGrocs
     def handleGrocs(self):
-        movingCount = 0
-        happyCount = 0
-        lonelyCount = 0
-        crowdedCount = 0
-        hungryCount = 0
-        deadCount = 0
-        coldCount = 0
-        sleepingCount = 0
-        eatingCount = 0
-        dancingCount = 0
         i = 0
         while i < len(self.grocList):
           if self.grocList[i].fp <= -5:
@@ -373,57 +361,35 @@ class World():
             self.createFood(500, deadGroc.x, deadGroc.y)
           else:
             i += 1
+        for item in groc.Groc.Mood:
+          self.moodCounts[item] = 0
         for thisGroc in self.grocList: 
           oldX = thisGroc.x
           oldY = thisGroc.y
           thisGroc.observe() 
           thisGroc.decide()
           thisGroc.act()
-          if thisGroc.didMove(oldX, oldY):
-            movingCount += 1
-          if thisGroc.mood == groc.Groc.HAPPY:
-            happyCount += 1
-          elif thisGroc.mood == groc.Groc.LONELY:
-            lonelyCount += 1
-          elif thisGroc.mood == groc.Groc.CROWDED:
-            crowdedCount += 1
-          elif thisGroc.mood == groc.Groc.HUNGRY:
-            hungryCount += 1
-          elif thisGroc.mood == groc.Groc.DEAD:
-            deadCount += 1 
-          elif thisGroc.mood == groc.Groc.COLD:
-            coldCount += 1
-          elif thisGroc.mood == groc.Groc.SLEEPING:
-            sleepingCount += 1
-          elif thisGroc.mood == groc.Groc.EATING:
-            eatingCount += 1
-          elif thisGroc.mood == groc.Groc.DANCING:
-            dancingCount += 1
-        self.setStats(happyCount, lonelyCount, crowdedCount, 
-                      hungryCount, deadCount, coldCount, 
-                      sleepingCount, eatingCount, dancingCount)
+          if thisGroc.mood in self.moodCounts:  
+            self.moodCounts[thisGroc.mood] += 1
+          else:
+            self.moodCounts[thisGroc.mood] = 1
+        self.population = sum(self.moodCounts.values())
+         
 
 # world.identify
     def identify(self):
       nl = self.NEWLINE      
       identity = (
         "Current Tick: " + str(self.currentTick) + nl + 
-        " Light Level: " + str(round(self.getLightLevel()*100)) + "%" + nl +
+        "       Light: " + str(round(self.getLightLevel()*100)) + "%" + nl +
         "         Air: " + str(round(self.airTemperature*100)) + 
                            self.DEGREESIGN + nl +
         "      Ground: " + str(round(self.groundTemperature*100)) + 
                            self.DEGREESIGN + nl +
-        " Total Grocs: " + str(self.population) + nl +
-        "        Cold: " + str(self.cold) + nl + 
-        "     Crowded: " + str(self.crowded) + nl + 
-        "     Dancing: " + str(self.dancing) + nl +
-        "        Dead: " + str(self.dead) + nl + 
-        "      Eating: " + str(self.eating) + nl + 
-        "       Happy: " + str(self.happy) + nl + 
-        "      Hungry: " + str(self.hungry) + nl + 
-        "      Lonely: " + str(self.lonely) + nl + 
-        "    Sleeping: " + str(self.sleeping) + nl + 
-        " ")
+        " Total Grocs: " + str(self.population) + nl) 
+      for key, count in self.moodCounts.items():
+        identity = (identity + 
+                    format(key.value).rjust(12) + ": " + str(count) + nl)
       return identity
 
 # world.ifNone
@@ -460,7 +426,7 @@ class World():
       
 # world.isEnabled
     def isEnabled(self, state):
-      if state in settings.enabledStates:
+      if state.value in settings.enabledStates:
         result = True  
       else:
         result = False
@@ -518,25 +484,10 @@ class World():
         self.worldFile.write(self.dump())
         self.worldFile.close()
 
-# world.setStats
-    def setStats(self, happy, lonely, crowded, hungry, 
-                 dead, cold, sleeping, eating, dancing):
-        self.happy = happy 
-        self.lonely = lonely
-        self.crowded = crowded
-        self.hungry = hungry
-        self.cold = cold
-        self.sleeping = sleeping
-        self.eating = eating
-        self.dead = dead
-        self.dancing = dancing
-        self.population = (happy + lonely + crowded + dancing + 
-                           hungry + cold + eating + sleeping)
-
 # world.spawnFood
     def spawnFood(self, calories=None, x=None, y=None):
         if calories == None:
-          foodCalories = 500 + (10 * self.hungry)
+          foodCalories = 500 + (10 * self.moodCounts[groc.Groc.Mood.HUNGRY])
           foodCalories = foodCalories * self.lightLevel
         else:
           foodCalories = calories * self.lightLevel

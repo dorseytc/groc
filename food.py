@@ -9,6 +9,7 @@
 #   TDORSEY  2022-06-16  Support "GrocTime"
 
 
+import groc
 import time
 
 class Food():
@@ -19,7 +20,7 @@ class Food():
         if None in (x, y):
           x, y = world.randomLocation()
         if None == calories:
-          self.calories = 500 + self.world.hungry 
+          self.calories = 500 + self.world.moodCounts[groc.Groc.Mood.HUNGRY]
         else:
           self.calories = calories
         self.x = x
@@ -55,11 +56,12 @@ class Food():
 #food.identify
     def identify(self):
       nl = self.world.NEWLINE
-      identity = ("   Calories: " + str(self.calories) + nl +
-                  "        X,Y: " + str(self.x) + "," + str(self.y) + nl + 
-                  "      Value: " + str(self.value) + nl + 
-                  "      Count: " + str(len(self.world.foodList)) + nl + 
-                  "     Hungry: " + str(self.world.hungry) + nl + 
-                  "Light Level: " + 
+      identity = (" Calories: " + str(self.calories) + nl +
+                  "      X,Y: " + str(self.x) + "," + str(self.y) + nl + 
+                  "    Value: " + str(self.value) + nl + 
+                  "    Count: " + str(len(self.world.foodList)) + nl + 
+                  "   Hungry: " + 
+                    str(self.world.moodCounts[groc.Groc.Mood.HUNGRY]) + nl +
+                  "    Light: " + 
                       str(round(self.world.lightLevel*100))+ "%" + nl)
       return identity 

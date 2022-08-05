@@ -33,6 +33,7 @@
 #                        World file format change
 #   TDORSEY  2022-07-03  Is there food?
 #   TDORSEY  2022-07-27  Improved identify output
+#   TDORSEY  2022-08-05  Fix 12 a.m. world clock
 
 
 
@@ -163,6 +164,9 @@ class World():
           tag = " pm "
         elif hour == 12:
           tag = " pm "
+        elif hour == 0:
+          hour = 12
+          tag = " am "
         else:
           tag = " am "
         return (str(hour) + ":" + str(minute).zfill(2) + tag)

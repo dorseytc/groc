@@ -310,9 +310,7 @@ class Groc():
             and self.fp >= self.hungerThreshold 
             and self.sp >= self.sleepThreshold
             and (self.world.currentTick - self.moodSince) < 1000
-            and (self.world.lightLevel < self.world.previousLightLevel
-                 or
-                 self.world.lightLevel == 0)): 
+            and self.world.lightLevel < .5):
         self.setMood(Groc.Mood.DANCING, "Time to dance")
       elif (self.world.isEnabled(Groc.Mood.COLD) and 
             self.world.airTemperature < .45 and
@@ -336,7 +334,9 @@ class Groc():
               maxDistance) > self.getComfortZone()):
         self.setMood(Groc.Mood.LONELY, "Grocs too far away")
       elif (self.world.isEnabled(Groc.Mood.SLEEPING) and 
-            self.mood == Groc.Mood.SLEEPING):
+            self.mood == Groc.Mood.SLEEPING and
+            (self.world.currentTick - self.moodSince < 2000 or 
+             self.world.getLightLevel() == 0)):
         self.setMood(Groc.Mood.SLEEPING, "Still asleep")
       else:
         self.setMood(Groc.Mood.HAPPY, "Feeling groovy")
@@ -555,16 +555,19 @@ class Groc():
                         mood=None, 
                         mustHaveTarget=False, 
                         grocList=None):
+        'find the nearest groc, optionally searching for a groc '
+        'with a specific mood, or having a target'
         if grocList == None:
           grocList = self.world.grocList
         leastDist = self.world.maxDistance
         nearestGroc = None
-        for anotherGroc in self.world.grocList:
+        for anotherGroc in grocList:
           if (anotherGroc.id == self.id):
             pass
           elif (anotherGroc.mood == Groc.Mood.DEAD):
             pass
-          elif (None in (anotherGroc.targetX, anotherGroc.targetY) and 
+          elif (None in (anotherGroc.targetX, 
+                         anotherGroc.targetY) and 
                 mustHaveTarget == True):
             pass
           elif (anotherGroc.mood == mood or mood == None):
@@ -581,6 +584,7 @@ class Groc():
     
 # groc.geneticAttributes
     def geneticAttributes(self):
+        'return gender (and eventually other) genetically determined attributes of the groc'
         seed = random.randint(1, self.world.MAXX) 
         if seed % 2 == 0:
           gender = Groc.Gender.FEMALE
@@ -596,7 +600,7 @@ class Groc():
 
 # groc.getAgeYMD
     def getAgeYMD(self):
-        'string describing age x years, y days'
+        'return age in years,months,days'
         totaldays = self.getAge()
         years = int(totaldays / 360)
         months = int((totaldays - (years*360))/ 30)
@@ -605,6 +609,7 @@ class Groc():
   
 # groc.getAgeText
     def getAgeText(self):
+        'return a human-readable string describing ones age'
         years, months, days = self.getAgeYMD()
         agetext = "Newborn"
         if years > 0:

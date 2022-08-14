@@ -70,11 +70,11 @@ def main():
           if mood == groc.Groc.DEAD: 
             groccolor = world.World.BLACK
             eyecolor = world.World.BLACK
-          elif mood == groc.Groc.LONELY:
+          elif mood == groc.Groc.Mood.LONELY:
             eyecolor = world.World.WHITE
-          elif mood == groc.Groc.CROWDED:
+          elif mood == groc.Groc.Mood.CROWDED:
             eyecolor = world.World.BLACK
-          elif mood == groc.Groc.HUNGRY:
+          elif mood == groc.Groc.Mood.HUNGRY:
             eyecolor = world.World.GRAY
           else:
             # mood == groc.Groc.HAPPY:

@@ -56,27 +56,31 @@
 #   TDORSEY  2022-07-10  More grockish dancing
 
 import random
+from enum import Enum
 
 class Groc():
     'Base class for the groc'
-    MALE = "M"
-    FEMALE = "F"
+    class Gender(Enum):
+      MALE = "M"
+      FEMALE = "F"
+    class Mood(Enum):
     # MOODS
-    COLD = "Cold"
-    CROWDED = "Crowded"
-    DANCING = "Dancing"
-    EATING = "Eating"
-    HAPPY = "Happy"
-    LONELY = "Lonely"
-    HUNGRY = "Hungry"
-    DEAD = "Dead"
-    SLEEPING = "Sleeping"
+      COLD = "Cold"
+      CROWDED = "Crowded"
+      DANCING = "Dancing"
+      EATING = "Eating"
+      HAPPY = "Happy"
+      LONELY = "Lonely"
+      HUNGRY = "Hungry"
+      DEAD = "Dead"
+      SLEEPING = "Sleeping"
 
     
     def __init__(self, world, mood, x, y, 
                  id=None, birthTick=None, 
                  gender=None, 
-                 fp=80):
+                 fp=80, 
+                 sp=100):
         
         #super(Groc, self).__init__()
 
@@ -90,24 +94,21 @@ class Groc():
         self.targetY = None
         self.urgency = 1
         self.targetComment = None
-        self.orbitAnchor = None
+        self.orbitalAnchor = None
         self.orbitalIndex = None
         self.orbitalPoints = None
-        self.orbitalLeader = None
-        self.orbiterNumber = None
         self.communityCount = 0
         self.personalCount = 0
         #personal variables (the result of decisions and actions)
         self.fp = fp
-        self.sp = 100
-        self.mood = mood
+        self.sp = sp
+        self.mood = Groc.Mood(mood)
         self.moodComment = "Initial mood"
         self.moodSince = self.world.currentTick
         self.x = int(x)
         self.y = int(y)
         # constants 
         self.maxfp = 100
-        self.maxsp = 100
         self.hungerThreshold = 66 + self.world.d6(3)
         self.sleepThreshold = 30
         self.metabolism = .01
@@ -130,7 +131,7 @@ class Groc():
         if gender is None:
           self.gender = self.geneticAttributes() 
         else:
-          self.gender = gender
+          self.gender = Groc.Gender(gender)
         if self.world.percentage() < 50:
           self.faceTowards = -1
         else:
@@ -150,7 +151,7 @@ class Groc():
     def act(self):
       'take action'
       'determine motion'
-      if self.mood == self.DEAD:  
+      if self.mood == self.Mood.DEAD:  
         moving = False
       elif None in (self.targetX, self.targetY):
         moving = False
@@ -172,22 +173,21 @@ class Groc():
       'move, or sit still; expend energy accordingly'
       if moving == True:
         self.moveTowardTarget(self.urgency)
-        if self.mood == Groc.DANCING:
+        if self.mood == Groc.Mood.DANCING:
           self.fp = self.fp - self.metabolism
         else:
-          self.fp = self.fp - (2 * self.metabolism)
-        self.sp = self.sp - self.metabolism/2
+          self.fp = self.fp - (2 * self.metabolism * self.urgency)
+        self.sp = self.sp - (self.urgency * 2)
+      elif self.mood == Groc.Mood.SLEEPING:
+        self.world.render.maybeDraw(self, self.x, self.y)
       else:
-        'moving == False'
+        'moving = False'
+        self.sp = self.sp - self.urgency
         if self.world.lightLevel == 0:
           self.fp = self.fp - (self.metabolism/2)
-          if self.mood == Groc.SLEEPING:
-            pass
-          else:
-            self.sp = self.sp - (self.metabolism/8)
         else:
           self.fp = self.fp - self.metabolism
-          self.sp = self.sp - (self.metabolism/4)
+        self.sp = self.sp - self.urgency
         if (self.world.ifNone(
              self.world.findDistance(self, self.nearestGroc), 
              self.world.maxDistance) < self.getPersonalSpace()):
@@ -203,7 +203,7 @@ class Groc():
       for otherGroc in nearbyGrocs:
         if otherGroc.nearestFood is None:
           pass
-        elif otherGroc.mood in (Groc.SLEEPING, Groc.DEAD):
+        elif otherGroc.mood in (Groc.Mood.SLEEPING, Groc.Mood.DEAD):
           pass
         else: 
           thisDist = self.world.findDistance(self, otherGroc.nearestFood) 
@@ -239,7 +239,7 @@ class Groc():
         bestPopulation = 0
       else:
         bestPopulation = 100000
-      if self.gender == Groc.MALE:
+      if self.gender == Groc.Gender.MALE:
         direction = -1
       else:
         direction = 1
@@ -278,94 +278,90 @@ class Groc():
       'count within a given radius'
       count = 0
       for anotherGroc in self.world.grocList:
-        if not (anotherGroc.id == self.id):
+        if (anotherGroc.id == self.id):
+          pass
+        elif (anotherGroc.mood == Groc.Mood.DEAD):
+          pass
+        else:
           zdist = self.world.findDistanceXY(x, y, 
                                           anotherGroc.x, anotherGroc.y)
           if zdist <= searchRadius:
             count += 1
       return count     
 
-# groc.countGrocsInOrbit
-    def countGrocsInOrbit(self, anchor):
-      count = 0
-      for anotherGroc in self.world.grocList: 
-        if anotherGroc.orbitAnchor == None:
-          pass
-        elif anotherGroc.id == self.id:
-          pass
-        elif (anotherGroc.orbitAnchor.x == anchor.x and
-            anotherGroc.orbitAnchor.y == anchor.y ):
-          count += 1
-      return count
-       
 # groc.decide
     def decide(self):
       'decide what to do'
       'set mood'
       maxDistance = self.world.maxDistance
-      self.urgency = 1
-      if (self.world.isEnabled(Groc.DEAD) 
+      #self.urgency = 1
+      if (self.world.isEnabled(Groc.Mood.DEAD) 
           and self.fp < 0):
-        self.setMood(Groc.DEAD, str(self.fp)+" food points")
-      elif (self.world.isEnabled(Groc.DANCING) 
-            and not self.world.ifNone(self.orbitAnchor, self.nearestFood) 
-                    == None
-            and self.fp >= self.hungerThreshold 
-            and self.sp >= self.sleepThreshold
-            and self.world.lightLevel < 1): 
-        self.setMood(Groc.DANCING, "Time to dance")
-      elif (self.world.isEnabled(Groc.COLD) and 
-            self.world.airTemperature < .45 and
-            self.communityCount < self.getPreferredCommunitySize()):
-        self.setMood(Groc.COLD, "Cold with no shelter")
-      elif (self.world.isEnabled(Groc.HUNGRY) and
-            self.fp < self.hungerThreshold and 
-            not self.nearestFood is None):
-        self.setMood(Groc.HUNGRY, "I can find food")
-      elif (self.world.isEnabled(Groc.EATING) and
+        self.setMood(Groc.Mood.DEAD, str(self.fp)+" food points")
+      elif (self.world.isEnabled(Groc.Mood.EATING) and
             self.fp < self.maxfp and 
             self.world.ifNone(
               self.world.findDistance(self, self.nearestFood), 
               maxDistance) < self.getPersonalSpace()):
-        self.setMood(Groc.EATING, "There is food right here")
-      elif (self.world.isEnabled(Groc.CROWDED) 
+        self.setMood(Groc.Mood.EATING, "There is food right here")
+      elif (self.world.isEnabled(Groc.Mood.DANCING) 
+            and not self.world.ifNone(self.orbitalAnchor, self.nearestFood) 
+                    == None
+            and self.fp >= self.hungerThreshold 
+            and self.sp >= self.sleepThreshold
+            and (self.world.currentTick - self.moodSince) < 1000
+            and self.world.lightLevel < .5):
+        self.setMood(Groc.Mood.DANCING, "Time to dance")
+      elif (self.world.isEnabled(Groc.Mood.COLD) and 
+            self.world.airTemperature < .45 and
+            self.communityCount < self.getPreferredCommunitySize()):
+        self.setMood(Groc.Mood.COLD, "Cold with no shelter")
+      elif (self.world.isEnabled(Groc.Mood.HUNGRY) and
+            self.fp < self.hungerThreshold and 
+            not self.nearestFood is None):
+        self.setMood(Groc.Mood.HUNGRY, "I can find food")
+      elif (self.world.isEnabled(Groc.Mood.CROWDED) 
             and self.world.ifNone(
               self.world.findDistance(self, self.nearestGroc), 
               maxDistance) < self.getPersonalSpace()):
-        self.setMood(Groc.CROWDED, "Grocs in my space")
-      elif (self.world.isEnabled(Groc.HUNGRY) and 
+        self.setMood(Groc.Mood.CROWDED, "Grocs in my space")
+      elif (self.world.isEnabled(Groc.Mood.HUNGRY) and 
             self.fp < self.hungerThreshold):
-        self.setMood(Groc.HUNGRY, "Can't find food")
-      elif (self.world.isEnabled(Groc.LONELY) and 
+        self.setMood(Groc.Mood.HUNGRY, "Can't find food")
+      elif (self.world.isEnabled(Groc.Mood.LONELY) and 
             self.world.ifNone(
               self.world.findDistance(self, self.nearestGroc), 
               maxDistance) > self.getComfortZone()):
-        self.setMood(Groc.LONELY, "Grocs too far away")
-      elif (self.world.isEnabled(Groc.SLEEPING) and 
-            self.mood == Groc.SLEEPING):
-        self.setMood(Groc.SLEEPING, "Still asleep")
+        self.setMood(Groc.Mood.LONELY, "Grocs too far away")
+      elif (self.world.isEnabled(Groc.Mood.SLEEPING) and 
+            self.mood == Groc.Mood.SLEEPING and
+            (self.world.currentTick - self.moodSince < 2000 or 
+             self.world.getLightLevel() == 0)):
+        self.setMood(Groc.Mood.SLEEPING, "Still asleep")
       else:
-        self.setMood(Groc.HAPPY, "Feeling groovy")
+        self.setMood(Groc.Mood.HAPPY, "Feeling groovy")
   
-      if (self.world.isEnabled(Groc.SLEEPING) and 
-          self.mood == Groc.HAPPY and 
-         (self.world.currentTick - self.moodSince) > 100 and
-          self.world.getLightLevel() == 0):
-         self.setMood(Groc.SLEEPING, "Catching some Zs")
+      if (self.world.isEnabled(Groc.Mood.SLEEPING) and 
+            self.mood == Groc.Mood.HAPPY and 
+            (self.world.currentTick - self.moodSince) > 100 and
+            (self.world.getLightLevel() == 0 
+             or
+             self.sp < 0)):
+         self.setMood(Groc.Mood.SLEEPING, "Catching some Zs")
 
       'set target'
-      if self.mood == Groc.DEAD:
+      if self.mood == Groc.Mood.DEAD:
         pass
-      elif self.mood == Groc.DANCING:
-        if self.orbitAnchor == None: 
+      elif self.mood == Groc.Mood.DANCING:
+        if self.orbitalAnchor == None: 
           self.doDance(self.nearestFood, 100)
         else:
-          self.doDance(self.orbitAnchor, 100)
+          self.doDance(self.orbitalAnchor, 100)
       elif self.targetX == self.x and self.targetY == self.y:
         self.setTarget(None, None, "Arrived")
-      elif self.mood == Groc.HAPPY:
+      elif self.mood == Groc.Mood.HAPPY:
         self.setTarget(None, None, "Stay put when you're happy")
-      elif self.mood == Groc.HUNGRY:
+      elif self.mood == Groc.Mood.HUNGRY:
         if self.nearestFood is None:
           if self.rumoredFood is None:
             self.setTarget(None, None, "Nobody knows where food is")
@@ -384,9 +380,9 @@ class Groc():
           if (self.fp < (self.hungerThreshold/2) and
             self.countFoodCompetitors(self.nearestFood) > 0): 
               self.urgency = 2
-      elif self.mood == Groc.EATING:
+      elif self.mood == Groc.Mood.EATING:
           self.setTarget(None, None, "Nom nom")
-      elif self.mood == Groc.LONELY:
+      elif self.mood == Groc.Mood.LONELY:
         if self.nearestGroc == None:
           self.setTarget(None, None, "I ain't got nobody")
         else:  
@@ -394,7 +390,7 @@ class Groc():
                          "I detect a friend nearby")
           if (self.world.currentTick - self.moodSince) > 100: 
             self.urgency = 2
-      elif self.mood == Groc.COLD:
+      elif self.mood == Groc.Mood.COLD:
         if not (self.nearestFood == None):
           self.setTarget(self.nearestFood.x, self.nearestFood.y,
                          "Cold and headed to food")
@@ -414,7 +410,7 @@ class Groc():
                 self.world.findDistance(self, self.nearestGroc), 
                 maxDistance) <= self.getComfortZone()):
           self.setTarget(None, None, "Cold next to a friend")
-      elif self.mood == Groc.CROWDED:
+      elif self.mood == Groc.Mood.CROWDED:
         if self.targetX is None and self.targetY is None:
           pct = self.world.percentage()
           if pct <= (100-self.impatience):
@@ -448,11 +444,14 @@ class Groc():
 
 # groc.dump
     def dump(self):
-        return ("groc.Groc(self, '" + self.mood + "', " + 
+        return ("groc.Groc(self, '" + self.mood.value + "', " + 
                 "self.bindX(" + str(self.x) + "), " + 
                 "self.bindY(" + str(self.y) + "), " + 
-                str(self.id) + ", " + str(self.birthTick) + ", '" + 
-                self.gender +  "'," + str(round(self.fp, 3)) + ")" + 
+                str(self.id) + ", " + 
+                str(self.birthTick) + ", '" + 
+                self.gender.value +  "'," + 
+                str(round(self.fp, 3)) + ", " + 
+                str(round(self.sp, 3)) + ")" + 
                 self.world.NEWLINE)
 
 # groc.findBiggestFood
@@ -468,6 +467,8 @@ class Groc():
           if (anotherGroc.id == self.id):
             pass
           elif not (anotherGroc.nearestFood == theFood):
+            pass
+          elif (anotherGroc.mood == Groc.Mood.DEAD):
             pass
           elif (self.world.findDistance(self, anotherGroc) > 
                 self.getVisualRange()):
@@ -486,6 +487,8 @@ class Groc():
         for anotherGroc in self.world.grocList:
           if (anotherGroc.id == self.id):
             pass
+          elif (anotherGroc.mood == Groc.Mood.DEAD):
+            pass
           else:
             thisDist = self.world.findDistance(self, anotherGroc)
             if anotherGroc.communityCount > biggestGroup: 
@@ -503,7 +506,7 @@ class Groc():
 
 # groc.findNearestFood
     def findNearestFood(self):
-        if self.gender == self.FEMALE:
+        if self.gender == self.Gender.FEMALE:
           leastDist = self.world.maxDistance
           nearestFood = None
           for someFood in self.world.foodList:
@@ -539,6 +542,8 @@ class Groc():
       for anotherGroc in self.world.grocList:
         if (anotherGroc.id == self.id):
           pass
+        elif (anotherGroc.mood == Groc.Mood.DEAD):
+          pass
         elif radius <= self.world.findDistance(self, anotherGroc):
           nearbyGrocs.append(anotherGroc)
         else:
@@ -550,14 +555,19 @@ class Groc():
                         mood=None, 
                         mustHaveTarget=False, 
                         grocList=None):
+        'find the nearest groc, optionally searching for a groc '
+        'with a specific mood, or having a target'
         if grocList == None:
           grocList = self.world.grocList
         leastDist = self.world.maxDistance
         nearestGroc = None
-        for anotherGroc in self.world.grocList:
+        for anotherGroc in grocList:
           if (anotherGroc.id == self.id):
             pass
-          elif (None in (anotherGroc.targetX, anotherGroc.targetY) and 
+          elif (anotherGroc.mood == Groc.Mood.DEAD):
+            pass
+          elif (None in (anotherGroc.targetX, 
+                         anotherGroc.targetY) and 
                 mustHaveTarget == True):
             pass
           elif (anotherGroc.mood == mood or mood == None):
@@ -574,14 +584,67 @@ class Groc():
     
 # groc.geneticAttributes
     def geneticAttributes(self):
+        'return gender (and eventually other) genetically determined attributes of the groc'
         seed = random.randint(1, self.world.MAXX) 
         if seed % 2 == 0:
-          gender = Groc.FEMALE
+          gender = Groc.Gender.FEMALE
         else:
-          gender = Groc.MALE
+          gender = Groc.Gender.MALE
         # additional attributes added later
         return gender
 
+# groc.getAge
+    def getAge(self):
+        'number of days old'
+        return round((self.world.currentTick - self.birthTick)/10000)
+
+# groc.getAgeYMD
+    def getAgeYMD(self):
+        'return age in years,months,days'
+        totaldays = self.getAge()
+        years = int(totaldays / 360)
+        months = int((totaldays - (years*360))/ 30)
+        days = int((totaldays - (years*360) - (months * 30)))
+        return years,months,days
+  
+# groc.getAgeText
+    def getAgeText(self):
+        'return a human-readable string describing ones age'
+        years, months, days = self.getAgeYMD()
+        agetext = "Newborn"
+        if years > 0:
+          agetext = str(years) 
+          if years == 1:
+            agetext = agetext + " year "
+          else:
+            agetext = agetext + " years " 
+        if months > 0:
+          agetext = agetext + str(months)
+          if months == 1:
+            agetext = agetext + " month "
+          else:
+            agetext = agetext + " months " 
+        if days > 0:
+          agetext = agetext + str(days) 
+          if days == 1:
+            agetext = agetext + " day"
+          else:
+            agetext = agetext + " days"
+        return agetext
+
+# groc.getAgeBracket
+    def getAgeBracket(self):
+      years, months, days = self.getAgeYMD()
+      if years < 1:
+        bracket = "Baby"
+      elif years < 20:
+        bracket = "Child"
+      elif years < 60:
+        bracket = "Adult"
+      else:
+        bracket = "Old"
+      return bracket
+      
 # groc.getComfortZone
     def getComfortZone(self):
         return self.defaultComfortZone
@@ -633,7 +696,10 @@ class Groc():
                       " was born at " + str(self.birthTick))
         nl = self.world.NEWLINE
         identity = (
-          "Id: " + str(self.id) + " Gender: " + self.gender + 
+          "Id: " + str(self.id) + " Gender: " + str(self.gender.value) + 
+          " " + self.getAgeBracket() + 
+          nl + 
+          self.getAgeText() + 
           nl + 
           "Location " + str(self.x) + "," + str(self.y) + 
           nl + 
@@ -642,7 +708,7 @@ class Groc():
           nl + 
           self.world.ifNone(self.targetComment, "") + 
           nl + 
-          "Mood: " + self.mood + 
+          "Mood: " + self.mood.value + 
           " Duration: " + str(self.world.currentTick - self.moodSince) +
           nl + 
           self.world.ifNone(self.moodComment, "") + 
@@ -660,21 +726,12 @@ class Groc():
           nl + 
           "Community Size: " + str(self.communityCount) +
           nl) 
-        if not None == self.orbitAnchor:
+        if not None == self.orbitalAnchor:
           identity = (identity + 
-            "Orbiting: " + str(self.orbitAnchor) + 
+            "Orbiting: " + str(self.orbitalAnchor) + 
             nl + 
             "OrbitalIndex: " + str(self.orbitalIndex) + 
             nl )
-        if not None == self.orbitalLeader:
-          identity = (identity + 
-            "leader.orbiterNumber " + 
-            str(self.orbitalLeader.orbiterNumber) +
-            nl + 
-            "leader.orbitalIndex " + 
-            str(self.orbitalLeader.orbitalIndex) + 
-            nl )
-            
         return identity 
  
 # groc.moveAwayFrom
@@ -723,7 +780,8 @@ class Groc():
         else:
           self.rumoredFood = None
         
-        self.nearestHungryGroc = self.findNearestGroc(Groc.HUNGRY, True)
+        self.nearestHungryGroc = self.findNearestGroc(
+                                   Groc.Mood.HUNGRY, True)
         self.communityCount = self.countNearbyGrocs(
                                    self.getCommunitySpace(), 
                                    self.x, self.y) + 1
@@ -731,18 +789,23 @@ class Groc():
                                    self.getPersonalSpace(), 
                                    self.x, self.y)
         self.mostCrowdedGroc = self.findMostCrowdedGroc()         
+        if self.orbitalAnchor == None:
+          pass
+        elif self.world.foodIsGone(self.orbitalAnchor.x, 
+                                  self.orbitalAnchor.y):
+          self.orbitalAnchor = None
         #other observations eventually
 
 # groc.findNearestOrbitalIndex
     def findNearestOrbitalIndex(self):
-      assert None not in (self.orbitAnchor, 
+      assert None not in (self.orbitalAnchor, 
         self.orbitalPoints), "invalid parms"
       closestDist = self.world.maxDistance
       for i in range(len(self.orbitalPoints)):
         pos = self.orbitalPoints[i]
         zdist = self.world.findDistanceXY(self.x, self.y, 
-                  pos[0] + self.orbitAnchor.x, 
-                  pos[1] + self.orbitAnchor.y)
+                  pos[0] + self.orbitalAnchor.x, 
+                  pos[1] + self.orbitalAnchor.y)
         if zdist < closestDist:
           closestDist = zdist
           closestIndex = i 
@@ -755,8 +818,8 @@ class Groc():
       assert None not in (anchor, radius, points), "invalid parms"
       def getNthStation(currentStation, n):
         return (currentStation + n) % points
-      if not (self.orbitAnchor == anchor):
-        self.orbitAnchor = anchor
+      if not (self.orbitalAnchor == anchor):
+        self.orbitalAnchor = anchor
         self.orbitalPoints = self.world.pointsOnACircle(radius, points)
         self.orbitalIndex = self.findNearestOrbitalIndex()
         newX, newY = self.orbitalPoints[self.orbitalIndex]
@@ -788,17 +851,15 @@ class Groc():
         
 # groc.exitOrbit
     def exitOrbit(self):
-      self.orbiterNumber = None
-      self.orbitAnchor = None
+      self.orbitalAnchor = None
       self.orbitalIndex = None
       self.orbitalPoints = None
-      self.orbitalLeader = None
 
 # groc.isInSameOrbit
     def isInSameOrbit(self, other):
       if other == None:
         result = False
-      elif self.orbitAnchor == other.orbitAnchor:
+      elif self.orbitalAnchor == other.orbitalAnchor:
         result = True
       else:
         result = False
@@ -810,19 +871,17 @@ class Groc():
         if self.mood == newMood:
           pass
         else:
-          if newMood == Groc.DEAD:
+          self.urgency = 1
+          if newMood == Groc.Mood.DEAD:
             self.identify()
             print("Groc died (" + str(self.id) + 
               ") " + str(self.world.currentGrocTime()))
             self.world.render.drawDeath(self)
-          elif self.mood == Groc.DANCING:
+          elif self.mood == Groc.Mood.DANCING:
             self.exitOrbit()
-          elif self.mood == Groc.SLEEPING:
+          elif self.mood == Groc.Mood.SLEEPING:
             sleepTicks = self.world.currentTick - self.moodSince
-            if sleepTicks < 200:
-              pass
-            else:
-              self.sp = min(100, self.sp + (sleepTicks * .025))
+            self.sp = min(100000, self.sp + ((sleepTicks ** 2)/1000))
           self.mood = newMood
           self.moodSince = self.world.currentTick
           self.world.render.drawGrocStatic(self, self.x, self.y)

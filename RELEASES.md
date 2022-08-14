@@ -1,11 +1,15 @@
 ## Release Notes
 
-### dance (v0.12.0) -- in progress
+### death (v0.13.0) -- not started
+- hitpoints are calculated
+- starvation can occur, but slowly
+- grocs can carry food to grocs 
+- burial ritual?
+
+### dance (v0.12.0) -- completed
 - groc, food, world on-screen inspection gauge
 - sundown ritual
 - better survival of dark and cold
-- food gathering
-- fire?  
 - global settings.py file for behavior configuration
 
 ### order (v0.11.0) -- completed

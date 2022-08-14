@@ -2,8 +2,9 @@
 
 ## to run, try something like 
 
-python3 run.py
-./run.py
+- python3 run.py
+- ./run.py
+- ./run.py 200 0
 
 ### FYI
 

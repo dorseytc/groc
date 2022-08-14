@@ -1,10 +1,17 @@
 ## Release Notes
 
-### death (v0.13.0) -- not started
-- hitpoints are calculated
-- starvation can occur, but slowly
-- grocs can carry food to grocs 
-- burial ritual?
+### scroll (v0.14.0) -- started
+- larger world, scrollable
+- region numbers
+- activity happens only in loaded regions
+- subdivided groc list by region
+- paving the way for terrain and large worlds
+
+### death (v0.13.0) -- completed
+- 12:00 a.m. clock fix
+- text based no-pipe renderer
+- change highlighting 
+- improved dancing animations
 
 ### dance (v0.12.0) -- completed
 - groc, food, world on-screen inspection gauge
